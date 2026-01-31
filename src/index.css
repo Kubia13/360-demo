@@ -1,0 +1,10 @@
+@font-face {
+  font-family: "Armegoe";
+  src: url("/fonts/Armegoe.ttf") format("truetype");
+}
+
+body {
+  margin: 0;
+  font-family: "Armegoe", sans-serif;
+  background: #f6f7fb;
+}
