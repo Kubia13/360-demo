@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Armegoe";
-  src: url("/fonts/Armegoe.ttf") format("truetype");
+  src: url("./assets/Armegoe.ttf") format("truetype");
 }
 
 body {
