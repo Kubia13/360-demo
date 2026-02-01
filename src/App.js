@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./index.css";
 
-/* ---------- Reusable Card ---------- */
+/* Card Component */
 function Card({ title, subtitle, to }) {
   return (
     <Link to={to} className="card">
@@ -12,7 +12,7 @@ function Card({ title, subtitle, to }) {
   );
 }
 
-/* ---------- Bottom Tabbar ---------- */
+/* Bottom Navigation */
 function Tabbar() {
   return (
     <div className="tabbar">
@@ -25,29 +25,24 @@ function Tabbar() {
   );
 }
 
-/* ---------- Dashboard ---------- */
+/* Dashboard */
 function Dashboard() {
   return (
     <div className="screen">
-      {/* Header with Logo */}
       <header className="header">
-        <img src="/logo.avif" alt="BarmeniaGothaer" className="logoImg" />
+        <img src="/logo.jpg" alt="BarmeniaGothaer" className="logoImg" />
       </header>
 
-      {/* Welcome */}
       <div className="welcome">Guten Abend</div>
       <div className="persona">
         Max, 25 · Single · Mietwohnung · KFZ · Hund
       </div>
 
-      {/* 360 Status Card */}
       <div className="heroCard">
         <div className="heroTitle">Dein Schutz-Status</div>
 
-        {/* Premium Progress Ring */}
         <div className="ringWrap">
           <svg width="160" height="160" viewBox="0 0 160 160">
-            {/* Background Circle */}
             <circle
               cx="80"
               cy="80"
@@ -57,7 +52,6 @@ function Dashboard() {
               fill="none"
             />
 
-            {/* Progress Circle (62%) */}
             <circle
               cx="80"
               cy="80"
@@ -72,7 +66,6 @@ function Dashboard() {
             />
           </svg>
 
-          {/* Center Avatar + % */}
           <div className="ringCenter">
             <div className="silhouette">👤</div>
             <div className="percent">62%</div>
@@ -86,7 +79,6 @@ function Dashboard() {
         </Link>
       </div>
 
-      {/* Modules */}
       <div className="moduleGrid">
         <Card
           title="Mobilität"
@@ -120,7 +112,7 @@ function Dashboard() {
   );
 }
 
-/* ---------- Module Detail Page ---------- */
+/* Module Detail Page */
 function ModulePage({ title, bullets }) {
   return (
     <div className="screen">
@@ -148,7 +140,7 @@ function ModulePage({ title, bullets }) {
   );
 }
 
-/* ---------- Recommendation Page ---------- */
+/* Recommendation */
 function Recommendation() {
   return (
     <div className="screen">
@@ -173,7 +165,7 @@ function Recommendation() {
   );
 }
 
-/* ---------- Status Overview ---------- */
+/* Status Page */
 function StatusPage() {
   return (
     <div className="screen">
@@ -196,7 +188,7 @@ function StatusPage() {
   );
 }
 
-/* ---------- Main App Router ---------- */
+/* Main App */
 export default function App() {
   return (
     <Router>
