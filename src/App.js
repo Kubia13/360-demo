@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./index.css";
 
+/* ---------- Reusable Card ---------- */
 function Card({ title, subtitle, to }) {
   return (
     <Link to={to} className="card">
@@ -11,6 +12,7 @@ function Card({ title, subtitle, to }) {
   );
 }
 
+/* ---------- Bottom Tabbar ---------- */
 function Tabbar() {
   return (
     <div className="tabbar">
@@ -23,27 +25,57 @@ function Tabbar() {
   );
 }
 
+/* ---------- Dashboard ---------- */
 function Dashboard() {
   return (
     <div className="screen">
+      {/* Header with Logo */}
       <header className="header">
-        <div className="logo">✦ BarmeniaGothaer</div>
+        <img src="/logo.avif" alt="BarmeniaGothaer" className="logoImg" />
       </header>
 
+      {/* Welcome */}
       <div className="welcome">Guten Abend</div>
       <div className="persona">
         Max, 25 · Single · Mietwohnung · KFZ · Hund
       </div>
 
+      {/* 360 Status Card */}
       <div className="heroCard">
         <div className="heroTitle">Dein Schutz-Status</div>
 
+        {/* Premium Progress Ring */}
         <div className="ringWrap">
-          <div className="ring">
-            <div className="ringInner">
-              <div className="silhouette">👤</div>
-              <div className="percent">62%</div>
-            </div>
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            {/* Background Circle */}
+            <circle
+              cx="80"
+              cy="80"
+              r="65"
+              stroke="#1a2a36"
+              strokeWidth="12"
+              fill="none"
+            />
+
+            {/* Progress Circle (62%) */}
+            <circle
+              cx="80"
+              cy="80"
+              r="65"
+              stroke="#00e5ff"
+              strokeWidth="12"
+              fill="none"
+              strokeDasharray="408"
+              strokeDashoffset="155"
+              strokeLinecap="round"
+              transform="rotate(-90 80 80)"
+            />
+          </svg>
+
+          {/* Center Avatar + % */}
+          <div className="ringCenter">
+            <div className="silhouette">👤</div>
+            <div className="percent">62%</div>
           </div>
         </div>
 
@@ -54,13 +86,18 @@ function Dashboard() {
         </Link>
       </div>
 
+      {/* Modules */}
       <div className="moduleGrid">
         <Card
           title="Mobilität"
           subtitle="KFZ ✔ Schutzbrief ❌"
           to="/module/mobilitaet"
         />
-        <Card title="Wohnen" subtitle="Hausrat ✔ Fahrrad ❌" to="/module/wohnen" />
+        <Card
+          title="Wohnen"
+          subtitle="Hausrat ✔ Fahrrad ❌"
+          to="/module/wohnen"
+        />
         <Card
           title="Vorsorge"
           subtitle="BU ❌ Unfall ✔"
@@ -83,6 +120,7 @@ function Dashboard() {
   );
 }
 
+/* ---------- Module Detail Page ---------- */
 function ModulePage({ title, bullets }) {
   return (
     <div className="screen">
@@ -110,6 +148,7 @@ function ModulePage({ title, bullets }) {
   );
 }
 
+/* ---------- Recommendation Page ---------- */
 function Recommendation() {
   return (
     <div className="screen">
@@ -134,6 +173,7 @@ function Recommendation() {
   );
 }
 
+/* ---------- Status Overview ---------- */
 function StatusPage() {
   return (
     <div className="screen">
@@ -156,6 +196,7 @@ function StatusPage() {
   );
 }
 
+/* ---------- Main App Router ---------- */
 export default function App() {
   return (
     <Router>
@@ -198,7 +239,7 @@ export default function App() {
               title="Vorsorge"
               bullets={[
                 "Berufsunfähigkeit: fehlt ❌",
-                "Unfall: optional ✔",
+                "Unfall: vorhanden ✔",
                 "Altersvorsorge: später relevant",
               ]}
             />

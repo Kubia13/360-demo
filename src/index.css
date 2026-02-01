@@ -5,6 +5,8 @@ body {
   font-family: "Armegoe", sans-serif;
 }
 
+/* ---------- Layout ---------- */
+
 .screen {
   padding: 18px;
   padding-bottom: 90px;
@@ -17,10 +19,12 @@ body {
   margin-bottom: 14px;
 }
 
-.logo {
-  font-weight: 700;
-  color: #00e5ff;
+.logoImg {
+  height: 28px;
+  width: auto;
 }
+
+/* ---------- Welcome ---------- */
 
 .welcome {
   font-size: 20px;
@@ -30,7 +34,10 @@ body {
 .persona {
   opacity: 0.7;
   margin-bottom: 16px;
+  font-size: 13px;
 }
+
+/* ---------- Hero Card ---------- */
 
 .heroCard {
   background: #111c26;
@@ -44,19 +51,24 @@ body {
   margin-bottom: 12px;
 }
 
+/* ---------- Premium Progress Ring ---------- */
+
 .ringWrap {
+  position: relative;
   display: flex;
   justify-content: center;
+  align-items: center;
+  margin-top: 10px;
 }
 
-.ring {
-  width: 140px;
-  height: 140px;
-  border-radius: 999px;
-  border: 10px solid #00e5ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.ringCenter {
+  position: absolute;
+  text-align: center;
+}
+
+.silhouette {
+  font-size: 22px;
+  opacity: 0.9;
 }
 
 .percent {
@@ -64,10 +76,15 @@ body {
   font-weight: bold;
 }
 
+/* ---------- Status Text ---------- */
+
 .gapText {
   margin-top: 12px;
   opacity: 0.75;
+  font-size: 14px;
 }
+
+/* ---------- Buttons ---------- */
 
 .primaryBtn {
   margin-top: 14px;
@@ -79,7 +96,11 @@ body {
   color: black;
   font-weight: 700;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
 }
+
+/* ---------- Modules ---------- */
 
 .moduleGrid {
   display: grid;
@@ -92,16 +113,51 @@ body {
   border-radius: 18px;
   text-decoration: none;
   color: white;
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.02);
 }
 
 .cardTitle {
   font-weight: 700;
+  font-size: 15px;
 }
 
 .cardSubtitle {
   opacity: 0.7;
   font-size: 13px;
+  margin-top: 4px;
 }
+
+/* ---------- Detail Pages ---------- */
+
+.detailCard {
+  background: #111c26;
+  border-radius: 20px;
+  padding: 18px;
+  margin-top: 18px;
+}
+
+.bullet {
+  margin-bottom: 10px;
+  opacity: 0.85;
+}
+
+/* ---------- Navigation ---------- */
+
+.backBtn {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.pageTitle {
+  font-weight: 700;
+}
+
+/* ---------- Bottom Tabbar ---------- */
 
 .tabbar {
   position: fixed;
@@ -112,6 +168,7 @@ body {
   display: flex;
   justify-content: space-around;
   padding: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .tabItem {
@@ -122,10 +179,5 @@ body {
 .tabItem.active {
   opacity: 1;
   color: #00e5ff;
-}
-
-.backBtn {
-  color: white;
-  text-decoration: none;
-  font-size: 18px;
+  font-weight: 700;
 }
