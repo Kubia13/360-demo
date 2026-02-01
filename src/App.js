@@ -27,19 +27,14 @@ function Dashboard() {
   return (
     <div className="screen">
       <header className="header">
-        <div className="logo">
-          ✦ BarmeniaGothaer
-        </div>
+        <div className="logo">✦ BarmeniaGothaer</div>
       </header>
 
       <div className="welcome">Guten Abend</div>
-
-      {/* Persona */}
       <div className="persona">
         Max, 25 · Single · Mietwohnung · KFZ · Hund
       </div>
 
-      {/* 360 Card */}
       <div className="heroCard">
         <div className="heroTitle">Dein Schutz-Status</div>
 
@@ -59,13 +54,28 @@ function Dashboard() {
         </Link>
       </div>
 
-      {/* Modules */}
       <div className="moduleGrid">
-        <Card title="Mobilität" subtitle="KFZ ✔ Schutzbrief ❌" to="/module/mobilitaet" />
+        <Card
+          title="Mobilität"
+          subtitle="KFZ ✔ Schutzbrief ❌"
+          to="/module/mobilitaet"
+        />
         <Card title="Wohnen" subtitle="Hausrat ✔ Fahrrad ❌" to="/module/wohnen" />
-        <Card title="Vorsorge" subtitle="BU ❌ Unfall ✔" to="/module/vorsorge" />
-        <Card title="Recht & Haftung" subtitle="Haftpflicht ✔ Recht ❌" to="/module/recht" />
-        <Card title="Gesundheit" subtitle="GKV ✔ Zusatz ❌" to="/module/gesundheit" />
+        <Card
+          title="Vorsorge"
+          subtitle="BU ❌ Unfall ✔"
+          to="/module/vorsorge"
+        />
+        <Card
+          title="Recht & Haftung"
+          subtitle="Haftpflicht ✔ Recht ❌"
+          to="/module/recht"
+        />
+        <Card
+          title="Gesundheit"
+          subtitle="GKV ✔ Zusatz ❌"
+          to="/module/gesundheit"
+        />
       </div>
 
       <Tabbar />
@@ -77,13 +87,17 @@ function ModulePage({ title, bullets }) {
   return (
     <div className="screen">
       <header className="header">
-        <Link to="/" className="backBtn">←</Link>
+        <Link to="/" className="backBtn">
+          ←
+        </Link>
         <div className="pageTitle">{title}</div>
       </header>
 
       <div className="detailCard">
         {bullets.map((b, i) => (
-          <div key={i} className="bullet">{b}</div>
+          <div key={i} className="bullet">
+            {b}
+          </div>
         ))}
 
         <Link to="/recommendation" className="primaryBtn">
@@ -100,7 +114,9 @@ function Recommendation() {
   return (
     <div className="screen">
       <header className="header">
-        <Link to="/" className="backBtn">←</Link>
+        <Link to="/" className="backBtn">
+          ←
+        </Link>
         <div className="pageTitle">Empfehlung</div>
       </header>
 
@@ -110,9 +126,7 @@ function Recommendation() {
           In deiner Lebensphase ist BU die wichtigste Existenzabsicherung.
         </div>
 
-        <button className="primaryBtn">
-          Online abschließen (Demo)
-        </button>
+        <button className="primaryBtn">Online abschließen (Demo)</button>
       </div>
 
       <Tabbar />
@@ -124,7 +138,9 @@ function StatusPage() {
   return (
     <div className="screen">
       <header className="header">
-        <Link to="/" className="backBtn">←</Link>
+        <Link to="/" className="backBtn">
+          ←
+        </Link>
         <div className="pageTitle">Absicherungsstatus</div>
       </header>
 
@@ -149,47 +165,72 @@ export default function App() {
 
         <Route
           path="/module/mobilitaet"
-          element={<ModulePage title="Mobilität" bullets={[
-            "KFZ Versicherung: vorhanden ✔",
-            "Schutzbrief: fehlt ❌",
-            "GAP Deckung: optional"
-          ]} />}
+          element={
+            <ModulePage
+              title="Mobilität"
+              bullets={[
+                "KFZ Versicherung: vorhanden ✔",
+                "Schutzbrief: fehlt ❌",
+                "GAP Deckung: optional",
+              ]}
+            />
+          }
         />
 
         <Route
           path="/module/wohnen"
-          element={<ModulePage title="Wohnen" bullets={[
-            "Hausrat: vorhanden ✔",
-            "Fahrradschutz: fehlt ❌",
-            "Glas: optional"
-          ]} />}
+          element={
+            <ModulePage
+              title="Wohnen"
+              bullets={[
+                "Hausrat: vorhanden ✔",
+                "Fahrradschutz: fehlt ❌",
+                "Glas: optional",
+              ]}
+            />
+          }
         />
 
         <Route
           path="/module/vorsorge"
-          element={<ModulePage title="Vorsorge" bullets={[
-            "Berufsunfähigkeit: fehlt ❌",
-            "Unfall: optional ✔",
-            "Altersvorsorge: später relevant"
-          ]} />}
+          element={
+            <ModulePage
+              title="Vorsorge"
+              bullets={[
+                "Berufsunfähigkeit: fehlt ❌",
+                "Unfall: optional ✔",
+                "Altersvorsorge: später relevant",
+              ]}
+            />
+          }
         />
 
         <Route
           path="/module/recht"
-          element={<ModulePage title="Recht & Haftung" bullets={[
-            "Privathaftpflicht: vorhanden ✔",
-            "Hundehalterhaftpflicht: vorhanden ✔",
-            "Rechtsschutz: fehlt ❌"
-          ]} />}
+          element={
+            <ModulePage
+              title="Recht & Haftung"
+              bullets={[
+                "Privathaftpflicht: vorhanden ✔",
+                "Hundehalterhaftpflicht: vorhanden ✔",
+                "Rechtsschutz: fehlt ❌",
+              ]}
+            />
+          }
         />
 
         <Route
           path="/module/gesundheit"
-          element={<ModulePage title="Gesundheit" bullets={[
-            "Gesetzliche KV: vorhanden ✔",
-            "Zahnzusatz: fehlt ❌",
-            "PKV: optional bei hohem Einkommen"
-          ]} />}
+          element={
+            <ModulePage
+              title="Gesundheit"
+              bullets={[
+                "Gesetzliche KV: vorhanden ✔",
+                "Zahnzusatz: fehlt ❌",
+                "PKV: optional bei hohem Einkommen",
+              ]}
+            />
+          }
         />
 
         <Route path="/recommendation" element={<Recommendation />} />

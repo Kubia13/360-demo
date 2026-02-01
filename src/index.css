@@ -1,12 +1,13 @@
 body {
+  margin: 0;
   background: #071018;
   color: white;
+  font-family: "Armegoe", sans-serif;
 }
 
 .screen {
   padding: 18px;
   padding-bottom: 90px;
-  font-family: "Armegoe", sans-serif;
 }
 
 .header {
@@ -56,10 +57,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.ringInner {
-  text-align: center;
 }
 
 .percent {
