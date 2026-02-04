@@ -1,164 +1,143 @@
-body {
-  margin: 0;
-  background: #071018;
-  color: white;
-  font-family: "Armegoe", sans-serif;
+:root {
+  --bg: #071018;
+  --card: #111c26;
+  --accent: #b39ddb;
+  --text: white;
 }
 
-/* ---------- Layout ---------- */
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
 
 .screen {
   padding: 18px;
-  padding-bottom: 90px;
+  padding-bottom: 100px;
 }
 
 .header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .logoImg {
-  height: 28px;
-  width: auto;
+  height: 56px;
 }
 
-/* ---------- Welcome ---------- */
-
-.welcome {
-  font-size: 20px;
-  margin-top: 10px;
-}
-
-.persona {
-  opacity: 0.7;
-  margin-bottom: 16px;
-  font-size: 13px;
-}
-
-/* ---------- Hero Card ---------- */
-
+/* HERO */
 .heroCard {
-  background: #111c26;
-  border-radius: 20px;
-  padding: 18px;
-  margin-bottom: 18px;
+  background: var(--card);
+  padding: 20px;
+  border-radius: 22px;
 }
 
 .heroTitle {
-  font-size: 16px;
-  margin-bottom: 12px;
-}
-
-/* ---------- Premium Progress Ring ---------- */
-
-.ringWrap {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.ringCenter {
-  position: absolute;
-  text-align: center;
-}
-
-.silhouette {
-  font-size: 22px;
-  opacity: 0.9;
-}
-
-.percent {
-  font-size: 28px;
   font-weight: bold;
+  margin-bottom: 16px;
 }
-
-/* ---------- Status Text ---------- */
 
 .gapText {
-  margin-top: 12px;
+  margin-top: 16px;
   opacity: 0.75;
   font-size: 14px;
 }
 
-/* ---------- Buttons ---------- */
+/* RING */
+.ringWrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
 
-.primaryBtn {
-  margin-top: 14px;
-  display: block;
+.ringCenter {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   text-align: center;
-  padding: 12px;
-  border-radius: 14px;
-  background: #00e5ff;
-  color: black;
-  font-weight: 700;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
 }
 
-/* ---------- Modules ---------- */
+.avatar {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
 
-.moduleGrid {
+.percent {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.ringProgress {
+  transition: stroke-dashoffset 1.4s ease;
+}
+
+/* SEGMENT MODULES */
+.segmentRing {
+  margin-top: 22px;
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
 }
 
-.card {
+.segmentItem {
   background: #0f1a23;
-  padding: 14px;
   border-radius: 18px;
+  padding: 14px;
   text-decoration: none;
   color: white;
+  text-align: center;
   transition: 0.2s;
 }
 
-.card:hover {
-  transform: scale(1.02);
+.segmentItem:hover {
+  transform: scale(1.04);
 }
 
-.cardTitle {
-  font-weight: 700;
-  font-size: 15px;
+.segmentItem.covered {
+  border: 1px solid rgba(179, 157, 219, 0.6);
 }
 
-.cardSubtitle {
-  opacity: 0.7;
-  font-size: 13px;
-  margin-top: 4px;
+.segmentItem.open {
+  opacity: 0.55;
 }
 
-/* ---------- Detail Pages ---------- */
+.segIcon {
+  font-size: 22px;
+}
 
+.segTitle {
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* BUTTON */
+.primaryBtn {
+  margin-top: 18px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  background: var(--accent);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* DETAIL */
 .detailCard {
-  background: #111c26;
-  border-radius: 20px;
+  background: var(--card);
   padding: 18px;
+  border-radius: 18px;
   margin-top: 18px;
 }
 
-.bullet {
-  margin-bottom: 10px;
-  opacity: 0.85;
-}
-
-/* ---------- Navigation ---------- */
-
 .backBtn {
+  display: inline-block;
+  margin-bottom: 12px;
   color: white;
   text-decoration: none;
-  font-size: 18px;
 }
 
-.pageTitle {
-  font-weight: 700;
-}
-
-/* ---------- Bottom Tabbar ---------- */
-
+/* TABBAR */
 .tabbar {
   position: fixed;
   bottom: 0;
@@ -168,16 +147,16 @@ body {
   display: flex;
   justify-content: space-around;
   padding: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .tabItem {
-  opacity: 0.5;
-  font-size: 12px;
+  color: white;
+  opacity: 0.65;
+  text-decoration: none;
 }
 
 .tabItem.active {
   opacity: 1;
-  color: #00e5ff;
-  font-weight: 700;
+  color: var(--accent);
+  font-weight: bold;
 }
