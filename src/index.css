@@ -1,117 +1,118 @@
-:root {
-  --bg: #071018;
-  --card: #111c26;
-  --primary: #00e5ff;
-  --lavender: #b7a7ff;
-  --danger: #ff3b30;
-  --warn: #ff9500;
-}
-
 body {
   margin: 0;
-  background: var(--bg);
+  background: #071018;
   color: white;
-  font-family: "Armegoe", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* ---------- Layout ---------- */
 .screen {
   padding: 18px;
+  padding-bottom: 80px;
 }
 
 .header {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .logoImg {
   height: 56px;
 }
 
-.progressWrap {
-  margin-top: 10px;
-}
-
-.progressText {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-bottom: 6px;
-}
-
-.progressBar {
-  height: 6px;
-  background: #1a2a36;
-  border-radius: 6px;
-}
-
-.progressFill {
-  height: 100%;
-  background: var(--lavender);
-  border-radius: 6px;
-}
-
-.card {
-  background: var(--card);
-  border-radius: 22px;
-  padding: 18px;
-  margin-top: 20px;
-}
-
-input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
+/* ---------- Head ---------- */
+.welcome {
+  font-size: 20px;
   margin-bottom: 16px;
 }
 
-.choices button {
-  width: 100%;
-  padding: 16px;
-  margin-bottom: 10px;
-  border-radius: 16px;
-  border: 1px solid #1a2a36;
+/* ---------- Hero ---------- */
+.heroCard {
   background: #0f1a23;
-  color: white;
+  border-radius: 22px;
+  padding: 18px;
+  margin-bottom: 18px;
 }
 
-.choices button.active {
-  border-color: var(--lavender);
-  background: rgba(183, 167, 255, 0.15);
+/* ---------- Ring ---------- */
+.ringWrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
 }
 
-.primary {
-  width: 100%;
-  padding: 16px;
-  background: var(--primary);
-  color: black;
-  border: none;
-  border-radius: 18px;
+.ringCenter {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+}
+
+.avatar {
+  font-size: 22px;
+}
+
+.percent {
+  font-size: 30px;
   font-weight: bold;
 }
 
-.rec {
+.gapText {
+  margin-top: 12px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* ---------- Fragen ---------- */
+.questionCard {
+  background: #0f1a23;
+  border-radius: 18px;
   padding: 14px;
-  border-radius: 14px;
   margin-bottom: 12px;
 }
 
-.rec.high {
-  background: rgba(255, 59, 48, 0.15);
-  border-left: 4px solid var(--danger);
+.questionText {
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 
-.rec.medium {
-  background: rgba(255, 149, 0, 0.15);
-  border-left: 4px solid var(--warn);
+.buttonRow {
+  display: flex;
+  gap: 8px;
 }
 
-.rec.low {
-  background: rgba(183, 167, 255, 0.15);
-  border-left: 4px solid var(--lavender);
+.buttonRow button {
+  flex: 1;
+  background: #1a2a36;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 13px;
 }
 
-.hint {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-top: 12px;
+/* ---------- CTA ---------- */
+.ctaCard {
+  margin-top: 20px;
+}
+
+.primaryBtn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  background: #8b7cf6;
+  color: #071018;
+  font-weight: 700;
+  border: none;
+  margin-bottom: 10px;
+}
+
+.secondaryBtn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 16px;
+  background: transparent;
+  border: 1px solid #8b7cf6;
+  color: #8b7cf6;
 }
