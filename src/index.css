@@ -5,37 +5,57 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* ---------- Layout ---------- */
 .screen {
   padding: 18px;
-  padding-bottom: 80px;
+  padding-bottom: 90px;
 }
 
 .header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .logoImg {
   height: 56px;
 }
 
-/* ---------- Head ---------- */
-.welcome {
-  font-size: 20px;
-  margin-bottom: 16px;
-}
-
-/* ---------- Hero ---------- */
+/* Cards & Fragen */
+.questionCard,
+.categoryItem,
 .heroCard {
   background: #0f1a23;
-  border-radius: 22px;
-  padding: 18px;
-  margin-bottom: 18px;
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 12px;
 }
 
-/* ---------- Ring ---------- */
+.questionText {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 8px;
+}
+
+.buttonRow button {
+  flex: 1;
+  background: #1a2a36;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+/* Ring */
 .ringWrap {
   position: relative;
   display: flex;
@@ -49,63 +69,44 @@ body {
   text-align: center;
 }
 
-.avatar {
-  font-size: 22px;
-}
-
 .percent {
-  font-size: 30px;
-  font-weight: bold;
+  font-size: 34px;
+  font-weight: 700;
 }
 
-.gapText {
-  margin-top: 12px;
-  font-size: 14px;
-  opacity: 0.8;
-}
-
-/* ---------- Fragen ---------- */
-.questionCard {
-  background: #0f1a23;
-  border-radius: 18px;
-  padding: 14px;
-  margin-bottom: 12px;
-}
-
-.questionText {
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-
-.buttonRow {
-  display: flex;
-  gap: 8px;
-}
-
-.buttonRow button {
-  flex: 1;
-  background: #1a2a36;
-  border: none;
-  color: white;
-  padding: 10px;
-  border-radius: 12px;
+.ringLabel {
   font-size: 13px;
+  opacity: 0.7;
 }
 
-/* ---------- CTA ---------- */
-.ctaCard {
-  margin-top: 20px;
+/* Kategorien */
+.categoryHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
+.categoryBar {
+  height: 8px;
+  background: #1a2a36;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.categoryFill {
+  height: 100%;
+}
+
+/* Buttons */
 .primaryBtn {
   width: 100%;
   padding: 14px;
   border-radius: 16px;
-  background: #8b7cf6;
+  background: #00e5ff;
   color: #071018;
   font-weight: 700;
   border: none;
-  margin-bottom: 10px;
+  margin-top: 14px;
 }
 
 .secondaryBtn {
@@ -113,6 +114,14 @@ body {
   padding: 12px;
   border-radius: 16px;
   background: transparent;
-  border: 1px solid #8b7cf6;
-  color: #8b7cf6;
+  border: 1px solid #00e5ff;
+  color: #00e5ff;
+  margin-top: 10px;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: white;
+  margin-bottom: 12px;
 }

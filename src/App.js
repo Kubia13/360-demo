@@ -1,201 +1,318 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
 
-/* ---------------- DIN Kategorien ---------------- */
-const CATEGORIES = {
-  existenz: { label: "Existenz", weight: 30 },
-  haftung: { label: "Haftung", weight: 20 },
-  gesundheit: { label: "Gesundheit", weight: 15 },
-  wohnen: { label: "Wohnen", weight: 15 },
-  mobilitaet: { label: "Mobilität", weight: 10 },
-  vorsorge: { label: "Vorsorge", weight: 10 },
-};
-
-/* ---------------- Fragenkatalog (DIN-nah, 22 Fragen gekürzt auf Kern) ---------------- */
-const QUESTIONS = [
-  {
-    id: "bu",
-    category: "existenz",
-    text: "Bist du aktuell gegen Berufsunfähigkeit abgesichert?",
-  },
-  {
-    id: "einkommen",
-    category: "existenz",
-    text: "Könntest du deinen Lebensstandard länger als 6 Monate ohne Einkommen halten?",
-  },
-  {
-    id: "haftpflicht",
-    category: "haftung",
-    text: "Hast du eine private Haftpflichtversicherung?",
-  },
-  {
-    id: "tierhaftung",
-    category: "haftung",
-    text: "Besitzt du ein Haustier mit eigener Haftpflicht (z. B. Hund)?",
-  },
-  {
-    id: "kranken",
-    category: "gesundheit",
-    text: "Bist du aktuell krankenversichert?",
-  },
-  {
-    id: "zusatz",
-    category: "gesundheit",
-    text: "Hast du sinnvolle Krankenzusatzversicherungen (z. B. Zähne)?",
-  },
-  {
-    id: "hausrat",
-    category: "wohnen",
-    text: "Ist dein Hausrat ausreichend versichert?",
-  },
-  {
-    id: "fahrrad",
-    category: "wohnen",
-    text: "Sind hochwertige Fahrräder separat abgesichert?",
-  },
-  {
-    id: "kfz",
-    category: "mobilitaet",
-    text: "Ist dein Fahrzeug ausreichend versichert?",
-  },
-  {
-    id: "schutzbrief",
-    category: "mobilitaet",
-    text: "Hast du einen Schutzbrief für Pannen & Abschleppen?",
-  },
-  {
-    id: "rente",
-    category: "vorsorge",
-    text: "Sparst du aktiv für deine Altersvorsorge?",
-  },
-  {
-    id: "rentenluecke",
-    category: "vorsorge",
-    text: "Kennst du deine persönliche Rentenlücke?",
-  },
+/* ---------------- DIN Kategorien & Farben (BG-nah) ---------------- */
+const CATEGORIES = [
+  { key: "existenz", label: "Existenz", weight: 30, color: "#8B7CF6" },
+  { key: "haftung", label: "Haftung", weight: 20, color: "#00E5FF" },
+  { key: "gesundheit", label: "Gesundheit", weight: 15, color: "#5ED1B2" },
+  { key: "wohnen", label: "Wohnen", weight: 15, color: "#4DA3FF" },
+  { key: "mobilitaet", label: "Mobilität", weight: 10, color: "#7FD8FF" },
+  { key: "vorsorge", label: "Vorsorge", weight: 10, color: "#B9A7FF" },
 ];
 
-/* ---------------- App ---------------- */
+/* ---------------- DIN-Startabfrage ---------------- */
+const START_QUESTIONS = [
+  { id: "alter", label: "Wie alt bist du?", type: "number" },
+  {
+    id: "beruf",
+    label: "Deine berufliche Situation",
+    type: "select",
+    options: ["Angestellt", "Selbstständig", "Beamter", "Nicht erwerbstätig"],
+  },
+  {
+    id: "wohnen",
+    label: "Wie wohnst du?",
+    type: "select",
+    options: ["Miete", "Eigentum"],
+  },
+  { id: "kfz", label: "Besitzt du ein KFZ?", type: "boolean" },
+  { id: "haustiere", label: "Hast du Haustiere (z. B. Hund)?", type: "boolean" },
+];
+
+/* ---------------- Kategorie-Detailfragen (gekürzt, erweiterbar) ---------------- */
+const DETAIL_QUESTIONS = {
+  existenz: [
+    "Könntest du deinen Lebensstandard länger als 6 Monate ohne Einkommen halten?",
+  ],
+  haftung: ["Sind ausreichend hohe Deckungssummen vereinbart?"],
+  gesundheit: ["Hast du sinnvolle Krankenzusatzversicherungen?"],
+  wohnen: ["Ist dein Hausrat aktuell und ausreichend versichert?"],
+  mobilitaet: ["Hast du einen Schutzbrief für Pannen & Abschleppen?"],
+  vorsorge: ["Kennst du deine persönliche Rentenlücke?"],
+};
+
 export default function App() {
-  const [answers, setAnswers] = useState({});
-  const [score, setScore] = useState(0);
+  const [step, setStep] = useState(0); // 0=Start, 1=Kategorie, 2=Dashboard
+  const [startData, setStartData] = useState({});
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [status, setStatus] = useState({});
+  const [detailAnswers, setDetailAnswers] = useState({});
   const [animatedScore, setAnimatedScore] = useState(0);
 
-  /* ---------- Antwort setzen ---------- */
-  function answerQuestion(id, value) {
-    setAnswers((prev) => ({ ...prev, [id]: value }));
+  /* ---------------- Relevante Kategorien aus Start ableiten ---------------- */
+  function isRelevant(catKey) {
+    if (catKey === "mobilitaet" && !startData.kfz) return false;
+    if (catKey === "haftung" && !startData.haustiere) return true; // Haftpflicht immer relevant
+    if (catKey === "existenz" && startData.beruf === "Nicht erwerbstätig")
+      return false;
+    return true;
   }
 
-  /* ---------- Score berechnen ---------- */
-  useEffect(() => {
-    let categoryPoints = {};
-    let categoryMax = {};
+  /* ---------------- Score pro Kategorie ---------------- */
+  function categoryScore(catKey) {
+    if (!isRelevant(catKey)) return 100;
 
-    QUESTIONS.forEach((q) => {
-      if (!categoryPoints[q.category]) {
-        categoryPoints[q.category] = 0;
-        categoryMax[q.category] = 0;
-      }
+    const s = status[catKey];
+    let base = 0;
 
-      categoryMax[q.category] += 1;
+    if (s === "vorhanden") base = 70;
+    if (s === "unbekannt") base = 40;
+    if (s === "keine") base = 0;
 
-      if (answers[q.id] === "yes") categoryPoints[q.category] += 1;
-      if (answers[q.id] === "existing") categoryPoints[q.category] += 0.7;
-    });
+    const details = detailAnswers[catKey] || [];
+    const bonus = details.filter(Boolean).length * 10;
 
-    let total = 0;
+    return Math.min(100, base + bonus);
+  }
 
-    Object.keys(CATEGORIES).forEach((cat) => {
-      const max = categoryMax[cat] || 1;
-      const value = categoryPoints[cat] || 0;
-      const ratio = value / max;
-      total += ratio * CATEGORIES[cat].weight;
-    });
+  /* ---------------- Gesamt-Score ---------------- */
+  const totalScore = Math.round(
+    CATEGORIES.reduce(
+      (sum, c) =>
+        sum +
+        (categoryScore(c.key) * c.weight) / 100,
+      0
+    )
+  );
 
-    setScore(Math.round(total));
-  }, [answers]);
-
-  /* ---------- Ring animieren ---------- */
+  /* ---------------- Ring animieren ---------------- */
   useEffect(() => {
     let current = 0;
-    const interval = setInterval(() => {
+    const i = setInterval(() => {
       current += 1;
-      if (current >= score) {
-        current = score;
-        clearInterval(interval);
+      if (current >= totalScore) {
+        current = totalScore;
+        clearInterval(i);
       }
       setAnimatedScore(current);
     }, 15);
+    return () => clearInterval(i);
+  }, [totalScore]);
 
-    return () => clearInterval(interval);
-  }, [score]);
+  /* ===================== RENDER ===================== */
 
-  /* ---------- Empfehlung ---------- */
-  function getRecommendation() {
-    if (score < 40)
-      return "Deine Absicherung ist kritisch. Wir empfehlen dringend eine persönliche Beratung.";
-    if (score < 70)
-      return "Deine Absicherung ist ausbaufähig. Es bestehen relevante Versorgungslücken.";
-    return "Deine Absicherung ist gut. Einzelne Optimierungen sind möglich.";
+  /* ---------- STEP 0: DIN-START ---------- */
+  if (step === 0) {
+    return (
+      <div className="screen">
+        <h2>Kurzer 360°-Check</h2>
+        <p>Ein paar Fragen – damit wir nur relevante Themen prüfen.</p>
+
+        {START_QUESTIONS.map((q) => (
+          <div key={q.id} className="questionCard">
+            <div className="questionText">{q.label}</div>
+
+            {q.type === "number" && (
+              <input
+                type="number"
+                onChange={(e) =>
+                  setStartData({ ...startData, [q.id]: e.target.value })
+                }
+              />
+            )}
+
+            {q.type === "boolean" && (
+              <div className="buttonRow">
+                <button
+                  onClick={() =>
+                    setStartData({ ...startData, [q.id]: true })
+                  }
+                >
+                  Ja
+                </button>
+                <button
+                  onClick={() =>
+                    setStartData({ ...startData, [q.id]: false })
+                  }
+                >
+                  Nein
+                </button>
+              </div>
+            )}
+
+            {q.type === "select" && (
+              <select
+                onChange={(e) =>
+                  setStartData({ ...startData, [q.id]: e.target.value })
+                }
+              >
+                <option value="">Bitte wählen</option>
+                {q.options.map((o) => (
+                  <option key={o}>{o}</option>
+                ))}
+              </select>
+            )}
+          </div>
+        ))}
+
+        <button className="primaryBtn" onClick={() => setStep(1)}>
+          Weiter
+        </button>
+      </div>
+    );
   }
 
+  /* ---------- STEP 1: KATEGORIE-DETAIL ---------- */
+  if (step === 1 && activeCategory) {
+    const questions = DETAIL_QUESTIONS[activeCategory] || [];
+    return (
+      <div className="screen">
+        <button className="backBtn" onClick={() => setActiveCategory(null)}>
+          ← Zur Übersicht
+        </button>
+
+        <h3>{CATEGORIES.find((c) => c.key === activeCategory).label}</h3>
+
+        <div className="questionCard">
+          <div className="questionText">Versicherungsstatus</div>
+          <div className="buttonRow">
+            {["vorhanden", "keine", "unbekannt"].map((v) => (
+              <button
+                key={v}
+                onClick={() =>
+                  setStatus({ ...status, [activeCategory]: v })
+                }
+              >
+                {v === "vorhanden"
+                  ? "Versicherung vorhanden"
+                  : v === "keine"
+                  ? "Keine Versicherung"
+                  : "Weiß ich nicht"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {questions.map((q, i) => (
+          <div key={i} className="questionCard">
+            <div className="questionText">{q}</div>
+            <div className="buttonRow">
+              <button
+                onClick={() =>
+                  setDetailAnswers({
+                    ...detailAnswers,
+                    [activeCategory]: [
+                      ...(detailAnswers[activeCategory] || []),
+                      true,
+                    ],
+                  })
+                }
+              >
+                Ja
+              </button>
+              <button>Nein</button>
+            </div>
+          </div>
+        ))}
+
+        <button className="primaryBtn" onClick={() => setActiveCategory(null)}>
+          Fertig
+        </button>
+      </div>
+    );
+  }
+
+  /* ---------- STEP 1: KATEGORIEN-ÜBERSICHT ---------- */
+  if (step === 1 && !activeCategory) {
+    return (
+      <div className="screen">
+        <h2>Themen</h2>
+        {CATEGORIES.filter((c) => isRelevant(c.key)).map((cat) => (
+          <div
+            key={cat.key}
+            className="categoryItem"
+            onClick={() => setActiveCategory(cat.key)}
+          >
+            <div className="categoryHeader">
+              <span>{cat.label}</span>
+              <span>{categoryScore(cat.key)}%</span>
+            </div>
+            <div className="categoryBar">
+              <div
+                className="categoryFill"
+                style={{
+                  width: `${categoryScore(cat.key)}%`,
+                  background: cat.color,
+                }}
+              />
+            </div>
+          </div>
+        ))}
+
+        <button className="primaryBtn" onClick={() => setStep(2)}>
+          Zum Dashboard
+        </button>
+      </div>
+    );
+  }
+
+  /* ---------- STEP 2: END-DASHBOARD ---------- */
   return (
     <div className="screen">
       <header className="header">
         <img src="/logo.jpg" alt="BarmeniaGothaer" className="logoImg" />
       </header>
 
-      <div className="welcome">Dein 360°-Absicherungsstatus</div>
-
-      {/* ---------- Ring ---------- */}
       <div className="heroCard">
         <div className="ringWrap">
-          <svg width="180" height="180">
-            <circle cx="90" cy="90" r="70" stroke="#1a2a36" strokeWidth="14" fill="none" />
+          <svg width="200" height="200">
             <circle
-              cx="90"
-              cy="90"
-              r="70"
-              stroke="#8b7cf6"
-              strokeWidth="14"
+              cx="100"
+              cy="100"
+              r="80"
+              stroke="#1A2A36"
+              strokeWidth="16"
               fill="none"
-              strokeDasharray="439"
-              strokeDashoffset={439 - (439 * animatedScore) / 100}
+            />
+            <circle
+              cx="100"
+              cy="100"
+              r="80"
+              stroke="#00E5FF"
+              strokeWidth="16"
+              fill="none"
+              strokeDasharray="503"
+              strokeDashoffset={503 - (503 * animatedScore) / 100}
               strokeLinecap="round"
-              transform="rotate(-90 90 90)"
+              transform="rotate(-90 100 100)"
             />
           </svg>
-
           <div className="ringCenter">
-            <div className="avatar">👤</div>
             <div className="percent">{animatedScore}%</div>
+            <div className="ringLabel">Dein Absicherungsstatus</div>
           </div>
         </div>
-
-        <div className="gapText">{getRecommendation()}</div>
       </div>
 
-      {/* ---------- Fragen ---------- */}
-      {QUESTIONS.map((q) => (
-        <div key={q.id} className="questionCard">
-          <div className="questionText">{q.text}</div>
-          <div className="buttonRow">
-            <button onClick={() => answerQuestion(q.id, "yes")}>Ja</button>
-            <button onClick={() => answerQuestion(q.id, "existing")}>
-              Habe ich schon
-            </button>
-            <button onClick={() => answerQuestion(q.id, "no")}>Nein</button>
+      {CATEGORIES.filter((c) => isRelevant(c.key)).map((cat) => (
+        <div key={cat.key} className="categoryItem">
+          <div className="categoryHeader">
+            <span>{cat.label}</span>
+            <span>{categoryScore(cat.key)}%</span>
           </div>
         </div>
       ))}
 
-      {/* ---------- CTA ---------- */}
       <div className="ctaCard">
         <button className="primaryBtn">Empfehlung ansehen</button>
         <button
           className="secondaryBtn"
           onClick={() =>
-            window.open("https://agentur.barmenia.de/florian_loeffler", "_blank")
+            window.open(
+              "https://agentur.barmenia.de/florian_loeffler",
+              "_blank"
+            )
           }
         >
           Berater kontaktieren
