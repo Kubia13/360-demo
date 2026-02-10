@@ -1,73 +1,109 @@
 body {
   margin: 0;
   background: #071018;
-  color: #fff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: white;
+  font-family: system-ui, sans-serif;
 }
 
+/* Layout */
 .screen {
   padding: 20px;
-  padding-bottom: 80px;
+  padding-bottom: 90px;
 }
 
-.heroCard,
-.detailCard,
-.questionCard {
-  background: #0f1a23;
-  border-radius: 18px;
+.screen.center {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.logoImg {
+  height: 56px;
+  cursor: pointer;
+}
+
+.backIcon {
+  height: 32px;
+  cursor: pointer;
+}
+
+.contactLink {
+  color: #8b7cf6;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+}
+
+.primaryBtn {
+  width: 100%;
+  margin-top: 20px;
   padding: 16px;
+  border-radius: 14px;
+  border: none;
+  background: #8b7cf6;
+  color: black;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.primaryBtn.big {
+  font-size: 18px;
+  padding: 18px;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.buttonRow button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #2a3a48;
+  background: #0f1a23;
+  color: white;
+}
+
+.buttonRow button.selected {
+  background: #8b7cf6;
+  color: black;
+  border-color: #8b7cf6;
+}
+
+/* Cards */
+.questionCard {
+  background: #111c26;
+  padding: 16px;
+  border-radius: 16px;
   margin-bottom: 14px;
 }
 
 .questionText {
   margin-bottom: 10px;
-  font-size: 14px;
 }
 
-.buttonRow {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-button,
-.categoryCard {
-  cursor: pointer;
-}
-
-.answerBtn {
-  padding: 10px 12px;
-  border-radius: 14px;
-  border: none;
-  font-size: 13px;
-  color: #fff;
-  transition: transform 0.15s, opacity 0.15s;
-}
-
-.answerBtn:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
-}
-
-.answerBtn.ja { background: #2ecc71; }
-.answerBtn.bestand { background: #8B7CF6; }
-.answerBtn.unbekannt { background: #f1c40f; color: #000; }
-.answerBtn.nein { background: #e74c3c; }
-
-.primaryBtn {
-  display: block;
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #00E5FF, #8B7CF6);
-  color: #000;
-  font-weight: 700;
-  text-align: center;
-  border: none;
-}
-
-.primaryBtn:hover {
-  opacity: 0.9;
+/* Ring */
+.heroCard {
+  background: #111c26;
+  border-radius: 20px;
+  padding: 20px;
 }
 
 .ringWrap {
@@ -80,33 +116,9 @@ button,
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  text-align: center;
 }
 
 .percent {
   font-size: 28px;
-  font-weight: 800;
+  font-weight: bold;
 }
-
-.sub {
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-.categoryCard {
-  background: #0f1a23;
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  transition: background 0.15s, transform 0.15s;
-}
-
-.categoryCard:hover {
-  background: #142433;
-  transform: translateX(4px);
-}
-
-.warn { color: #f1c40f; }
-.ok { color: #2ecc71; }

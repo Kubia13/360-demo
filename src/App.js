@@ -4,12 +4,12 @@ import "./index.css";
 /* ================= KONFIG ================= */
 
 const CATEGORIES = [
-  { key: "existenz", label: "Existenz", weight: 30, color: "#8B7CF6" },
-  { key: "haftung", label: "Haftung", weight: 20, color: "#00E5FF" },
-  { key: "gesundheit", label: "Gesundheit", weight: 15, color: "#5ED1B2" },
-  { key: "wohnen", label: "Wohnen", weight: 15, color: "#4DA3FF" },
-  { key: "mobilitaet", label: "Mobilität", weight: 10, color: "#7FD8FF" },
-  { key: "vorsorge", label: "Vorsorge", weight: 10, color: "#B9A7FF" },
+  { key: "existenz", label: "Existenz", weight: 30 },
+  { key: "haftung", label: "Haftung", weight: 20 },
+  { key: "gesundheit", label: "Gesundheit", weight: 15 },
+  { key: "wohnen", label: "Wohnen", weight: 15 },
+  { key: "mobilitaet", label: "Mobilität", weight: 10 },
+  { key: "vorsorge", label: "Vorsorge", weight: 10 },
 ];
 
 const START_QUESTIONS = [
@@ -21,18 +21,11 @@ const START_QUESTIONS = [
     options: ["Angestellt", "Selbstständig", "Beamter", "Nicht erwerbstätig"],
   },
   {
-    id: "einkommen",
-    label: "Monatliches Nettoeinkommen",
-    type: "select",
-    options: ["< 1.500 €", "1.500 – 2.500 €", "2.500 – 4.000 €", "> 4.000 €"],
-  },
-  {
     id: "wohnen",
     label: "Wohnsituation",
     type: "select",
     options: ["Miete", "Eigentum"],
   },
-  { id: "kinder", label: "Hast du Kinder?", type: "boolean" },
   { id: "kfz", label: "Besitzt du ein KFZ?", type: "boolean" },
   { id: "haustier", label: "Hast du ein Haustier (z. B. Hund)?", type: "boolean" },
 ];
@@ -41,38 +34,27 @@ const QUESTIONS = {
   existenz: [
     "Hast du eine Berufsunfähigkeitsversicherung?",
     "Deckt sie mindestens 60 % deines Nettoeinkommens?",
-    "Ist dein aktueller Beruf korrekt abgesichert?",
-    "Sind psychische Erkrankungen eingeschlossen?",
     "Wurde der Vertrag in den letzten 5 Jahren geprüft?",
   ],
   haftung: [
     "Hast du eine private Haftpflichtversicherung?",
-    "Beträgt die Deckung mindestens 10 Mio €?",
-    "Sind Kinder mitversichert?",
-    "Ist ein Haustier mitversichert?",
+    "Sind hohe Deckungssummen vereinbart?",
   ],
   gesundheit: [
     "Bist du krankenversichert?",
-    "Hast du eine Zahnzusatzversicherung?",
-    "Hast du eine stationäre Zusatzversicherung?",
-    "Passt dein Schutz zu deinem Einkommen?",
+    "Hast du Zusatzversicherungen?",
   ],
   wohnen: [
     "Ist dein Hausrat versichert?",
-    "Ist die Versicherungssumme korrekt?",
-    "Besteht Elementarschutz?",
-    "Sind Fahrräder/Wertsachen mitversichert?",
+    "Sind Wertsachen/Fahrräder mitversichert?",
   ],
   mobilitaet: [
     "Ist dein KFZ versichert?",
-    "Hast du Voll- oder Teilkasko?",
-    "Besteht ein Schutzbrief?",
+    "Hast du einen Schutzbrief?",
   ],
   vorsorge: [
     "Sparst du aktiv für das Alter?",
     "Kennst du deine Rentenlücke?",
-    "Nutzt du staatliche Förderung?",
-    "Wurde die Vorsorge regelmäßig geprüft?",
   ],
 };
 
@@ -150,14 +132,29 @@ export default function App() {
   const Header = () => (
     <div className="header">
       {step !== "welcome" && (
-        <span className="backBtn" onClick={back}>←</span>
+        <img
+          src="/back.svg"
+          alt="Zurück"
+          className="backIcon"
+          onClick={back}
+        />
       )}
+
       <img
         src="/logo.jpg"
         alt="BarmeniaGothaer"
         className="logoImg"
         onClick={reset}
       />
+
+      <a
+        href="https://agentur.barmenia.de/florian_loeffler"
+        target="_blank"
+        rel="noreferrer"
+        className="contactLink"
+      >
+        Kontakt
+      </a>
     </div>
   );
 
@@ -165,14 +162,14 @@ export default function App() {
 
   if (step === "welcome") {
     return (
-      <div className="screen">
+      <div className="screen center">
         <Header />
         <h2>Willkommen</h2>
         <p>
-          In wenigen Minuten prüfen wir deine Absicherung nach DIN 77230 –
-          verständlich, neutral und individuell.
+          In wenigen Minuten prüfen wir deine Absicherung – verständlich,
+          neutral und individuell.
         </p>
-        <button className="primaryBtn" onClick={() => go("start")}>
+        <button className="primaryBtn big" onClick={() => go("start")}>
           Jetzt starten
         </button>
       </div>
@@ -200,8 +197,18 @@ export default function App() {
 
             {q.type === "boolean" && (
               <div className="buttonRow">
-                <button onClick={() => setStartData({ ...startData, [q.id]: true })}>Ja</button>
-                <button onClick={() => setStartData({ ...startData, [q.id]: false })}>Nein</button>
+                <button
+                  className={startData[q.id] === true ? "selected" : ""}
+                  onClick={() => setStartData({ ...startData, [q.id]: true })}
+                >
+                  Ja
+                </button>
+                <button
+                  className={startData[q.id] === false ? "selected" : ""}
+                  onClick={() => setStartData({ ...startData, [q.id]: false })}
+                >
+                  Nein
+                </button>
               </div>
             )}
 
@@ -227,8 +234,11 @@ export default function App() {
     );
   }
 
+  /* ================= FRAGEN ================= */
+
   if (step === "questions") {
     const qs = QUESTIONS[category.key];
+
     return (
       <div className="screen">
         <Header />
@@ -241,7 +251,7 @@ export default function App() {
               {["ja", "bestand", "unbekannt", "nein"].map((v) => (
                 <button
                   key={v}
-                  className={`answerBtn ${v}`}
+                  className={answers[category.key]?.[i] === v ? "selected" : ""}
                   onClick={() => answer(category.key, i, v)}
                 >
                   {v === "ja"
@@ -276,7 +286,7 @@ export default function App() {
   return (
     <div className="screen">
       <Header />
-      <h2>Dein Status</h2>
+      <h2>Dein Absicherungsstatus</h2>
 
       <div className="heroCard">
         <div className="ringWrap">
@@ -297,17 +307,9 @@ export default function App() {
           </svg>
           <div className="ringCenter">
             <div className="percent">{animatedScore}%</div>
-            <div className="sub">Gesamtabsicherung</div>
           </div>
         </div>
       </div>
-
-      {CATEGORIES.map((c) => (
-        <div key={c.key} className="categoryCard">
-          <span>{c.label}</span>
-          <strong>{categoryScore(c.key)}%</strong>
-        </div>
-      ))}
     </div>
   );
 }
