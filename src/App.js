@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
 
-/* ---------------- DIN Kategorien & Farben (BG-nah) ---------------- */
+/* ================= DIN-KATEGORIEN ================= */
 const CATEGORIES = [
   { key: "existenz", label: "Existenz", weight: 30, color: "#8B7CF6" },
   { key: "haftung", label: "Haftung", weight: 20, color: "#00E5FF" },
@@ -11,7 +11,7 @@ const CATEGORIES = [
   { key: "vorsorge", label: "Vorsorge", weight: 10, color: "#B9A7FF" },
 ];
 
-/* ---------------- DIN-Startabfrage ---------------- */
+/* ================= DIN-STARTABFRAGE ================= */
 const START_QUESTIONS = [
   { id: "alter", label: "Wie alt bist du?", type: "number" },
   {
@@ -27,87 +27,114 @@ const START_QUESTIONS = [
     options: ["Miete", "Eigentum"],
   },
   { id: "kfz", label: "Besitzt du ein KFZ?", type: "boolean" },
-  { id: "haustiere", label: "Hast du Haustiere (z. B. Hund)?", type: "boolean" },
+  { id: "haustier", label: "Hast du ein Haustier (z. B. Hund)?", type: "boolean" },
 ];
 
-/* ---------------- Kategorie-Detailfragen (gekürzt, erweiterbar) ---------------- */
-const DETAIL_QUESTIONS = {
+/* ================= DETAILFRAGEN PRO KATEGORIE ================= */
+const CATEGORY_QUESTIONS = {
   existenz: [
-    "Könntest du deinen Lebensstandard länger als 6 Monate ohne Einkommen halten?",
+    "Ist eine Berufsunfähigkeitsversicherung vorhanden?",
+    "Ist die BU-Rente ausreichend hoch?",
+    "Passt der Schutz zu deinem aktuellen Beruf?",
+    "Wurde der Vertrag in den letzten 5 Jahren geprüft?",
+    "Fühlst du dich damit ausreichend abgesichert?",
   ],
-  haftung: ["Sind ausreichend hohe Deckungssummen vereinbart?"],
-  gesundheit: ["Hast du sinnvolle Krankenzusatzversicherungen?"],
-  wohnen: ["Ist dein Hausrat aktuell und ausreichend versichert?"],
-  mobilitaet: ["Hast du einen Schutzbrief für Pannen & Abschleppen?"],
-  vorsorge: ["Kennst du deine persönliche Rentenlücke?"],
+  haftung: [
+    "Ist eine private Haftpflichtversicherung vorhanden?",
+    "Sind hohe Deckungssummen vereinbart?",
+    "Ist ein Haustier mitversichert?",
+    "Wurde der Vertrag in den letzten 5 Jahren geprüft?",
+  ],
+  gesundheit: [
+    "Besteht eine Krankenversicherung?",
+    "Hast du Zusatzversicherungen (z. B. Zähne)?",
+    "Entspricht der Schutz deinem aktuellen Bedarf?",
+    "Wurde der Schutz zuletzt überprüft?",
+  ],
+  wohnen: [
+    "Ist dein Hausrat versichert?",
+    "Ist die Versicherungssumme ausreichend?",
+    "Sind Fahrräder oder Wertsachen mitversichert?",
+    "Wurde der Vertrag aktualisiert?",
+  ],
+  mobilitaet: [
+    "Ist dein KFZ versichert?",
+    "Besteht ein Schutzbrief?",
+    "Sind Zusatzbausteine (z. B. GAP) vorhanden?",
+  ],
+  vorsorge: [
+    "Sparst du aktiv für das Alter?",
+    "Kennst du deine Rentenlücke?",
+    "Ist die Vorsorge langfristig passend?",
+    "Wurde die Vorsorge regelmäßig überprüft?",
+  ],
 };
 
+/* ================= SCORING ================= */
+function scoreFromAnswer(answer) {
+  if (answer === "ja") return 100;
+  if (answer === "bestand") return 75;
+  if (answer === "unbekannt") return 45;
+  return 0;
+}
+
+/* ================= APP ================= */
 export default function App() {
-  const [step, setStep] = useState(0); // 0=Start, 1=Kategorie, 2=Dashboard
+  const [step, setStep] = useState("start"); // start | category | dashboard
   const [startData, setStartData] = useState({});
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [status, setStatus] = useState({});
-  const [detailAnswers, setDetailAnswers] = useState({});
+  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
+  const [answers, setAnswers] = useState({});
   const [animatedScore, setAnimatedScore] = useState(0);
 
-  /* ---------------- Relevante Kategorien aus Start ableiten ---------------- */
-  function isRelevant(catKey) {
-    if (catKey === "mobilitaet" && !startData.kfz) return false;
-    if (catKey === "haftung" && !startData.haustiere) return true; // Haftpflicht immer relevant
-    if (catKey === "existenz" && startData.beruf === "Nicht erwerbstätig")
-      return false;
-    return true;
+  const currentCategory = CATEGORIES[currentCategoryIndex];
+
+  function answerQuestion(catKey, index, value) {
+    setAnswers({
+      ...answers,
+      [catKey]: {
+        ...(answers[catKey] || {}),
+        [index]: value,
+      },
+    });
   }
 
-  /* ---------------- Score pro Kategorie ---------------- */
   function categoryScore(catKey) {
-    if (!isRelevant(catKey)) return 100;
-
-    const s = status[catKey];
-    let base = 0;
-
-    if (s === "vorhanden") base = 70;
-    if (s === "unbekannt") base = 40;
-    if (s === "keine") base = 0;
-
-    const details = detailAnswers[catKey] || [];
-    const bonus = details.filter(Boolean).length * 10;
-
-    return Math.min(100, base + bonus);
+    const qs = CATEGORY_QUESTIONS[catKey];
+    const a = answers[catKey] || {};
+    const total = qs.length * 100;
+    const achieved = qs.reduce(
+      (sum, _, i) => sum + scoreFromAnswer(a[i]),
+      0
+    );
+    return Math.round((achieved / total) * 100);
   }
 
-  /* ---------------- Gesamt-Score ---------------- */
   const totalScore = Math.round(
     CATEGORIES.reduce(
-      (sum, c) =>
-        sum +
-        (categoryScore(c.key) * c.weight) / 100,
+      (sum, c) => sum + (categoryScore(c.key) * c.weight) / 100,
       0
     )
   );
 
-  /* ---------------- Ring animieren ---------------- */
   useEffect(() => {
-    let current = 0;
+    let cur = 0;
     const i = setInterval(() => {
-      current += 1;
-      if (current >= totalScore) {
-        current = totalScore;
+      cur += 1;
+      if (cur >= totalScore) {
+        cur = totalScore;
         clearInterval(i);
       }
-      setAnimatedScore(current);
+      setAnimatedScore(cur);
     }, 15);
     return () => clearInterval(i);
   }, [totalScore]);
 
-  /* ===================== RENDER ===================== */
-
-  /* ---------- STEP 0: DIN-START ---------- */
-  if (step === 0) {
+  /* ================= START ================= */
+  if (step === "start") {
     return (
       <div className="screen">
-        <h2>Kurzer 360°-Check</h2>
-        <p>Ein paar Fragen – damit wir nur relevante Themen prüfen.</p>
+        <h2>360°-Check</h2>
+        <p>Kurze Fragen, damit wir nur relevante Themen prüfen.</p>
 
         {START_QUESTIONS.map((q) => (
           <div key={q.id} className="questionCard">
@@ -156,125 +183,76 @@ export default function App() {
           </div>
         ))}
 
-        <button className="primaryBtn" onClick={() => setStep(1)}>
+        <button className="primaryBtn" onClick={() => setStep("category")}>
           Weiter
         </button>
       </div>
     );
   }
 
-  /* ---------- STEP 1: KATEGORIE-DETAIL ---------- */
-  if (step === 1 && activeCategory) {
-    const questions = DETAIL_QUESTIONS[activeCategory] || [];
+  /* ================= KATEGORIE-WEISE FRAGEN ================= */
+  if (step === "category") {
+    const qs = CATEGORY_QUESTIONS[currentCategory.key];
+
     return (
       <div className="screen">
-        <button className="backBtn" onClick={() => setActiveCategory(null)}>
-          ← Zur Übersicht
-        </button>
+        <h3>{currentCategory.label}</h3>
 
-        <h3>{CATEGORIES.find((c) => c.key === activeCategory).label}</h3>
-
-        <div className="questionCard">
-          <div className="questionText">Versicherungsstatus</div>
-          <div className="buttonRow">
-            {["vorhanden", "keine", "unbekannt"].map((v) => (
-              <button
-                key={v}
-                onClick={() =>
-                  setStatus({ ...status, [activeCategory]: v })
-                }
-              >
-                {v === "vorhanden"
-                  ? "Versicherung vorhanden"
-                  : v === "keine"
-                  ? "Keine Versicherung"
-                  : "Weiß ich nicht"}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {questions.map((q, i) => (
+        {qs.map((q, i) => (
           <div key={i} className="questionCard">
             <div className="questionText">{q}</div>
             <div className="buttonRow">
-              <button
-                onClick={() =>
-                  setDetailAnswers({
-                    ...detailAnswers,
-                    [activeCategory]: [
-                      ...(detailAnswers[activeCategory] || []),
-                      true,
-                    ],
-                  })
-                }
-              >
+              <button onClick={() => answerQuestion(currentCategory.key, i, "ja")}>
                 Ja
               </button>
-              <button>Nein</button>
+              <button
+                onClick={() =>
+                  answerQuestion(currentCategory.key, i, "bestand")
+                }
+              >
+                Habe ich
+              </button>
+              <button
+                onClick={() =>
+                  answerQuestion(currentCategory.key, i, "unbekannt")
+                }
+              >
+                Weiß ich nicht
+              </button>
+              <button
+                onClick={() => answerQuestion(currentCategory.key, i, "nein")}
+              >
+                Nein
+              </button>
             </div>
           </div>
         ))}
 
-        <button className="primaryBtn" onClick={() => setActiveCategory(null)}>
-          Fertig
+        <button
+          className="primaryBtn"
+          onClick={() => {
+            if (currentCategoryIndex < CATEGORIES.length - 1) {
+              setCurrentCategoryIndex(currentCategoryIndex + 1);
+            } else {
+              setStep("dashboard");
+            }
+          }}
+        >
+          Weiter
         </button>
       </div>
     );
   }
 
-  /* ---------- STEP 1: KATEGORIEN-ÜBERSICHT ---------- */
-  if (step === 1 && !activeCategory) {
-    return (
-      <div className="screen">
-        <h2>Themen</h2>
-        {CATEGORIES.filter((c) => isRelevant(c.key)).map((cat) => (
-          <div
-            key={cat.key}
-            className="categoryItem"
-            onClick={() => setActiveCategory(cat.key)}
-          >
-            <div className="categoryHeader">
-              <span>{cat.label}</span>
-              <span>{categoryScore(cat.key)}%</span>
-            </div>
-            <div className="categoryBar">
-              <div
-                className="categoryFill"
-                style={{
-                  width: `${categoryScore(cat.key)}%`,
-                  background: cat.color,
-                }}
-              />
-            </div>
-          </div>
-        ))}
-
-        <button className="primaryBtn" onClick={() => setStep(2)}>
-          Zum Dashboard
-        </button>
-      </div>
-    );
-  }
-
-  /* ---------- STEP 2: END-DASHBOARD ---------- */
+  /* ================= DASHBOARD ================= */
   return (
     <div className="screen">
-      <header className="header">
-        <img src="/logo.jpg" alt="BarmeniaGothaer" className="logoImg" />
-      </header>
+      <h2>Dein Absicherungsstatus</h2>
 
       <div className="heroCard">
         <div className="ringWrap">
           <svg width="200" height="200">
-            <circle
-              cx="100"
-              cy="100"
-              r="80"
-              stroke="#1A2A36"
-              strokeWidth="16"
-              fill="none"
-            />
+            <circle cx="100" cy="100" r="80" stroke="#1A2A36" strokeWidth="16" fill="none" />
             <circle
               cx="100"
               cy="100"
@@ -290,34 +268,18 @@ export default function App() {
           </svg>
           <div className="ringCenter">
             <div className="percent">{animatedScore}%</div>
-            <div className="ringLabel">Dein Absicherungsstatus</div>
           </div>
         </div>
       </div>
 
-      {CATEGORIES.filter((c) => isRelevant(c.key)).map((cat) => (
-        <div key={cat.key} className="categoryItem">
+      {CATEGORIES.map((c) => (
+        <div key={c.key} className="categoryItem">
           <div className="categoryHeader">
-            <span>{cat.label}</span>
-            <span>{categoryScore(cat.key)}%</span>
+            <span>{c.label}</span>
+            <span>{categoryScore(c.key)}%</span>
           </div>
         </div>
       ))}
-
-      <div className="ctaCard">
-        <button className="primaryBtn">Empfehlung ansehen</button>
-        <button
-          className="secondaryBtn"
-          onClick={() =>
-            window.open(
-              "https://agentur.barmenia.de/florian_loeffler",
-              "_blank"
-            )
-          }
-        >
-          Berater kontaktieren
-        </button>
-      </div>
     </div>
   );
 }
