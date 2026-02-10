@@ -3,6 +3,8 @@
   --card: #111c26;
   --primary: #00e5ff;
   --lavender: #b7a7ff;
+  --danger: #ff3b30;
+  --warn: #ff9500;
 }
 
 body {
@@ -18,86 +20,98 @@ body {
 
 .header {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  justify-content: center;
 }
 
 .logoImg {
   height: 56px;
 }
 
-.heroCard {
+.progressWrap {
+  margin-top: 10px;
+}
+
+.progressText {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.progressBar {
+  height: 6px;
+  background: #1a2a36;
+  border-radius: 6px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--lavender);
+  border-radius: 6px;
+}
+
+.card {
   background: var(--card);
   border-radius: 22px;
   padding: 18px;
   margin-top: 20px;
 }
 
-.heroTitle {
-  font-size: 18px;
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
   margin-bottom: 16px;
 }
 
-.form input,
-.form select {
+.choices button {
   width: 100%;
-  margin-bottom: 12px;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-}
-
-label {
-  display: block;
+  padding: 16px;
   margin-bottom: 10px;
+  border-radius: 16px;
+  border: 1px solid #1a2a36;
+  background: #0f1a23;
+  color: white;
 }
 
-.primaryBtn {
+.choices button.active {
+  border-color: var(--lavender);
+  background: rgba(183, 167, 255, 0.15);
+}
+
+.primary {
   width: 100%;
-  padding: 14px;
+  padding: 16px;
   background: var(--primary);
   color: black;
-  font-weight: bold;
   border: none;
+  border-radius: 18px;
+  font-weight: bold;
+}
+
+.rec {
+  padding: 14px;
   border-radius: 14px;
-  margin-top: 16px;
+  margin-bottom: 12px;
 }
 
-.ringWrap {
-  position: relative;
-  display: flex;
-  justify-content: center;
+.rec.high {
+  background: rgba(255, 59, 48, 0.15);
+  border-left: 4px solid var(--danger);
 }
 
-.ringCenter {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  text-align: center;
+.rec.medium {
+  background: rgba(255, 149, 0, 0.15);
+  border-left: 4px solid var(--warn);
 }
 
-.avatar {
-  font-size: 22px;
+.rec.low {
+  background: rgba(183, 167, 255, 0.15);
+  border-left: 4px solid var(--lavender);
 }
 
-.percent {
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.ringAnim {
-  transition: stroke-dashoffset 1.2s ease-out;
-}
-
-.statusRow {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.backBtn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 22px;
+.hint {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 12px;
 }
