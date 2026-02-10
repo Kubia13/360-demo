@@ -1,312 +1,306 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link,
-  useParams,
   useNavigate,
 } from "react-router-dom";
 import "./index.css";
 
-/* -----------------------------
-   MODULES (Demo)
------------------------------- */
+/* ======================================================
+   DIN-77230 BASIS
+====================================================== */
 
-const MODULES = [
-  { key: "existenz", title: "BU", icon: "💼", weight: 20 },
-  { key: "haftpflicht", title: "Haftpflicht", icon: "🛡️", weight: 15 },
-  { key: "gesundheit", title: "Gesundheit", icon: "❤️", weight: 15 },
-  { key: "wohnen", title: "Wohnen", icon: "🏠", weight: 10 },
-  { key: "mobilitaet", title: "Mobilität", icon: "🚗", weight: 10 },
-  { key: "recht", title: "Recht", icon: "⚖️", weight: 10 },
-];
+const DIN = {
+  existenz: 0.4,
+  sach: 0.3,
+  vorsorge: 0.2,
+  komfort: 0.1,
+};
 
-/* -----------------------------
-   COVERAGE SCORE (Demo Logic)
------------------------------- */
+/* ======================================================
+   INITIAL PROFIL (Bestandskunde = später vorfüllbar)
+====================================================== */
 
-function calculateCoverage(profile) {
-  let covered = [];
+const initialProfile = {
+  age: "",
+  job: "",
+  income: "",
+  living: "",
+  car: false,
+  dog: false,
+  bu: false,
+  gkv: true,
+};
 
-  if (profile.hasCar) covered.push("mobilitaet");
-  if (profile.rentsFlat) covered.push("wohnen");
-  if (profile.hasDog) covered.push("haftpflicht");
-  if (profile.age < 40) covered.push("existenz");
+/* ======================================================
+   SCORE LOGIK (DIN-nah, erklärbar)
+====================================================== */
 
-  return covered;
+function calculateScores(p) {
+  const existenz =
+    p.bu && p.income > 0 ? 90 : p.income > 0 ? 30 : 60;
+
+  const sach =
+    (p.car ? 70 : 100) - (p.dog ? 15 : 0);
+
+  const vorsorge =
+    p.age < 30 ? 40 : p.age < 50 ? 60 : 70;
+
+  const komfort = 60;
+
+  const total =
+    existenz * DIN.existenz +
+    sach * DIN.sach +
+    vorsorge * DIN.vorsorge +
+    komfort * DIN.komfort;
+
+  return {
+    existenz,
+    sach,
+    vorsorge,
+    komfort,
+    total: Math.round(total),
+  };
 }
 
-function scorePercent(coveredKeys) {
-  const total = MODULES.reduce((s, m) => s + m.weight, 0);
-  const covered = MODULES.reduce(
-    (s, m) => s + (coveredKeys.includes(m.key) ? m.weight : 0),
-    0
-  );
-  return Math.round((covered / total) * 100);
-}
+/* ======================================================
+   UI KOMPONENTEN
+====================================================== */
 
-/* -----------------------------
-   TABBAR
------------------------------- */
-
-function Tabbar() {
-  return (
-    <div className="tabbar">
-      <Link className="tabItem active" to="/">
-        Home
-      </Link>
-      <Link className="tabItem" to="/onboarding">
-        Check
-      </Link>
-      <Link className="tabItem" to="/recommendation">
-        Empfehlung
-      </Link>
-
-      <a
-        className="tabItem"
-        href="https://agentur.barmenia.de/florian_loeffler"
-        target="_blank"
-        rel="noreferrer"
-      >
-        Kontakt
-      </a>
-    </div>
-  );
-}
-
-/* -----------------------------
-   ONBOARDING (Mini Demo)
------------------------------- */
-
-function Onboarding({ setProfile }) {
+function Header({ back }) {
   const nav = useNavigate();
+  return (
+    <header className="header">
+      {back && (
+        <button className="backBtn" onClick={() => nav(-1)}>
+          ←
+        </button>
+      )}
+      <img src="/logo.jpg" className="logoImg" alt="Logo" />
+    </header>
+  );
+}
 
-  const [age, setAge] = useState(25);
-  const [hasCar, setHasCar] = useState(true);
-  const [hasDog, setHasDog] = useState(true);
-  const [rentsFlat, setRentsFlat] = useState(true);
-
-  function save() {
-    const p = { age, hasCar, hasDog, rentsFlat };
-    localStorage.setItem("bg360_profile", JSON.stringify(p));
-    setProfile(p);
-    nav("/");
-  }
+function Ring({ value }) {
+  const r = 70;
+  const c = 2 * Math.PI * r;
+  const o = c - (value / 100) * c;
 
   return (
-    <div className="screen">
-      <h2>360° Bedarfs-Check</h2>
-
-      <label>Alter: {age}</label>
-      <input
-        type="range"
-        min="18"
-        max="70"
-        value={age}
-        onChange={(e) => setAge(Number(e.target.value))}
-      />
-
-      <label>
-        <input
-          type="checkbox"
-          checked={hasCar}
-          onChange={(e) => setHasCar(e.target.checked)}
+    <div className="ringWrap">
+      <svg width="180" height="180">
+        <circle
+          cx="90"
+          cy="90"
+          r={r}
+          stroke="#1a2a36"
+          strokeWidth="12"
+          fill="none"
         />
-        KFZ vorhanden
-      </label>
-
-      <label>
-        <input
-          type="checkbox"
-          checked={hasDog}
-          onChange={(e) => setHasDog(e.target.checked)}
+        <circle
+          cx="90"
+          cy="90"
+          r={r}
+          stroke="#00e5ff"
+          strokeWidth="12"
+          fill="none"
+          strokeDasharray={c}
+          strokeDashoffset={o}
+          strokeLinecap="round"
+          transform="rotate(-90 90 90)"
+          className="ringAnim"
         />
-        Hund vorhanden
-      </label>
-
-      <label>
-        <input
-          type="checkbox"
-          checked={rentsFlat}
-          onChange={(e) => setRentsFlat(e.target.checked)}
-        />
-        Mietwohnung
-      </label>
-
-      <button className="primaryBtn" onClick={save}>
-        Speichern
-      </button>
-
-      <Tabbar />
+      </svg>
+      <div className="ringCenter">
+        <div className="avatar">👤</div>
+        <div className="percent">{value}%</div>
+      </div>
     </div>
   );
 }
 
-/* -----------------------------
-   DASHBOARD – SEGMENT RING
------------------------------- */
+/* ======================================================
+   WIZARD (ECHTE ABFRAGE)
+====================================================== */
 
-function Dashboard({ profile }) {
-  const coveredKeys = useMemo(() => calculateCoverage(profile), [profile]);
-  const targetScore = useMemo(
-    () => scorePercent(coveredKeys),
-    [coveredKeys]
-  );
+function Wizard({ profile, setProfile }) {
+  const nav = useNavigate();
+  const [step, setStep] = useState(0);
 
-  const [animatedScore, setAnimatedScore] = useState(0);
-
-  useEffect(() => {
-    setTimeout(() => setAnimatedScore(targetScore), 300);
-  }, [targetScore]);
+  const steps = [
+    {
+      title: "Über dich",
+      content: (
+        <>
+          <input
+            placeholder="Alter"
+            type="number"
+            value={profile.age}
+            onChange={(e) =>
+              setProfile({ ...profile, age: +e.target.value })
+            }
+          />
+          <select
+            value={profile.job}
+            onChange={(e) =>
+              setProfile({ ...profile, job: e.target.value })
+            }
+          >
+            <option value="">Beruf</option>
+            <option value="angestellt">Angestellt</option>
+            <option value="selbständig">Selbständig</option>
+            <option value="öd">Öffentlicher Dienst</option>
+          </select>
+        </>
+      ),
+    },
+    {
+      title: "Einkommen & Wohnen",
+      content: (
+        <>
+          <input
+            placeholder="Nettoeinkommen"
+            type="number"
+            value={profile.income}
+            onChange={(e) =>
+              setProfile({ ...profile, income: +e.target.value })
+            }
+          />
+          <select
+            value={profile.living}
+            onChange={(e) =>
+              setProfile({ ...profile, living: e.target.value })
+            }
+          >
+            <option value="">Wohnsituation</option>
+            <option value="miete">Miete</option>
+            <option value="eigentum">Eigentum</option>
+          </select>
+        </>
+      ),
+    },
+    {
+      title: "Risiken",
+      content: (
+        <>
+          <label>
+            <input
+              type="checkbox"
+              checked={profile.car}
+              onChange={(e) =>
+                setProfile({ ...profile, car: e.target.checked })
+              }
+            />
+            KFZ vorhanden
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={profile.dog}
+              onChange={(e) =>
+                setProfile({ ...profile, dog: e.target.checked })
+              }
+            />
+            Hund vorhanden
+          </label>
+        </>
+      ),
+    },
+    {
+      title: "Vorsorge",
+      content: (
+        <>
+          <label>
+            <input
+              type="checkbox"
+              checked={profile.bu}
+              onChange={(e) =>
+                setProfile({ ...profile, bu: e.target.checked })
+              }
+            />
+            Berufsunfähigkeitsversicherung vorhanden
+          </label>
+        </>
+      ),
+    },
+  ];
 
   return (
     <div className="screen">
-      <header className="header">
-        <img src="/logo.jpg" alt="BG Logo" className="logoImg" />
-      </header>
-
+      <Header back={step > 0} />
       <div className="heroCard">
-        <div className="heroTitle">Dein 360° Absicherungsstatus</div>
+        <div className="heroTitle">{steps[step].title}</div>
+        <div className="form">{steps[step].content}</div>
 
-        {/* Progress Ring */}
-        <div className="ringWrap">
-          <svg width="200" height="200">
-            <circle
-              cx="100"
-              cy="100"
-              r="80"
-              stroke="#1a2a36"
-              strokeWidth="14"
-              fill="none"
-            />
+        <button
+          className="primaryBtn"
+          onClick={() =>
+            step < steps.length - 1
+              ? setStep(step + 1)
+              : nav("/result")
+          }
+        >
+          {step < steps.length - 1 ? "Weiter" : "Auswertung"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
-            <circle
-              cx="100"
-              cy="100"
-              r="80"
-              stroke="#b39ddb"
-              strokeWidth="14"
-              fill="none"
-              strokeDasharray="502"
-              strokeDashoffset={502 - (502 * animatedScore) / 100}
-              strokeLinecap="round"
-              transform="rotate(-90 100 100)"
-              className="ringProgress"
-            />
-          </svg>
+/* ======================================================
+   ERGEBNIS
+====================================================== */
 
-          <div className="ringCenter">
-            <div className="avatar">👤</div>
-            <div className="percent">{animatedScore}%</div>
-          </div>
+function Result({ profile }) {
+  const scores = calculateScores(profile);
+
+  return (
+    <div className="screen">
+      <Header back />
+      <div className="heroCard">
+        <div className="heroTitle">Dein Absicherungsstatus</div>
+        <Ring value={scores.total} />
+
+        <div className="statusRow">
+          <span>Existenz</span>
+          <span>{scores.existenz}%</span>
         </div>
-
-        {/* Segment Modules */}
-        <div className="segmentRing">
-          {MODULES.map((m) => (
-            <Link
-              key={m.key}
-              to={`/module/${m.key}`}
-              className={
-                coveredKeys.includes(m.key)
-                  ? "segmentItem covered"
-                  : "segmentItem open"
-              }
-            >
-              <div className="segIcon">{m.icon}</div>
-              <div className="segTitle">{m.title}</div>
-            </Link>
-          ))}
+        <div className="statusRow">
+          <span>Sach & Haftung</span>
+          <span>{scores.sach}%</span>
+        </div>
+        <div className="statusRow">
+          <span>Vorsorge</span>
+          <span>{scores.vorsorge}%</span>
         </div>
 
         <div className="gapText">
-          Offen:{" "}
-          {MODULES.filter((m) => !coveredKeys.includes(m.key))
-            .map((m) => m.title)
-            .join(" · ")}
+          Empfehlung priorisiert nach DIN-Logik
         </div>
       </div>
-
-      <Tabbar />
     </div>
   );
 }
 
-/* -----------------------------
-   MODULE DETAIL PAGE
------------------------------- */
-
-function ModuleDetail() {
-  const { key } = useParams();
-  const mod = MODULES.find((m) => m.key === key);
-
-  if (!mod) return <div className="screen">Nicht gefunden</div>;
-
-  return (
-    <div className="screen">
-      <Link to="/" className="backBtn">
-        ← Zurück
-      </Link>
-
-      <h2>
-        {mod.icon} {mod.title}
-      </h2>
-
-      <div className="detailCard">
-        Hier kommt später DIN 77230 Logik + echte Empfehlung rein.
-      </div>
-
-      <Tabbar />
-    </div>
-  );
-}
-
-/* -----------------------------
-   RECOMMENDATION
------------------------------- */
-
-function Recommendation() {
-  return (
-    <div className="screen">
-      <h2>Empfehlung</h2>
-
-      <div className="detailCard">
-        <b>Top Priorität:</b> Berufsunfähigkeit (BU)
-        <p>
-          In jungen Jahren ist die Absicherung der Arbeitskraft die wichtigste
-          Existenzgrundlage.
-        </p>
-      </div>
-
-      <Tabbar />
-    </div>
-  );
-}
-
-/* -----------------------------
-   MAIN APP
------------------------------- */
+/* ======================================================
+   APP
+====================================================== */
 
 export default function App() {
-  const stored = localStorage.getItem("bg360_profile");
-
-  const [profile, setProfile] = useState(
-    stored
-      ? JSON.parse(stored)
-      : { age: 25, hasCar: true, hasDog: true, rentsFlat: true }
-  );
+  const [profile, setProfile] = useState(initialProfile);
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboard profile={profile} />} />
         <Route
-          path="/onboarding"
-          element={<Onboarding setProfile={setProfile} />}
+          path="/"
+          element={<Wizard profile={profile} setProfile={setProfile} />}
         />
-        <Route path="/module/:key" element={<ModuleDetail />} />
-        <Route path="/recommendation" element={<Recommendation />} />
+        <Route
+          path="/result"
+          element={<Result profile={profile} />}
+        />
       </Routes>
     </Router>
   );
