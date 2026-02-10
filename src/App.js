@@ -3,8 +3,10 @@ import "./index.css";
 
 /* ================= KONFIG ================= */
 
+const CONTACT_URL = "https://agentur.barmenia.de/florian_loeffler";
+
 const CATEGORIES = [
-  { key: "existenz", label: "Existenz", weight: 30 },
+  { key: "existenz", label: "Existenzsicherung", weight: 30 },
   { key: "haftung", label: "Haftung", weight: 20 },
   { key: "gesundheit", label: "Gesundheit", weight: 15 },
   { key: "wohnen", label: "Wohnen", weight: 15 },
@@ -12,175 +14,240 @@ const CATEGORIES = [
   { key: "vorsorge", label: "Vorsorge", weight: 10 },
 ];
 
+const START_QUESTIONS = [
+  { id: "vorname", label: "Vorname", type: "text" },
+  { id: "nachname", label: "Nachname", type: "text" },
+  {
+    id: "geschlecht",
+    label: "Geschlecht",
+    type: "select",
+    options: ["Frau", "Mann", "Divers"],
+  },
+  { id: "alter", label: "Alter", type: "number" },
+  {
+    id: "beruf",
+    label: "Berufliche Situation",
+    type: "select",
+    options: [
+      "Angestellt",
+      "Öffentlicher Dienst",
+      "Selbstständig",
+      "Nicht berufstätig",
+    ],
+  },
+  { id: "einkommen", label: "Monatliches Nettoeinkommen (€)", type: "number" },
+  { id: "kinder", label: "Hast du Kinder?", type: "boolean" },
+  { id: "haustiere", label: "Hast du Haustiere?", type: "boolean" },
+  { id: "kfz", label: "Besitzt du ein KFZ?", type: "boolean" },
+  {
+    id: "kv",
+    label: "Krankenversicherung",
+    type: "select",
+    options: ["Gesetzlich", "Privat"],
+  },
+];
+
 const QUESTIONS = {
   existenz: [
     "Hast du eine Berufsunfähigkeitsversicherung?",
-    "Deckt sie mindestens 60 % deines Nettoeinkommens?",
-    "Wurde der Vertrag in den letzten 5 Jahren geprüft?",
+    "Deckt die BU mindestens 60 % deines Nettoeinkommens ab?",
+    "Passt der Schutz zu deinem aktuellen Beruf?",
   ],
   haftung: [
     "Hast du eine private Haftpflichtversicherung?",
-    "Sind hohe Deckungssummen vereinbart?",
+    "Ist eine hohe Deckungssumme (≥10 Mio €) vereinbart?",
   ],
   gesundheit: [
-    "Bist du krankenversichert?",
-    "Hast du Zusatzversicherungen?",
+    "Entspricht dein Krankenversicherungsschutz deinem Bedarf?",
+    "Hast du relevante Zusatzversicherungen (z. B. Zähne)?",
   ],
   wohnen: [
-    "Ist dein Hausrat versichert?",
+    "Ist dein Hausrat ausreichend versichert?",
     "Sind Wertsachen/Fahrräder mitversichert?",
   ],
   mobilitaet: [
-    "Ist dein KFZ versichert?",
+    "Ist dein KFZ ausreichend versichert?",
     "Hast du einen Schutzbrief?",
   ],
   vorsorge: [
     "Sparst du aktiv für das Alter?",
-    "Kennst du deine Rentenlücke?",
+    "Kennst du deine persönliche Rentenlücke?",
   ],
 };
 
-const SCORE = {
-  ja: 100,
-  unbekannt: 40,
-  nein: 0,
-};
+const SCORE = { ja: 100, nein: 0, unbekannt: 40 };
 
 /* ================= APP ================= */
 
 export default function App() {
-  const [step, setStep] = useState("welcome");
-  const [categoryIndex, setCategoryIndex] = useState(0);
+  const [screen, setScreen] = useState("start"); // start | intake | questions | dashboard
+  const [startData, setStartData] = useState({});
+  const [catIndex, setCatIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [animatedScore, setAnimatedScore] = useState(0);
+  const [animated, setAnimated] = useState(0);
 
-  const category = CATEGORIES[categoryIndex];
-  const qs = QUESTIONS[category.key];
+  const category = CATEGORIES[catIndex];
+  const qs = QUESTIONS[category?.key] || [];
 
-  function reset() {
-    setStep("welcome");
-    setCategoryIndex(0);
+  function resetAll() {
+    setScreen("start");
+    setStartData({});
     setAnswers({});
+    setCatIndex(0);
+    setAnimated(0);
   }
 
-  function answer(cat, index, value) {
+  function answer(cat, i, val) {
     setAnswers({
       ...answers,
-      [cat]: {
-        ...(answers[cat] || {}),
-        [index]: value,
-      },
+      [cat]: { ...(answers[cat] || {}), [i]: val },
     });
   }
 
   function categoryScore(cat) {
+    const q = QUESTIONS[cat];
     const a = answers[cat] || {};
-    const max = QUESTIONS[cat].length * 100;
-    const val = QUESTIONS[cat].reduce(
-      (sum, _, i) => sum + (SCORE[a[i]] ?? 0),
-      0
-    );
-    return Math.round((val / max) * 100);
+    const max = q.length * 100;
+    const sum = q.reduce((s, _, i) => s + (SCORE[a[i]] ?? 0), 0);
+    return Math.round((sum / max) * 100);
   }
 
   const totalScore = Math.round(
     CATEGORIES.reduce(
-      (sum, c) => sum + (categoryScore(c.key) * c.weight) / 100,
+      (s, c) => s + (categoryScore(c.key) * c.weight) / 100,
       0
     )
   );
 
   useEffect(() => {
-    let cur = 0;
-    const timer = setInterval(() => {
-      cur += 1;
-      if (cur >= totalScore) {
-        cur = totalScore;
-        clearInterval(timer);
-      }
-      setAnimatedScore(cur);
+    let i = 0;
+    const t = setInterval(() => {
+      i++;
+      if (i >= totalScore) clearInterval(t);
+      setAnimated(i);
     }, 15);
-    return () => clearInterval(timer);
+    return () => clearInterval(t);
   }, [totalScore]);
 
-  /* ================= HEADER ================= */
+  /* ================= START ================= */
 
-  const Header = () => (
-    <div className="header center">
-      <img
-        src="/logo.jpg"
-        alt="BarmeniaGothaer"
-        className="logoImg"
-        onClick={reset}
-      />
-    </div>
-  );
-
-  /* ================= WELCOME ================= */
-
-  if (step === "welcome") {
+  if (screen === "start") {
     return (
-      <div className="screen center full">
-        <Header />
-        <h2>Willkommen</h2>
-        <p>
-          Wir prüfen deine Absicherung nach DIN-Logik – klar, neutral und
-          verständlich.
-        </p>
-        <button className="primaryBtn big" onClick={() => setStep("questions")}>
+      <div className="screen center">
+        <img
+          src="/logo.jpg"
+          alt="Logo"
+          className="logoBig"
+          onClick={resetAll}
+        />
+        <h1>360°-Analyse</h1>
+        <p>Kurz. Neutral. DIN-orientiert.</p>
+        <button className="primaryBtn big" onClick={() => setScreen("intake")}>
           Jetzt starten
+        </button>
+        <a href={CONTACT_URL} className="contactLink">
+          Kontakt
+        </a>
+      </div>
+    );
+  }
+
+  /* ================= INTAKE ================= */
+
+  if (screen === "intake") {
+    return (
+      <div className="screen">
+        <Header onBack={resetAll} />
+
+        {START_QUESTIONS.map((q) => (
+          <div key={q.id} className="questionCard">
+            <div className="questionText">{q.label}</div>
+
+            {q.type === "text" || q.type === "number" ? (
+              <input
+                type={q.type}
+                value={startData[q.id] || ""}
+                onChange={(e) =>
+                  setStartData({ ...startData, [q.id]: e.target.value })
+                }
+              />
+            ) : q.type === "select" ? (
+              <select
+                value={startData[q.id] || ""}
+                onChange={(e) =>
+                  setStartData({ ...startData, [q.id]: e.target.value })
+                }
+              >
+                <option value="">Bitte wählen</option>
+                {q.options.map((o) => (
+                  <option key={o}>{o}</option>
+                ))}
+              </select>
+            ) : (
+              <div className="buttonRow">
+                {["ja", "nein"].map((v) => (
+                  <button
+                    key={v}
+                    className={startData[q.id] === v ? "active" : ""}
+                    onClick={() =>
+                      setStartData({ ...startData, [q.id]: v })
+                    }
+                  >
+                    {v === "ja" ? "Ja" : "Nein"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+
+        <button className="primaryBtn" onClick={() => setScreen("questions")}>
+          Weiter
         </button>
       </div>
     );
   }
 
-  /* ================= FRAGEN ================= */
+  /* ================= QUESTIONS ================= */
 
-  if (step === "questions") {
+  if (screen === "questions") {
     return (
-      <div className="screen center">
-        <Header />
-        <h3>{category.label}</h3>
+      <div className="screen">
+        <Header
+          onBack={() =>
+            catIndex === 0 ? setScreen("intake") : setCatIndex(catIndex - 1)
+          }
+        />
 
-        {qs.map((q, i) => {
-          const selected = answers[category.key]?.[i];
+        <h2>{category.label}</h2>
 
-          return (
-            <div key={i} className="questionCard">
-              <div className="questionText">{q}</div>
-
-              <div className="buttonRow">
+        {qs.map((q, i) => (
+          <div key={i} className="questionCard">
+            <div className="questionText">{q}</div>
+            <div className="buttonRow">
+              {["ja", "nein", "unbekannt"].map((v) => (
                 <button
-                  className={selected === "ja" ? "selected yes" : ""}
-                  onClick={() => answer(category.key, i, "ja")}
+                  key={v}
+                  className={answers[category.key]?.[i] === v ? "active" : ""}
+                  onClick={() => answer(category.key, i, v)}
                 >
-                  Ja
+                  {v === "ja"
+                    ? "Ja"
+                    : v === "nein"
+                    ? "Nein"
+                    : "Weiß nicht"}
                 </button>
-
-                <button
-                  className={selected === "unbekannt" ? "selected maybe" : ""}
-                  onClick={() => answer(category.key, i, "unbekannt")}
-                >
-                  Weiß ich nicht
-                </button>
-
-                <button
-                  className={selected === "nein" ? "selected no" : ""}
-                  onClick={() => answer(category.key, i, "nein")}
-                >
-                  Nein
-                </button>
-              </div>
+              ))}
             </div>
-          );
-        })}
+          </div>
+        ))}
 
         <button
           className="primaryBtn"
           onClick={() =>
-            categoryIndex < CATEGORIES.length - 1
-              ? setCategoryIndex(categoryIndex + 1)
-              : setStep("dashboard")
+            catIndex < CATEGORIES.length - 1
+              ? setCatIndex(catIndex + 1)
+              : setScreen("dashboard")
           }
         >
           Weiter
@@ -192,47 +259,56 @@ export default function App() {
   /* ================= DASHBOARD ================= */
 
   return (
-    <div className="screen center">
-      <Header />
-      <h2>Dein Absicherungsstatus</h2>
+    <div className="screen">
+      <Header onBack={() => setScreen("questions")} />
 
       <div className="heroCard">
         <div className="ringWrap">
-          <svg width="200" height="200">
+          <svg width="220" height="220">
+            <circle cx="110" cy="110" r="90" stroke="#1a2a36" strokeWidth="18" fill="none" />
             <circle
-              cx="100"
-              cy="100"
-              r="80"
-              stroke="#1A2A36"
-              strokeWidth="16"
+              cx="110"
+              cy="110"
+              r="90"
+              stroke="#00e5ff"
+              strokeWidth="18"
               fill="none"
-            />
-            <circle
-              cx="100"
-              cy="100"
-              r="80"
-              stroke="#8B7CF6"
-              strokeWidth="16"
-              fill="none"
-              strokeDasharray="503"
-              strokeDashoffset={503 - (503 * animatedScore) / 100}
+              strokeDasharray="565"
+              strokeDashoffset={565 - (565 * animated) / 100}
               strokeLinecap="round"
-              transform="rotate(-90 100 100)"
+              transform="rotate(-90 110 110)"
             />
           </svg>
           <div className="ringCenter">
-            <div className="percent">{animatedScore}%</div>
-            <div className="sub">Gesamtabsicherung</div>
+            <div className="percent">{animated}%</div>
+            <div className="sub">Gesamtstatus</div>
           </div>
         </div>
       </div>
 
       {CATEGORIES.map((c) => (
-        <div key={c.key} className="categoryRow">
+        <div key={c.key} className="categoryItem">
           <span>{c.label}</span>
-          <strong>{categoryScore(c.key)}%</strong>
+          <span>{categoryScore(c.key)}%</span>
         </div>
       ))}
+
+      <a href={CONTACT_URL} className="primaryBtn">
+        Kontakt aufnehmen
+      </a>
     </div>
+  );
+}
+
+/* ================= HEADER ================= */
+
+function Header({ onBack }) {
+  return (
+    <header className="header">
+      <div className="backIcon" onClick={onBack}>
+        ←
+      </div>
+      <img src="/logo.jpg" alt="Logo" className="logoSmall" onClick={onBack} />
+    </header>
   );
 }
