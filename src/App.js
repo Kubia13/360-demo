@@ -12,24 +12,6 @@ const CATEGORIES = [
   { key: "vorsorge", label: "Vorsorge", weight: 10 },
 ];
 
-const START_QUESTIONS = [
-  { id: "alter", label: "Wie alt bist du?", type: "number" },
-  {
-    id: "beruf",
-    label: "Deine berufliche Situation",
-    type: "select",
-    options: ["Angestellt", "Selbstständig", "Beamter", "Nicht erwerbstätig"],
-  },
-  {
-    id: "wohnen",
-    label: "Wohnsituation",
-    type: "select",
-    options: ["Miete", "Eigentum"],
-  },
-  { id: "kfz", label: "Besitzt du ein KFZ?", type: "boolean" },
-  { id: "haustier", label: "Hast du ein Haustier (z. B. Hund)?", type: "boolean" },
-];
-
 const QUESTIONS = {
   existenz: [
     "Hast du eine Berufsunfähigkeitsversicherung?",
@@ -58,177 +40,95 @@ const QUESTIONS = {
   ],
 };
 
-const SCORE = { ja: 100, bestand: 80, unbekannt: 40, nein: 0 };
+const SCORE = {
+  ja: 100,
+  unbekannt: 40,
+  nein: 0,
+};
 
 /* ================= APP ================= */
 
 export default function App() {
   const [step, setStep] = useState("welcome");
-  const [history, setHistory] = useState([]);
-  const [startData, setStartData] = useState({});
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [animatedScore, setAnimatedScore] = useState(0);
 
   const category = CATEGORIES[categoryIndex];
-
-  function go(next) {
-    setHistory([...history, step]);
-    setStep(next);
-  }
-
-  function back() {
-    const h = [...history];
-    const prev = h.pop();
-    setHistory(h);
-    setStep(prev || "welcome");
-  }
+  const qs = QUESTIONS[category.key];
 
   function reset() {
     setStep("welcome");
-    setHistory([]);
-    setAnswers({});
-    setStartData({});
     setCategoryIndex(0);
+    setAnswers({});
   }
 
-  function answer(cat, i, v) {
+  function answer(cat, index, value) {
     setAnswers({
       ...answers,
-      [cat]: { ...(answers[cat] || {}), [i]: v },
+      [cat]: {
+        ...(answers[cat] || {}),
+        [index]: value,
+      },
     });
   }
 
   function categoryScore(cat) {
-    const qs = QUESTIONS[cat];
     const a = answers[cat] || {};
-    const max = qs.length * 100;
-    const val = qs.reduce((s, _, i) => s + (SCORE[a[i]] ?? 0), 0);
+    const max = QUESTIONS[cat].length * 100;
+    const val = QUESTIONS[cat].reduce(
+      (sum, _, i) => sum + (SCORE[a[i]] ?? 0),
+      0
+    );
     return Math.round((val / max) * 100);
   }
 
   const totalScore = Math.round(
     CATEGORIES.reduce(
-      (s, c) => s + (categoryScore(c.key) * c.weight) / 100,
+      (sum, c) => sum + (categoryScore(c.key) * c.weight) / 100,
       0
     )
   );
 
   useEffect(() => {
     let cur = 0;
-    const i = setInterval(() => {
+    const timer = setInterval(() => {
       cur += 1;
       if (cur >= totalScore) {
         cur = totalScore;
-        clearInterval(i);
+        clearInterval(timer);
       }
       setAnimatedScore(cur);
-    }, 12);
-    return () => clearInterval(i);
+    }, 15);
+    return () => clearInterval(timer);
   }, [totalScore]);
 
   /* ================= HEADER ================= */
 
   const Header = () => (
-    <div className="header">
-      {step !== "welcome" && (
-        <img
-          src="/back.svg"
-          alt="Zurück"
-          className="backIcon"
-          onClick={back}
-        />
-      )}
-
+    <div className="header center">
       <img
         src="/logo.jpg"
         alt="BarmeniaGothaer"
         className="logoImg"
         onClick={reset}
       />
-
-      <a
-        href="https://agentur.barmenia.de/florian_loeffler"
-        target="_blank"
-        rel="noreferrer"
-        className="contactLink"
-      >
-        Kontakt
-      </a>
     </div>
   );
 
-  /* ================= SCREENS ================= */
+  /* ================= WELCOME ================= */
 
   if (step === "welcome") {
     return (
-      <div className="screen center">
+      <div className="screen center full">
         <Header />
         <h2>Willkommen</h2>
         <p>
-          In wenigen Minuten prüfen wir deine Absicherung – verständlich,
-          neutral und individuell.
+          Wir prüfen deine Absicherung nach DIN-Logik – klar, neutral und
+          verständlich.
         </p>
-        <button className="primaryBtn big" onClick={() => go("start")}>
+        <button className="primaryBtn big" onClick={() => setStep("questions")}>
           Jetzt starten
-        </button>
-      </div>
-    );
-  }
-
-  if (step === "start") {
-    return (
-      <div className="screen">
-        <Header />
-        <h3>Kurze Einordnung</h3>
-
-        {START_QUESTIONS.map((q) => (
-          <div key={q.id} className="questionCard">
-            <div className="questionText">{q.label}</div>
-
-            {q.type === "number" && (
-              <input
-                type="number"
-                onChange={(e) =>
-                  setStartData({ ...startData, [q.id]: e.target.value })
-                }
-              />
-            )}
-
-            {q.type === "boolean" && (
-              <div className="buttonRow">
-                <button
-                  className={startData[q.id] === true ? "selected" : ""}
-                  onClick={() => setStartData({ ...startData, [q.id]: true })}
-                >
-                  Ja
-                </button>
-                <button
-                  className={startData[q.id] === false ? "selected" : ""}
-                  onClick={() => setStartData({ ...startData, [q.id]: false })}
-                >
-                  Nein
-                </button>
-              </div>
-            )}
-
-            {q.type === "select" && (
-              <select
-                onChange={(e) =>
-                  setStartData({ ...startData, [q.id]: e.target.value })
-                }
-              >
-                <option value="">Bitte wählen</option>
-                {q.options.map((o) => (
-                  <option key={o}>{o}</option>
-                ))}
-              </select>
-            )}
-          </div>
-        ))}
-
-        <button className="primaryBtn" onClick={() => go("questions")}>
-          Weiter
         </button>
       </div>
     );
@@ -237,42 +137,50 @@ export default function App() {
   /* ================= FRAGEN ================= */
 
   if (step === "questions") {
-    const qs = QUESTIONS[category.key];
-
     return (
-      <div className="screen">
+      <div className="screen center">
         <Header />
         <h3>{category.label}</h3>
 
-        {qs.map((q, i) => (
-          <div key={i} className="questionCard">
-            <div className="questionText">{q}</div>
-            <div className="buttonRow">
-              {["ja", "bestand", "unbekannt", "nein"].map((v) => (
+        {qs.map((q, i) => {
+          const selected = answers[category.key]?.[i];
+
+          return (
+            <div key={i} className="questionCard">
+              <div className="questionText">{q}</div>
+
+              <div className="buttonRow">
                 <button
-                  key={v}
-                  className={answers[category.key]?.[i] === v ? "selected" : ""}
-                  onClick={() => answer(category.key, i, v)}
+                  className={selected === "ja" ? "selected yes" : ""}
+                  onClick={() => answer(category.key, i, "ja")}
                 >
-                  {v === "ja"
-                    ? "Ja"
-                    : v === "bestand"
-                    ? "Habe ich"
-                    : v === "unbekannt"
-                    ? "Weiß ich nicht"
-                    : "Nein"}
+                  Ja
                 </button>
-              ))}
+
+                <button
+                  className={selected === "unbekannt" ? "selected maybe" : ""}
+                  onClick={() => answer(category.key, i, "unbekannt")}
+                >
+                  Weiß ich nicht
+                </button>
+
+                <button
+                  className={selected === "nein" ? "selected no" : ""}
+                  onClick={() => answer(category.key, i, "nein")}
+                >
+                  Nein
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         <button
           className="primaryBtn"
           onClick={() =>
             categoryIndex < CATEGORIES.length - 1
               ? setCategoryIndex(categoryIndex + 1)
-              : go("dashboard")
+              : setStep("dashboard")
           }
         >
           Weiter
@@ -284,14 +192,21 @@ export default function App() {
   /* ================= DASHBOARD ================= */
 
   return (
-    <div className="screen">
+    <div className="screen center">
       <Header />
       <h2>Dein Absicherungsstatus</h2>
 
       <div className="heroCard">
         <div className="ringWrap">
           <svg width="200" height="200">
-            <circle cx="100" cy="100" r="80" stroke="#1A2A36" strokeWidth="16" fill="none" />
+            <circle
+              cx="100"
+              cy="100"
+              r="80"
+              stroke="#1A2A36"
+              strokeWidth="16"
+              fill="none"
+            />
             <circle
               cx="100"
               cy="100"
@@ -307,9 +222,17 @@ export default function App() {
           </svg>
           <div className="ringCenter">
             <div className="percent">{animatedScore}%</div>
+            <div className="sub">Gesamtabsicherung</div>
           </div>
         </div>
       </div>
+
+      {CATEGORIES.map((c) => (
+        <div key={c.key} className="categoryRow">
+          <span>{c.label}</span>
+          <strong>{categoryScore(c.key)}%</strong>
+        </div>
+      ))}
     </div>
   );
 }
