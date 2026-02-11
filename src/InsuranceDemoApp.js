@@ -60,7 +60,7 @@ export default function InsuranceDemoApp() {
               </ul>
               <button
                 style={buttonStyle}
-                onClick={() => setScreen("questions")}
+                onClick={() => setScreen("category")}
               >
                 Lücke schließen →
               </button>
