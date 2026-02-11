@@ -6,7 +6,7 @@ body {
 }
 
 .screen {
-  padding: 24px;
+  padding: 20px;
   max-width: 480px;
   margin: auto;
   padding-bottom: 120px;
@@ -18,7 +18,7 @@ body {
 
 .logo.large {
   height: 72px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   cursor: pointer;
 }
 
@@ -29,30 +29,25 @@ body {
 
 .header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  margin-bottom: 20px;
 }
 
 .backBtn {
-  position: absolute;
-  left: 0;
-  font-size: 26px;
+  font-size: 24px;
   background: none;
   border: none;
-  color: #00e5ff;
+  color: white;
   cursor: pointer;
 }
 
 .field {
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .field label {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 6px;
+  font-size: 13px;
+  opacity: 0.8;
 }
 
 .field input,
@@ -62,8 +57,7 @@ body {
   border-radius: 14px;
   border: none;
   background: #0f1a23;
-  color: #fff;
-  font-size: 16px;
+  color: white;
 }
 
 .primaryBtn {
@@ -71,16 +65,15 @@ body {
   padding: 16px;
   border-radius: 18px;
   background: #00e5ff;
-  color: #000;
+  color: black;
   font-weight: bold;
   border: none;
   cursor: pointer;
-  font-size: 16px;
   margin-top: 20px;
 }
 
 .primaryBtn.big {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .questionCard.dark {
@@ -91,36 +84,70 @@ body {
 }
 
 .questionText {
-  font-size: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .buttonRow {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .answerBtn {
   flex: 1;
   padding: 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: none;
   background: #111c26;
-  color: #fff;
-  font-size: 14px;
+  color: white;
   cursor: pointer;
 }
 
 .answerBtn.active {
   background: #00e5ff;
-  color: #000;
+  color: black;
   font-weight: bold;
 }
 
-.ringWrap {
-  position: relative;
+.inlineLink {
+  color: #8b7cf6;
+  font-size: 13px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.infoIcon {
+  margin-left: 6px;
+  background: #00e5ff;
+  color: black;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.infoOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
   display: flex;
   justify-content: center;
+  align-items: center;
+}
+
+.infoBox {
+  background: #111c26;
+  padding: 20px;
+  border-radius: 18px;
+  max-width: 300px;
+}
+
+.ringWrap {
+  display: flex;
+  justify-content: center;
+  position: relative;
   margin: 30px 0;
 }
 
@@ -132,22 +159,15 @@ body {
   font-weight: bold;
 }
 
-.categoryLine {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  font-size: 15px;
-}
-
 .contactFixed {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  background: #071018;
   padding: 14px;
   display: flex;
   justify-content: center;
-  background: #071018;
 }
 
 .contactFixed a {
@@ -156,8 +176,7 @@ body {
   padding: 16px;
   border-radius: 18px;
   background: #00e5ff;
-  color: #000;
+  color: black;
   font-weight: bold;
   text-decoration: none;
-  font-size: 16px;
 }
