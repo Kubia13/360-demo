@@ -747,7 +747,7 @@ function Header({ reset, back }) {
         alt="Logo"
       />
       <button className="backBtn" onClick={back}>
-       ←
+       ⟵
       </button>
     </div>
   );
