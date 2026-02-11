@@ -229,10 +229,12 @@ body {
 }
 
 .secondaryBtn {
+  border-radius: 18px;
   background: #1a2a36;
   color: white;
   border: 1px solid #5E4AE3;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .secondaryBtn:hover {
