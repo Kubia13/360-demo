@@ -168,13 +168,13 @@ body {
 }
 
 /* Beide Buttons absolut identisch */
-.contactFixed a,
-.contactFixed .secondaryBtn {
+.contactFixed > a,
+.contactFixed > button {
   flex: 1;
   max-width: 200px;
 
-  height: 56px;              /* feste Höhe */
-  padding: 0;                /* Padding komplett raus */
+  height: 56px;
+  padding: 0 !important;        /* überschreibt alles */
   
   display: flex;
   align-items: center;
@@ -182,10 +182,10 @@ body {
 
   border-radius: 18px;
   font-weight: bold;
-  font-size: 15px;           /* gleiche Schriftgröße */
-  line-height: 1;            /* wichtig */
+  font-size: 15px;
+  line-height: 1;
 
-  box-sizing: border-box;    /* verhindert Differenzen */
+  box-sizing: border-box;
   transition: 0.2s ease;
 }
 
@@ -197,7 +197,7 @@ body {
 }
 
 /* Neustart */
-.contactFixed .secondaryBtn {
+.contactFixed > button {
   background: #1a2a36;
   color: white;
   border: 1px solid #5E4AE3;
