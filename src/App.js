@@ -51,20 +51,54 @@ export default function App() {
   const [baseData, setBaseData] = useState({});
   const [animatedScore, setAnimatedScore] = useState(0);
   const [showInfo, setShowInfo] = useState(null);
+  const [modules, setModules] = useState({});
 
-  function resetAll() {
-    setStep("welcome");
-    setAnswers({});
-    setBaseData({});
+function resetAll() {
+  setStep("welcome");
+  setAnswers({});
+  setBaseData({});
+  setModules({});
   }
 
   function answer(key, value) {
     setAnswers({ ...answers, [key]: value });
   }
 
-  function score(key) {
-    return SCORE[answers[key]] || 0;
+  /* ================= ERWEITERTE SCORE-LOGIK ================= */
+
+function getScore(key) {
+  const value = answers[key];
+
+  // Standard Ja / Nein
+  if (value === "ja") return 100;
+  if (value === "nein" || value === "unbekannt") return 0;
+
+  // Kasko differenziert
+  if (key === "kasko") {
+    if (value === "vollkasko") return 100;
+    if (value === "teilkasko") return 50;
+    if (value === "haftpflicht") return 0;
+    return 0;
   }
+
+  // Rechtsschutz Module
+  if (key === "rechtsschutz") {
+    if (answers[key] !== "ja") return 0;
+    const m = modules?.rechtsschutz || {};
+    const count = Object.values(m).filter(Boolean).length;
+    return Math.min(count * 25, 100);
+  }
+
+  // Private Altersvorsorge Module
+  if (key === "private_rente") {
+    if (answers[key] !== "ja") return 0;
+    const m = modules?.private_rente || {};
+    const count = Object.values(m).filter(Boolean).length;
+    return Math.min(count * 34, 100);
+  }
+
+  return 0;
+}
 
   const categoryScores = Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
     const questionsInCategory = Object.keys(QUESTION_CATEGORY_MAP).filter(
@@ -74,7 +108,7 @@ export default function App() {
     if (questionsInCategory.length === 0) {
       acc[cat] = 0;
     } else {
-      const sum = questionsInCategory.reduce((s, q) => s + score(q), 0);
+      const sum = keys.reduce((s, k) => s + getScore(k), 0);
       acc[cat] = Math.round(sum / questionsInCategory.length);
     }
 
