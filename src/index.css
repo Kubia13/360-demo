@@ -485,3 +485,11 @@ body {
   font-weight: 600;
   color: #A99BFF;
 }
+.scoreLabel {
+  text-align: center;
+  margin-top: -8px;
+  margin-bottom: 25px;
+  font-weight: 500;
+  color: #A99BFF;
+  opacity: 0.9;
+}

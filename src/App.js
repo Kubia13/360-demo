@@ -26,6 +26,7 @@ const CATEGORY_LABELS = {
 /* ================= FRAGEN ================= */
 
 const QUESTIONS = {
+
   /* ===== EXISTENZ ===== */
 
   bu: {
@@ -40,7 +41,7 @@ const QUESTIONS = {
     type: "yesno",
     link: {
       label: "Krankentagegeld-Rechner",
-      url: "https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner?..."
+      url: "https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner"
     }
   },
 
@@ -157,14 +158,14 @@ const QUESTIONS = {
   },
 
   rentenluecke: {
-  label: "Kennst du deine Rentenlücke?",
-  category: "vorsorge",
-  type: "yesno",
-  link: {
-    label: "Rentenlückenrechner",
-    url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke"
-  }
-},
+    label: "Kennst du deine Rentenlücke?",
+    category: "vorsorge",
+    type: "yesno",
+    link: {
+      label: "Rentenlückenrechner",
+      url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke"
+    }
+  },
 
   /* ===== KINDER ===== */
 
@@ -190,6 +191,7 @@ const QUESTIONS = {
   },
 };
 export default function App() {
+
   const [step, setStep] = useState("welcome");
   const [answers, setAnswers] = useState({});
   const [baseData, setBaseData] = useState({});
@@ -201,19 +203,20 @@ export default function App() {
   /* ================= DYNAMISCHE KATEGORIEN ================= */
 
   const categories = useMemo(() => {
-  return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
-    const questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
-      const q = QUESTIONS[id];
+    return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
 
-      if (q.category !== cat) return false;
-      if (q.condition && !q.condition(baseData)) return false;
+      const questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
+        const q = QUESTIONS[id];
 
-      return true;
+        if (q.category !== cat) return false;
+        if (q.condition && !q.condition(baseData)) return false;
+
+        return true;
+      });
+
+      return questionsInCategory.length > 0;
     });
-
-    return questionsInCategory.length > 0;
-  });
-}, [baseData]);
+  }, [baseData]);
 
   const currentCategory = categories[currentCategoryIndex];
 
@@ -232,18 +235,25 @@ export default function App() {
     setAnswers({});
     setBaseData({});
     setCurrentCategoryIndex(0);
+    setAnimatedScore(0);
   }
 
   /* ================= ANSWER ================= */
 
   function answer(key, value) {
-    setAnswers((prev) => ({ ...prev, [key]: value }));
+    setAnswers((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   }
 
   /* ================= SCORE ================= */
 
   function getScore(key) {
+
     const value = answers[key];
+
+    if (!value) return 0;
 
     if (value === "ja") return 100;
     if (value === "nein" || value === "unbekannt") return 0;
@@ -257,49 +267,69 @@ export default function App() {
     return 0;
   }
 
-  const categoryScores = Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
-    const questions = Object.keys(QUESTIONS).filter((id) => {
-      const q = QUESTIONS[id];
-      if (q.category !== cat) return false;
-      if (q.condition && !q.condition(baseData)) return false;
-      if (answers[id] === undefined) return false;
-      return true;
-    });
+  const categoryScores = useMemo(() => {
 
-    if (!questions.length) {
-      acc[cat] = 0;
-    } else {
-      const sum = questions.reduce((s, id) => s + getScore(id), 0);
-      acc[cat] = Math.round(sum / questions.length);
-    }
+    return Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
 
-    return acc;
-  }, {});
+      const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
 
-  const totalScore = Math.round(
-    Object.keys(CATEGORY_WEIGHTS).reduce(
-      (sum, cat) =>
-        sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat],
-      0
-    )
-  );
+        const q = QUESTIONS[id];
+
+        if (q.category !== cat) return false;
+        if (q.condition && !q.condition(baseData)) return false;
+        if (answers[id] === undefined) return false;
+
+        return true;
+      });
+
+      if (!relevantQuestions.length) {
+        acc[cat] = 0;
+      } else {
+        const sum = relevantQuestions.reduce(
+          (total, id) => total + getScore(id),
+          0
+        );
+        acc[cat] = Math.round(sum / relevantQuestions.length);
+      }
+
+      return acc;
+
+    }, {});
+
+  }, [answers, baseData]);
+
+  const totalScore = useMemo(() => {
+
+    return Math.round(
+      Object.keys(CATEGORY_WEIGHTS).reduce((sum, cat) => {
+        return sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat];
+      }, 0)
+    );
+
+  }, [categoryScores]);
 
   /* ===== SCORE ANIMATION ===== */
 
   useEffect(() => {
+
     let current = 0;
+
     const interval = setInterval(() => {
+
       current++;
+
       if (current >= totalScore) {
         current = totalScore;
         clearInterval(interval);
       }
+
       setAnimatedScore(current);
-    }, 10);
+
+    }, 8);
 
     return () => clearInterval(interval);
-  }, [totalScore]);
 
+  }, [totalScore]);
   /* ================= RESET OVERLAY ================= */
 
   const ResetOverlay = showResetConfirm && (
@@ -334,6 +364,7 @@ export default function App() {
       </div>
     </div>
   );
+
   /* ================= WELCOME ================= */
 
   if (step === "welcome") {
@@ -376,6 +407,18 @@ export default function App() {
           options={["Herr", "Frau", "Divers"]}
           onChange={(v) =>
             setBaseData({ ...baseData, geschlecht: v })
+          }
+        />
+
+        <Select
+          label="Beziehungsstatus"
+          options={[
+            "Single",
+            "Partnerschaft",
+            "Verheiratet"
+          ]}
+          onChange={(v) =>
+            setBaseData({ ...baseData, beziehungsstatus: v })
           }
         />
 
@@ -503,7 +546,6 @@ export default function App() {
       </div>
     );
   }
-
   /* ================= KATEGORIEN ================= */
 
   if (step === "category") {
@@ -512,7 +554,6 @@ export default function App() {
       const q = QUESTIONS[id];
 
       if (q.category !== currentCategory) return false;
-
       if (q.condition && !q.condition(baseData)) return false;
 
       return true;
@@ -554,8 +595,7 @@ export default function App() {
               style={{
                 width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`,
                 height: "100%",
-                background:
-                  "linear-gradient(135deg, #8B7CF6, #5E4AE3)",
+                background: "linear-gradient(135deg, #8B7CF6, #5E4AE3)",
                 transition: "0.3s ease",
               }}
             />
@@ -586,16 +626,15 @@ export default function App() {
 
               {q.link && (
                 <a
-                href={q.link.url}
-                target="_blank"
-                rel="noreferrer"
-                className="calculatorIcon"
-                title={q.link.label}
+                  href={q.link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="calculatorIcon"
+                  title={q.link.label}
                 >
                   🧮
-                  </a>
-                )}
-
+                </a>
+              )}
 
               {q.type === "select" && (
                 <Select
@@ -655,14 +694,18 @@ export default function App() {
             : "Auswertung"}
         </button>
 
+        {/* Info Overlay */}
         {showInfo && (
           <div
             className="infoOverlay"
             onClick={() => setShowInfo(null)}
           >
-            <div className="infoBox">
-              {showInfo.split("\n").map((l, i) => (
-                <p key={i}>{l}</p>
+            <div
+              className="infoBox"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {showInfo.split("\n").map((line, i) => (
+                <p key={i}>{line}</p>
               ))}
             </div>
           </div>
@@ -675,81 +718,82 @@ export default function App() {
   }
   /* ================= DASHBOARD ================= */
 
-return (
-  <div className="screen">
-    <Header reset={resetAll} back={() => setStep("category")} />
+  return (
+    <div className="screen">
+      <Header reset={resetAll} back={() => setStep("category")} />
 
-    <h2>
-      {baseData.vorname
-        ? `${baseData.vorname}, dein Status`
-        : "Dein Status"}
-    </h2>
+      <h2>
+        {baseData.vorname
+          ? `${baseData.vorname}, dein Status`
+          : "Dein Status"}
+      </h2>
 
-    <div className="ringWrap">
-      <svg width="220" height="220">
-        {/* Hintergrund Ring */}
-        <circle
-          cx="110"
-          cy="110"
-          r="90"
-          stroke="#1a2a36"
-          strokeWidth="16"
-          fill="none"
-        />
+      {/* Score Ring */}
+      <div className="ringWrap">
+        <svg width="220" height="220">
+          {/* Hintergrund Ring */}
+          <circle
+            cx="110"
+            cy="110"
+            r="90"
+            stroke="#1a2a36"
+            strokeWidth="16"
+            fill="none"
+          />
 
-        {/* Fortschritt Ring */}
-        <circle
-          cx="110"
-          cy="110"
-          r="90"
-          stroke="url(#grad)"
-          strokeWidth="16"
-          fill="none"
-          strokeDasharray="565"
-          strokeDashoffset={565 - (565 * animatedScore) / 100}
-          strokeLinecap="round"
-          transform="rotate(-90 110 110)"
-          style={{
-            filter: "drop-shadow(0 0 10px rgba(139,124,246,0.6))",
-            transition: "0.6s ease",
-          }}
-        />
+          {/* Fortschritt Ring */}
+          <circle
+            cx="110"
+            cy="110"
+            r="90"
+            stroke="url(#grad)"
+            strokeWidth="16"
+            fill="none"
+            strokeDasharray="565"
+            strokeDashoffset={565 - (565 * animatedScore) / 100}
+            strokeLinecap="round"
+            transform="rotate(-90 110 110)"
+            style={{
+              filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
+              transition: "0.6s ease",
+            }}
+          />
 
-        <defs>
-          <linearGradient id="grad">
-            <stop offset="0%" stopColor="#8B7CF6" />
-            <stop offset="100%" stopColor="#5E4AE3" />
-          </linearGradient>
-        </defs>
-      </svg>
+          <defs>
+            <linearGradient id="grad">
+              <stop offset="0%" stopColor="#8B7CF6" />
+              <stop offset="100%" stopColor="#5E4AE3" />
+            </linearGradient>
+          </defs>
+        </svg>
 
-      <div className="ringCenter">{animatedScore}%</div>
+        <div className="ringCenter">{animatedScore}%</div>
+      </div>
+
+      {/* Score Bewertung */}
+      <p className="scoreLabel">
+        {animatedScore >= 80
+          ? "Sehr gut abgesichert"
+          : animatedScore >= 60
+          ? "Solide Basis"
+          : "Optimierung sinnvoll"}
+      </p>
+
+      {/* Kategorien Übersicht */}
+      <div className="categoryList">
+        {categories.map((cat) => (
+          <div key={cat} className="categoryRow">
+            <span>{CATEGORY_LABELS[cat]}</span>
+            <span>{categoryScores[cat] || 0}%</span>
+          </div>
+        ))}
+      </div>
+
+      <ContactButton onReset={() => setShowResetConfirm(true)} />
+      {ResetOverlay}
     </div>
-
-    {/* Score Bewertung */}
-    <p className="scoreLabel">
-      {animatedScore >= 80
-        ? "Sehr gut abgesichert"
-        : animatedScore >= 60
-        ? "Solide Basis"
-        : "Optimierung sinnvoll"}
-    </p>
-
-    {/* Kategorien Übersicht */}
-    <div className="categoryList">
-      {categories.map((cat) => (
-        <div key={cat} className="categoryRow">
-          <span>{CATEGORY_LABELS[cat]}</span>
-          <span>{categoryScores[cat] || 0}%</span>
-        </div>
-      ))}
-    </div>
-
-    <ContactButton onReset={() => setShowResetConfirm(true)} />
-    {ResetOverlay}
-  </div>
-);
-
+  );
+}
 
 /* ================= UI COMPONENTS ================= */
 
@@ -764,8 +808,7 @@ function Header({ reset, back }) {
       />
       <button className="backBtn" onClick={back}>
         <span className="arrowIcon"></span>
-        </button>
-
+      </button>
     </div>
   );
 }
