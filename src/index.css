@@ -241,82 +241,67 @@ body {
   background: #071018;
   padding: 14px;
   display: flex;
-  justify-content: center;
   gap: 10px;
 }
 
-/* Basis für Kontakt & Neustart */
-.contactBtn {
+/* WICHTIG: a UND button identisch behandeln */
+.contactFixed .contactBtn,
+.contactFixed .contactBtn.secondary {
   flex: 1;
   max-width: 200px;
 
   height: 56px;
-  padding: 0 16px;
+  padding: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 18px;
-  font-weight: bold;
   font-size: 15px;
+  font-weight: bold;
   line-height: 1;
 
+  border-radius: 18px;
+
   box-sizing: border-box;
+  margin: 0;
+
   appearance: none;
   -webkit-appearance: none;
 
+  text-decoration: none;
   cursor: pointer;
   transition: 0.2s ease;
-  text-decoration: none;
+}
 
-  border: none;
+/* Kontakt */
+.contactFixed .contactBtn {
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
   color: white;
-}
-
-.contactBtn:hover {
-  filter: brightness(1.1);
-}
-
-.contactBtn:active {
-  transform: scale(0.97);
+  border: 1px solid transparent; /* WICHTIG für gleiche Höhe */
 }
 
 /* Neustart */
-.contactBtn.secondary {
+.contactFixed .contactBtn.secondary {
   background: #1a2a36;
   color: white;
   border: 1px solid #5E4AE3;
 }
 
-.contactBtn.secondary:hover {
+.contactFixed .contactBtn:hover {
+  filter: brightness(1.1);
+}
+
+.contactFixed .contactBtn.secondary:hover {
   background: #223445;
+}
+
+.contactFixed .contactBtn:active {
+  transform: scale(0.97);
 }
 
 
 /* ================= RESET OVERLAY ================= */
-
-.infoOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  cursor: pointer;
-}
-
-.infoBox {
-  background: #111c26;
-  padding: 22px;
-  border-radius: 18px;
-  max-width: 320px;
-  line-height: 1.4;
-  text-align: left;
-  cursor: default;
-}
 
 .overlayButtons {
   display: flex;
@@ -324,55 +309,56 @@ body {
   margin-top: 20px;
 }
 
-/* Ja & Nein EXAKT gleich */
-.overlayBtn {
+/* Ja & Nein exakt gleich */
+.overlayButtons .overlayBtn {
   flex: 1;
 
   height: 56px;
-  padding: 0 16px;
+  padding: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 18px;
-  font-weight: bold;
   font-size: 15px;
+  font-weight: bold;
   line-height: 1;
 
+  border-radius: 18px;
+
   box-sizing: border-box;
+  margin: 0;
+
   appearance: none;
   -webkit-appearance: none;
 
   cursor: pointer;
   transition: 0.2s ease;
-
-  background: transparent;
-  color: white;
-  border: none;
 }
 
 /* Ja */
-.overlayBtn.primary {
+.overlayButtons .overlayBtn.primary {
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  border: none;
-}
-
-.overlayBtn.primary:hover {
-  filter: brightness(1.1);
+  color: white;
+  border: 1px solid transparent; /* gleiche Höhe wie Nein */
 }
 
 /* Nein */
-.overlayBtn.secondary {
+.overlayButtons .overlayBtn.secondary {
   background: #1a2a36;
+  color: white;
   border: 1px solid #5E4AE3;
 }
 
-.overlayBtn.secondary:hover {
+.overlayButtons .overlayBtn.primary:hover {
+  filter: brightness(1.1);
+}
+
+.overlayButtons .overlayBtn.secondary:hover {
   background: #223445;
 }
 
-.overlayBtn:active {
+.overlayButtons .overlayBtn:active {
   transform: scale(0.97);
 }
 
