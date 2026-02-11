@@ -22,9 +22,6 @@ const CATEGORY_LABELS = {
 const QUESTIONS = {
   /* ================= EXISTENZ ================= */
 
-  const QUESTIONS = {
-
-  /* ================= EXISTENZ ================= */
 
   bu: {
     label: "Berufsunfähigkeitsversicherung vorhanden?",
@@ -503,23 +500,21 @@ export default function App() {
               </a>
             )}
 
-            {/* SELECT */}
             {q.type === "select" && (
               <Select
-                label=""
-                options={q.options}
-                onChange={(v) => {
-                  answer(id, v);
-
-                  // baseData Triggerfelder speichern
-                  if (id === "kinder" || id === "kfz" || id === "wohnen" || id === "tiere") {
-                    setBaseData({
-                      ...baseData,
-                      [id]: v,
-                    });
-                  }
-                }}
-              />
+              label=""
+              options={q.options}
+              onChange={(v) => {
+                if (id === "kasko") {
+                  if (v === "Haftpflicht") answer(id, "haftpflicht");
+                  else if (v === "Teilkasko") answer(id, "teilkasko");
+                  else if (v === "Vollkasko") answer(id, "vollkasko");
+                  else answer(id, "unbekannt");
+                } else {
+                  answer(id, v === "Weiß nicht" ? "unbekannt" : "ja");
+                }
+              }}
+            />
             )}
 
             {/* NUMBER */}
