@@ -38,6 +38,10 @@ const QUESTIONS = {
     label: "Krankentagegeld vorhanden?",
     category: "existenz",
     type: "yesno",
+    link: {
+      label: "Krankentagegeld-Rechner",
+      url: "https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner?..."
+    }
   },
 
   unfall: {
@@ -152,6 +156,16 @@ const QUESTIONS = {
     type: "yesno",
   },
 
+  rentenluecke: {
+  label: "Kennst du deine Rentenlücke?",
+  category: "vorsorge",
+  type: "yesno",
+  link: {
+    label: "Rentenlückenrechner",
+    url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke"
+  }
+},
+
   /* ===== KINDER ===== */
 
   kinder_unfall: {
@@ -188,15 +202,12 @@ export default function App() {
 
   const categories = useMemo(() => {
     return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
-      const questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
+      cconst questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
         const q = QUESTIONS[id];
-
+        
         if (q.category !== cat) return false;
-
-        if (q.condition) {
-          return q.condition(baseData);
-        }
-
+        if (q.condition) return q.condition(baseData);
+        
         return true;
       });
 

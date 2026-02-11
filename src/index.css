@@ -245,10 +245,52 @@ body {
   gap: 10px;
 }
 
-.contactFixed .btn {
+/* Basis für Kontakt & Neustart */
+.contactBtn {
   flex: 1;
   max-width: 200px;
+
+  height: 56px;
+  padding: 0 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+  font-weight: bold;
+  font-size: 15px;
+  line-height: 1;
+
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: 0.2s ease;
+  border: none;
+
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+  text-decoration: none;
 }
+
+.contactBtn:hover {
+  filter: brightness(1.1);
+}
+
+.contactBtn:active {
+  transform: scale(0.97);
+}
+
+/* Neustart */
+.contactBtn.secondary {
+  background: #1a2a36;
+  color: white;
+  border: 1px solid #5E4AE3;
+}
+
+.contactBtn.secondary:hover {
+  background: #223445;
+}
+
 
 /* ================= RESET OVERLAY ================= */
 
@@ -279,6 +321,49 @@ body {
   margin-top: 20px;
 }
 
-.overlayButtons .btn {
+/* Ja & Nein IDENTISCH groß */
+.overlayBtn {
   flex: 1;
+
+  height: 56px;
+  padding: 0 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+  font-weight: bold;
+  font-size: 15px;
+  line-height: 1;
+
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: 0.2s ease;
+  border: none;
+}
+
+/* Ja */
+.overlayBtn.primary {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+}
+
+.overlayBtn.primary:hover {
+  filter: brightness(1.1);
+}
+
+/* Nein */
+.overlayBtn.secondary {
+  background: #1a2a36;
+  color: white;
+  border: 1px solid #5E4AE3;
+}
+
+.overlayBtn.secondary:hover {
+  background: #223445;
+}
+
+.overlayBtn:active {
+  transform: scale(0.97);
 }
