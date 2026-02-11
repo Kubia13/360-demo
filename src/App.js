@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "./index.css";
 
+/* ================= KATEGORIE GEWICHTE ================= */
+
 const CATEGORY_WEIGHTS = {
-  existenz: 0.3,
+  existenz: 0.25,
   haftung: 0.15,
   gesundheit: 0.15,
   wohnen: 0.1,
   mobilitaet: 0.1,
-  vorsorge: 0.1,
-  kinder: 0.1,   // NEU
+  vorsorge: 0.15,
+  kinder: 0.1,
 };
 
 const CATEGORY_LABELS = {
@@ -18,50 +20,73 @@ const CATEGORY_LABELS = {
   wohnen: "Wohnen",
   mobilitaet: "Mobilität",
   vorsorge: "Vorsorge",
-  kinder: "Kinder",   // NEU
+  kinder: "Kinder",
 };
 
+/* ================= FRAGEN ================= */
+
 const QUESTIONS = {
-  bu: { label: "Berufsunfähigkeitsversicherung vorhanden?", category: "existenz", type: "yesno" },
+  /* ===== EXISTENZ ===== */
+
+  bu: {
+    label: "Berufsunfähigkeitsversicherung vorhanden?",
+    category: "existenz",
+    type: "yesno",
+  },
+
   ktg: {
     label: "Krankentagegeld vorhanden?",
     category: "existenz",
     type: "yesno",
-    link: {
-      label: "Krankentagegeld-Rechner",
-      url: "https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner?prd=Apps%2Bund%2BRechner&dom=www.barmenia.de&p0=334300",
-    },
   },
-  unfall: { label: "Unfallversicherung vorhanden?", category: "existenz", type: "yesno" },
 
-  haftpflicht: { label: "Private Haftpflicht vorhanden?", category: "haftung", type: "yesno" },
+  unfall: {
+    label: "Unfallversicherung vorhanden?",
+    category: "existenz",
+    type: "yesno",
+  },
+
+  /* ===== HAFTUNG ===== */
+
+  haftpflicht: {
+    label: "Private Haftpflicht vorhanden?",
+    category: "haftung",
+    type: "yesno",
+  },
 
   tierhaft: {
     label: "Tierhalterhaftpflicht vorhanden?",
     category: "haftung",
     type: "yesno",
     condition: (baseData) =>
-      baseData.tiere === "Hund" || baseData.tiere === "Hund und Katze",
+      baseData.tiere === "Hund" ||
+      baseData.tiere === "Hund und Katze",
+  },
+
+  tier_op: {
+    label: "Tier OP- oder Tierkrankenversicherung vorhanden?",
+    category: "haftung",
+    type: "yesno",
+    condition: (baseData) =>
+      baseData.tiere === "Hund" ||
+      baseData.tiere === "Hund und Katze",
   },
 
   rechtsschutz: {
     label: "Rechtsschutz vorhanden?",
     category: "haftung",
     type: "yesno",
-    modules: ["Privat", "Beruf", "Verkehr", "Immobilie/Mietrecht"],
   },
+
+  /* ===== WOHNEN ===== */
 
   hausrat: {
     label: "Hausrat ausreichend versichert?",
     category: "wohnen",
     type: "yesno",
     condition: (baseData) =>
-      baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern",
-    info:
-      "Faustregel zur Berechnung der Versicherungssumme:\n\n" +
-      "Wohnfläche × 650 € = empfohlene Versicherungssumme.\n\n" +
-      "Beispiel:\n80 m² × 650 € = 52.000 €\n\n" +
-      "Hausrat wird zum Neuwert versichert.\nEine zu niedrige Summe führt zur Unterversicherung.",
+      baseData.wohnen &&
+      baseData.wohnen !== "Wohne bei Eltern",
   },
 
   elementar: {
@@ -69,15 +94,19 @@ const QUESTIONS = {
     category: "wohnen",
     type: "yesno",
     condition: (baseData) =>
-      baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern",
+      baseData.wohnen &&
+      baseData.wohnen !== "Wohne bei Eltern",
   },
 
   gebaeude: {
     label: "Wohngebäudeversicherung vorhanden?",
     category: "wohnen",
     type: "yesno",
-    condition: (baseData) => baseData.wohnen === "Eigentum Haus",
+    condition: (baseData) =>
+      baseData.wohnen === "Eigentum Haus",
   },
+
+  /* ===== MOBILITÄT ===== */
 
   kfz_haftpflicht: {
     label: "KFZ-Haftpflicht vorhanden?",
@@ -87,7 +116,7 @@ const QUESTIONS = {
   },
 
   kasko: {
-    label: "Welche KFZ-Kaskoversicherung besteht?",
+    label: "Welche KFZ-Kasko besteht?",
     category: "mobilitaet",
     type: "select",
     options: ["Haftpflicht", "Teilkasko", "Vollkasko", "Weiß nicht"],
@@ -101,15 +130,10 @@ const QUESTIONS = {
     condition: (baseData) => baseData.kfz === "Ja",
   },
 
-  kv_typ: {
-    label: "Welche Krankenversicherung?",
-    category: "gesundheit",
-    type: "select",
-    options: ["Gesetzlich", "Privat", "Weiß nicht"],
-  },
+  /* ===== GESUNDHEIT ===== */
 
   zahn: {
-    label: "Krankenzusatzversicherung vorhanden? (Zahn, Ambulant, Stationär...)",
+    label: "Krankenzusatzversicherung vorhanden?",
     category: "gesundheit",
     type: "yesno",
   },
@@ -120,24 +144,15 @@ const QUESTIONS = {
     type: "yesno",
   },
 
+  /* ===== VORSORGE ===== */
+
   private_rente: {
-    label: "Sorgst du privat für deine Rente vor?",
+    label: "Private Altersvorsorge vorhanden?",
     category: "vorsorge",
     type: "yesno",
-    modules: ["Private Vorsorge", "Rürup", "Riester"],
   },
 
-  rentenluecke: {
-    label: "Kennst du deine Rentenlücke?",
-    category: "vorsorge",
-    type: "yesno",
-    link: {
-      label: "Rentenlückenrechner",
-      url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke",
-    },
-  },
-
-  /* ================= KINDER ================= */
+  /* ===== KINDER ===== */
 
   kinder_unfall: {
     label: "Unfallversicherung für dein Kind vorhanden?",
@@ -147,7 +162,7 @@ const QUESTIONS = {
   },
 
   kinder_zahn: {
-    label: "Krankenzusatzversicherung für dein Kind vorhanden? (Zahn, Ambulant, Stationär...)",
+    label: "Krankenzusatz für dein Kind vorhanden?",
     category: "kinder",
     type: "yesno",
     condition: (baseData) => baseData.kinder === "Ja",
@@ -160,56 +175,62 @@ const QUESTIONS = {
     condition: (baseData) => baseData.kinder === "Ja",
   },
 };
-
 export default function App() {
   const [step, setStep] = useState("welcome");
   const [answers, setAnswers] = useState({});
-  const [modules, setModules] = useState({});
   const [baseData, setBaseData] = useState({});
   const [animatedScore, setAnimatedScore] = useState(0);
-  const [showInfo, setShowInfo] = useState(null);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showInfo, setShowInfo] = useState(null);
 
   /* ================= DYNAMISCHE KATEGORIEN ================= */
 
-const categories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
-  const questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
-    const q = QUESTIONS[id];
+  const categories = useMemo(() => {
+    return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
+      const questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
+        const q = QUESTIONS[id];
 
-    if (q.category !== cat) return false;
+        if (q.category !== cat) return false;
 
-    if (q.condition) {
-      return q.condition(baseData);
+        if (q.condition) {
+          return q.condition(baseData);
+        }
+
+        return true;
+      });
+
+      return questionsInCategory.length > 0;
+    });
+  }, [baseData]);
+
+  const currentCategory = categories[currentCategoryIndex];
+
+  /* ===== FLOW-SCHUTZ ===== */
+
+  useEffect(() => {
+    if (currentCategoryIndex >= categories.length) {
+      setCurrentCategoryIndex(0);
     }
+  }, [categories, currentCategoryIndex]);
 
-    return true;
-  });
-
-  return questionsInCategory.length > 0;
-});
-
-const currentCategory = categories[currentCategoryIndex];
-
-/* ===== Sauberer Flow-Schutz ===== */
-
-useEffect(() => {
-  if (currentCategoryIndex >= categories.length) {
-    setCurrentCategoryIndex(0);
-  }
-}, [categories, currentCategoryIndex]);
+  /* ================= RESET ================= */
 
   function resetAll() {
     setStep("welcome");
     setAnswers({});
-    setModules({});
     setBaseData({});
     setCurrentCategoryIndex(0);
   }
 
+  /* ================= ANSWER ================= */
+
   function answer(key, value) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
+
+  /* ================= SCORE ================= */
+
   function getScore(key) {
     const value = answers[key];
 
@@ -222,28 +243,23 @@ useEffect(() => {
       return 0;
     }
 
-    if (key === "rechtsschutz" && answers[key] === "ja") {
-      const count = Object.values(modules?.rechtsschutz || {}).filter(Boolean).length;
-      return Math.min(count * 25, 100);
-    }
-
-    if (key === "private_rente" && answers[key] === "ja") {
-      const count = Object.values(modules?.private_rente || {}).filter(Boolean).length;
-      return Math.min(count * 34, 100);
-    }
-
     return 0;
   }
 
   const categoryScores = Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
-    const q = Object.keys(QUESTIONS).filter(
-      (id) => QUESTIONS[id].category === cat && answers[id] !== undefined
-    );
+    const questions = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
+      if (q.category !== cat) return false;
+      if (q.condition && !q.condition(baseData)) return false;
+      if (answers[id] === undefined) return false;
+      return true;
+    });
 
-    if (!q.length) acc[cat] = 0;
-    else {
-      const sum = q.reduce((s, id) => s + getScore(id), 0);
-      acc[cat] = Math.round(sum / q.length);
+    if (!questions.length) {
+      acc[cat] = 0;
+    } else {
+      const sum = questions.reduce((s, id) => s + getScore(id), 0);
+      acc[cat] = Math.round(sum / questions.length);
     }
 
     return acc;
@@ -251,23 +267,29 @@ useEffect(() => {
 
   const totalScore = Math.round(
     Object.keys(CATEGORY_WEIGHTS).reduce(
-      (sum, cat) => sum + categoryScores[cat] * CATEGORY_WEIGHTS[cat],
+      (sum, cat) =>
+        sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat],
       0
     )
   );
 
+  /* ===== SCORE ANIMATION ===== */
+
   useEffect(() => {
-    let c = 0;
-    const i = setInterval(() => {
-      c++;
-      if (c >= totalScore) {
-        c = totalScore;
-        clearInterval(i);
+    let current = 0;
+    const interval = setInterval(() => {
+      current++;
+      if (current >= totalScore) {
+        current = totalScore;
+        clearInterval(interval);
       }
-      setAnimatedScore(c);
+      setAnimatedScore(current);
     }, 10);
-    return () => clearInterval(i);
+
+    return () => clearInterval(interval);
   }, [totalScore]);
+
+  /* ================= RESET OVERLAY ================= */
 
   const ResetOverlay = showResetConfirm && (
     <div
@@ -282,33 +304,37 @@ useEffect(() => {
 
         <div className="overlayButtons">
           <button
-          className="overlayBtn primary"
-          onClick={() => {
-            setShowResetConfirm(false);
-            resetAll();
+            className="overlayBtn primary"
+            onClick={() => {
+              setShowResetConfirm(false);
+              resetAll();
             }}
-            >
-              Ja
-              </button>
-              
-              <button
-              className="overlayBtn secondary"
-              onClick={() => setShowResetConfirm(false)}
-              >
-                Nein
-                </button>
+          >
+            Ja
+          </button>
 
+          <button
+            className="overlayBtn secondary"
+            onClick={() => setShowResetConfirm(false)}
+          >
+            Nein
+          </button>
         </div>
       </div>
     </div>
   );
-
   /* ================= WELCOME ================= */
 
   if (step === "welcome") {
     return (
       <div className="screen center">
-        <img src="/logo.jpg" className="logo large" onClick={resetAll} alt="Logo" />
+        <img
+          src="/logo.jpg"
+          className="logo large"
+          onClick={resetAll}
+          alt="Logo"
+        />
+
         <h1>360° Absicherungscheck</h1>
         <p>Beantworte ein paar Fragen zu deiner Situation.</p>
 
@@ -466,14 +492,17 @@ useEffect(() => {
       </div>
     );
   }
-  /* ================= KATEGORIEN-FRAGEN ================= */
+
+  /* ================= KATEGORIEN ================= */
 
   if (step === "category") {
+
     const questionsOfCategory = Object.keys(QUESTIONS).filter((id) => {
       const q = QUESTIONS[id];
 
       if (q.category !== currentCategory) return false;
-      if (q.condition) return q.condition(baseData);
+
+      if (q.condition && !q.condition(baseData)) return false;
 
       return true;
     });
@@ -514,7 +543,8 @@ useEffect(() => {
               style={{
                 width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`,
                 height: "100%",
-                background: "linear-gradient(135deg, #8B7CF6, #5E4AE3)",
+                background:
+                  "linear-gradient(135deg, #8B7CF6, #5E4AE3)",
                 transition: "0.3s ease",
               }}
             />
@@ -565,7 +595,10 @@ useEffect(() => {
                       else if (v === "Vollkasko") answer(id, "vollkasko");
                       else answer(id, "unbekannt");
                     } else {
-                      answer(id, v === "Weiß nicht" ? "unbekannt" : v);
+                      answer(
+                        id,
+                        v === "Weiß nicht" ? "unbekannt" : v
+                      );
                     }
                   }}
                 />
@@ -576,7 +609,9 @@ useEffect(() => {
                   {["ja", "nein", "unbekannt"].map((v) => (
                     <button
                       key={v}
-                      className={`answerBtn ${answers[id] === v ? "active" : ""}`}
+                      className={`answerBtn ${
+                        answers[id] === v ? "active" : ""
+                      }`}
                       onClick={() => answer(id, v)}
                     >
                       {v === "ja"
@@ -585,27 +620,6 @@ useEffect(() => {
                         ? "Nein"
                         : "Weiß ich nicht"}
                     </button>
-                  ))}
-                </div>
-              )}
-
-              {q.modules && answers[id] === "ja" && (
-                <div className="subOptions">
-                  {q.modules.map((mod) => (
-                    <Checkbox
-                      key={mod}
-                      label={mod}
-                      checked={modules[id]?.[mod]}
-                      onChange={() =>
-                        setModules({
-                          ...modules,
-                          [id]: {
-                            ...modules[id],
-                            [mod]: !modules[id]?.[mod],
-                          },
-                        })
-                      }
-                    />
                   ))}
                 </div>
               )}
@@ -629,7 +643,10 @@ useEffect(() => {
         </button>
 
         {showInfo && (
-          <div className="infoOverlay" onClick={() => setShowInfo(null)}>
+          <div
+            className="infoOverlay"
+            onClick={() => setShowInfo(null)}
+          >
             <div className="infoBox">
               {showInfo.split("\n").map((l, i) => (
                 <p key={i}>{l}</p>
@@ -643,7 +660,6 @@ useEffect(() => {
       </div>
     );
   }
-
   /* ================= DASHBOARD ================= */
 
   return (
@@ -692,10 +708,10 @@ useEffect(() => {
       </div>
 
       <div className="categoryList">
-        {Object.keys(categoryScores).map((cat) => (
+        {categories.map((cat) => (
           <div key={cat} className="categoryRow">
             <span>{CATEGORY_LABELS[cat]}</span>
-            <span>{categoryScores[cat]}%</span>
+            <span>{categoryScores[cat] || 0}%</span>
           </div>
         ))}
       </div>
@@ -711,7 +727,12 @@ useEffect(() => {
 function Header({ reset, back }) {
   return (
     <div className="header">
-      <img src="/logo.jpg" className="logo small" onClick={reset} alt="Logo" />
+      <img
+        src="/logo.jpg"
+        className="logo small"
+        onClick={reset}
+        alt="Logo"
+      />
       <button className="backBtn" onClick={back}>
         ⬅
       </button>
@@ -723,7 +744,10 @@ function Input({ label, type = "text", onChange }) {
   return (
     <div className="field">
       {label && <label>{label}</label>}
-      <input type={type} onChange={(e) => onChange(e.target.value)} />
+      <input
+        type={type}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </div>
   );
 }
@@ -745,7 +769,11 @@ function Select({ label, options, onChange }) {
 function Checkbox({ label, checked, onChange }) {
   return (
     <label className="checkbox">
-      <input type="checkbox" checked={!!checked} onChange={onChange} />
+      <input
+        type="checkbox"
+        checked={!!checked}
+        onChange={onChange}
+      />
       {label}
     </label>
   );
@@ -774,47 +802,4 @@ function ContactButton({ onReset }) {
       </button>
     </div>
   );
-}
-/* ================= RESET OVERLAY BUTTONS ================= */
-
-.overlayButtons {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.overlayBtn {
-  flex: 1;
-
-  height: 50px;
-  padding: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 18px;
-  font-weight: bold;
-  font-size: 15px;
-
-  border: none;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-/* JA */
-.overlayBtn.primary {
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-}
-
-/* NEIN */
-.overlayBtn.secondary {
-  background: #1a2a36;
-  color: white;
-  border: 1px solid #5E4AE3;
-}
-
-.overlayBtn:active {
-  transform: scale(0.97);
 }
