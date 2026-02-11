@@ -23,7 +23,6 @@ const CATEGORY_LABELS = {
   vorsorge: "Vorsorge",
 };
 
-/* Frage → Kategorie Mapping */
 const QUESTION_CATEGORY_MAP = {
   bu: "existenz",
   ktg: "existenz",
@@ -73,25 +72,18 @@ export default function App() {
     if (questionsInCategory.length === 0) {
       acc[cat] = 0;
     } else {
-      const sum = questionsInCategory.reduce(
-        (s, q) => s + score(q),
-        0
-      );
+      const sum = questionsInCategory.reduce((s, q) => s + score(q), 0);
       acc[cat] = Math.round(sum / questionsInCategory.length);
     }
 
     return acc;
   }, {});
 
-  /* ================= GESAMT-SCORE (GEWICHTET) ================= */
-
   const totalScore = Math.round(
     Object.keys(CATEGORY_WEIGHTS).reduce((sum, cat) => {
       return sum + categoryScores[cat] * CATEGORY_WEIGHTS[cat];
     }, 0)
   );
-
-  /* ================= RING ANIMATION ================= */
 
   useEffect(() => {
     let c = 0;
@@ -130,6 +122,12 @@ export default function App() {
         <Header reset={resetAll} back={() => setStep("welcome")} />
 
         <h2>Persönliche Angaben</h2>
+
+        <Select
+          label="Geschlecht"
+          options={["Herr", "Frau", "Divers"]}
+          onChange={(v) => setBaseData({ ...baseData, geschlecht: v })}
+        />
 
         <Input label="Vorname" onChange={(v) => setBaseData({ ...baseData, vorname: v })} />
         <Input label="Nachname" onChange={(v) => setBaseData({ ...baseData, nachname: v })} />
@@ -193,13 +191,87 @@ export default function App() {
         <h2>Absicherungsfragen</h2>
 
         <Question label="Berufsunfähigkeitsversicherung vorhanden?" id="bu" {...{ answers, answer }} />
-        <Question label="Krankentagegeld vorhanden?" id="ktg" {...{ answers, answer }} />
+
+        <Question
+          label="Krankentagegeld vorhanden?"
+          id="ktg"
+          link={{
+            label: "Krankentagegeld-Rechner",
+            url: "https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner?prd=Apps%2Bund%2BRechner&dom=www.barmenia.de&p0=334300",
+          }}
+          {...{ answers, answer }}
+        />
+
         <Question label="Unfallversicherung vorhanden?" id="unfall" {...{ answers, answer }} />
-        <Question label="Private Haftpflicht (mind. 10 Mio €)?" id="haftpflicht" {...{ answers, answer }} />
+
+        <Question
+          label="Private Haftpflicht (mind. 10 Mio €)?"
+          id="haftpflicht"
+          {...{ answers, answer }}
+        />
+
+        {(baseData.tiere === "Hund" || baseData.tiere === "Hund und Katze") && (
+          <>
+            <Question label="Tierhalterhaftpflicht vorhanden?" id="tierhaft" {...{ answers, answer }} />
+
+            <Select
+              label="Tier-Kranken-/OP-Versicherung"
+              options={["Keine", "Krankenversicherung", "OP-Versicherung", "Weiß nicht"]}
+              onChange={(v) =>
+                answer("tierkranken", v === "Weiß nicht" || v === "Keine" ? "nein" : "ja")
+              }
+            />
+          </>
+        )}
+
+        {baseData.wohnen !== "Wohne bei Eltern" && (
+          <>
+            <Question
+              label="Hausrat ausreichend versichert?"
+              id="hausrat"
+              info="Faustregel: Wohnfläche × 650 €.\nHausrat wird zum Neuwert versichert."
+              {...{ answers, answer, setShowInfo }}
+            />
+
+            <Question label="Elementarversicherung vorhanden?" id="elementar" {...{ answers, answer }} />
+          </>
+        )}
+
+        {baseData.wohnen === "Eigentum Haus" && (
+          <Question label="Wohngebäudeversicherung vorhanden?" id="gebaeude" {...{ answers, answer }} />
+        )}
+
+        <Question label="Rechtsschutz vorhanden?" id="rechtsschutz" {...{ answers, answer }} />
+
+        <Select
+          label="KFZ-Kasko"
+          options={["Teilkasko", "Vollkasko", "Weiß nicht"]}
+          onChange={(v) => answer("kasko", v === "Weiß nicht" ? "nein" : "ja")}
+        />
+
+        <Question
+          label="Kennst du deine Rentenlücke?"
+          id="rentenluecke"
+          link={{
+            label: "Rentenlückenrechner",
+            url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke",
+          }}
+          {...{ answers, answer }}
+        />
 
         <button className="primaryBtn" onClick={() => setStep("dashboard")}>
           Auswertung
         </button>
+
+        {showInfo && (
+          <div className="infoOverlay" onClick={() => setShowInfo(null)}>
+            <div className="infoBox">
+              {showInfo.split("\n").map((l, i) => (
+                <p key={i}>{l}</p>
+              ))}
+            </div>
+          </div>
+        )}
 
         <ContactButton />
       </div>
@@ -251,71 +323,6 @@ export default function App() {
       </div>
 
       <ContactButton />
-    </div>
-  );
-}
-
-/* ================= UI KOMPONENTEN ================= */
-
-function Header({ reset, back }) {
-  return (
-    <div className="header">
-      <img src="/logo.jpg" className="logo small" onClick={reset} />
-      <button className="backBtn" onClick={back}>
-        ⬅
-      </button>
-    </div>
-  );
-}
-
-function Question({ label, id, answers, answer }) {
-  return (
-    <div className="questionCard dark">
-      <div className="questionText">{label}</div>
-      <div className="buttonRow">
-        {["ja", "nein", "unbekannt"].map((v) => (
-          <button
-            key={v}
-            className={`answerBtn ${answers[id] === v ? "active" : ""}`}
-            onClick={() => answer(id, v)}
-          >
-            {v === "ja" ? "Ja" : v === "nein" ? "Nein" : "Weiß ich nicht"}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Input({ label, type = "text", onChange }) {
-  return (
-    <div className="field">
-      <label>{label}</label>
-      <input type={type} onChange={(e) => onChange(e.target.value)} />
-    </div>
-  );
-}
-
-function Select({ label, options, onChange }) {
-  return (
-    <div className="field">
-      <label>{label}</label>
-      <select onChange={(e) => onChange(e.target.value)}>
-        <option value="">Bitte wählen</option>
-        {options.map((o) => (
-          <option key={o}>{o}</option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function ContactButton() {
-  return (
-    <div className="contactFixed">
-      <a href="https://agentur.barmenia.de/florian_loeffler" target="_blank" rel="noreferrer">
-        Kontakt aufnehmen
-      </a>
     </div>
   );
 }
