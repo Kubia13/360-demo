@@ -675,65 +675,81 @@ export default function App() {
   }
   /* ================= DASHBOARD ================= */
 
-  return (
-    <div className="screen">
-      <Header reset={resetAll} back={() => setStep("category")} />
+return (
+  <div className="screen">
+    <Header reset={resetAll} back={() => setStep("category")} />
 
-      <h2>
-        {baseData.vorname
-          ? `${baseData.vorname}, dein Status`
-          : "Dein Status"}
-      </h2>
+    <h2>
+      {baseData.vorname
+        ? `${baseData.vorname}, dein Status`
+        : "Dein Status"}
+    </h2>
 
-      <div className="ringWrap">
-        <svg width="220" height="220">
-          <circle
-            cx="110"
-            cy="110"
-            r="90"
-            stroke="#1a2a36"
-            strokeWidth="16"
-            fill="none"
-          />
+    <div className="ringWrap">
+      <svg width="220" height="220">
+        {/* Hintergrund Ring */}
+        <circle
+          cx="110"
+          cy="110"
+          r="90"
+          stroke="#1a2a36"
+          strokeWidth="16"
+          fill="none"
+        />
 
-          <circle
-            cx="110"
-            cy="110"
-            r="90"
-            stroke="url(#grad)"
-            strokeWidth="16"
-            fill="none"
-            strokeDasharray="565"
-            strokeDashoffset={565 - (565 * animatedScore) / 100}
-            strokeLinecap="round"
-            transform="rotate(-90 110 110)"
-          />
+        {/* Fortschritt Ring */}
+        <circle
+          cx="110"
+          cy="110"
+          r="90"
+          stroke="url(#grad)"
+          strokeWidth="16"
+          fill="none"
+          strokeDasharray="565"
+          strokeDashoffset={565 - (565 * animatedScore) / 100}
+          strokeLinecap="round"
+          transform="rotate(-90 110 110)"
+          style={{
+            filter: "drop-shadow(0 0 10px rgba(139,124,246,0.6))",
+            transition: "0.6s ease",
+          }}
+        />
 
-          <defs>
-            <linearGradient id="grad">
-              <stop offset="0%" stopColor="#8B7CF6" />
-              <stop offset="100%" stopColor="#5E4AE3" />
-            </linearGradient>
-          </defs>
-        </svg>
+        <defs>
+          <linearGradient id="grad">
+            <stop offset="0%" stopColor="#8B7CF6" />
+            <stop offset="100%" stopColor="#5E4AE3" />
+          </linearGradient>
+        </defs>
+      </svg>
 
-        <div className="ringCenter">{animatedScore}%</div>
-      </div>
-
-      <div className="categoryList">
-        {categories.map((cat) => (
-          <div key={cat} className="categoryRow">
-            <span>{CATEGORY_LABELS[cat]}</span>
-            <span>{categoryScores[cat] || 0}%</span>
-          </div>
-        ))}
-      </div>
-
-      <ContactButton onReset={() => setShowResetConfirm(true)} />
-      {ResetOverlay}
+      <div className="ringCenter">{animatedScore}%</div>
     </div>
-  );
-}
+
+    {/* Score Bewertung */}
+    <p className="scoreLabel">
+      {animatedScore >= 80
+        ? "Sehr gut abgesichert"
+        : animatedScore >= 60
+        ? "Solide Basis"
+        : "Optimierung sinnvoll"}
+    </p>
+
+    {/* Kategorien Übersicht */}
+    <div className="categoryList">
+      {categories.map((cat) => (
+        <div key={cat} className="categoryRow">
+          <span>{CATEGORY_LABELS[cat]}</span>
+          <span>{categoryScores[cat] || 0}%</span>
+        </div>
+      ))}
+    </div>
+
+    <ContactButton onReset={() => setShowResetConfirm(true)} />
+    {ResetOverlay}
+  </div>
+);
+
 
 /* ================= UI COMPONENTS ================= */
 

@@ -194,8 +194,15 @@ body {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 32px;
-  font-weight: bold;
+
+  font-size: 36px;
+  font-weight: 700;
+
+  background: linear-gradient(135deg, #8B7CF6, #A99BFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  letter-spacing: 1px;
 }
 
 .categoryList {
@@ -205,8 +212,25 @@ body {
 .categoryRow {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #1a2a36;
+  align-items: center;
+
+  padding: 14px 16px;
+  margin-bottom: 10px;
+
+  border-radius: 14px;
+  background: #111c26;
+
+  border: 1px solid rgba(139,124,246,0.15);
+
+  transition: 0.2s ease;
+}
+.categoryRow:hover {
+  border-color: rgba(139,124,246,0.4);
+  transform: translateY(-1px);
+}
+.categoryRow span:last-child {
+  font-weight: 600;
+  color: #A99BFF;
 }
 
 .subOptions {
@@ -446,4 +470,18 @@ body {
 
 .calculatorIcon:active {
   transform: scale(0.95);
+}
+
+.scoreLabel {
+  text-align: center;
+  margin-top: -10px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  opacity: 0.85;
+}
+
+.categoryRow span:last-child {
+  font-weight: 600;
+  color: #A99BFF;
 }
