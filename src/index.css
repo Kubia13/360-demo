@@ -178,3 +178,14 @@ body {
 .contactFixed a:active {
   transform: scale(0.97);
 }
+.subOptions {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding-left: 10px;
+}
+
+.checkbox {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}

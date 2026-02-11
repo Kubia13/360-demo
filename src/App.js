@@ -286,7 +286,36 @@ function getScore(key) {
           </>
         )}
 
-        <Question label="Rechtsschutz vorhanden?" id="rechtsschutz" {...{ answers, answer }} />
+        <Question
+  label="Rechtsschutz vorhanden?"
+  id="rechtsschutz"
+  {...{
+    answers,
+    answer: (id, value) => {
+      answer(id, value);
+    },
+  }}
+/>
+{answers.rechtsschutz === "ja" && (
+  <div className="subOptions">
+    {["Privat", "Beruf", "Verkehr", "Immobilie/Mietrecht"].map((mod) => (
+      <Checkbox
+        key={mod}
+        label={mod}
+        checked={modules.rechtsschutz?.[mod]}
+        onChange={() =>
+          setModules({
+            ...modules,
+            rechtsschutz: {
+              ...modules.rechtsschutz,
+              [mod]: !modules.rechtsschutz?.[mod],
+            },
+          })
+        }
+      />
+    ))}
+  </div>
+)}
 
         <Select
           label="Welche Krankenversicherung?"
@@ -450,5 +479,13 @@ function ContactButton() {
         Kontakt aufnehmen
       </a>
     </div>
+  );
+}
+function Checkbox({ label, checked, onChange }) {
+  return (
+    <label className="checkbox">
+      <input type="checkbox" checked={!!checked} onChange={onChange} />
+      {label}
+    </label>
   );
 }
