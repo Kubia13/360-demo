@@ -201,19 +201,19 @@ export default function App() {
   /* ================= DYNAMISCHE KATEGORIEN ================= */
 
   const categories = useMemo(() => {
-    return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
-      cconst questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
-        const q = QUESTIONS[id];
-        
-        if (q.category !== cat) return false;
-        if (q.condition) return q.condition(baseData);
-        
-        return true;
-      });
+  return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
+    const questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
 
-      return questionsInCategory.length > 0;
+      if (q.category !== cat) return false;
+      if (q.condition && !q.condition(baseData)) return false;
+
+      return true;
     });
-  }, [baseData]);
+
+    return questionsInCategory.length > 0;
+  });
+}, [baseData]);
 
   const currentCategory = categories[currentCategoryIndex];
 
