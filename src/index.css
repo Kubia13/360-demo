@@ -1,156 +1,163 @@
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   background: #071018;
-  color: white;
-  font-family: "Armegoe", sans-serif;
+  color: #fff;
+  font-family: system-ui, sans-serif;
 }
 
 .screen {
-  padding: 20px;
+  padding: 24px;
   max-width: 480px;
-  margin: 0 auto;
+  margin: auto;
+  padding-bottom: 120px;
 }
 
 .center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
   text-align: center;
 }
 
-.logoBig {
-  height: 80px;
-  cursor: pointer;
+.logo.large {
+  height: 72px;
   margin-bottom: 20px;
+  cursor: pointer;
 }
 
-.logoSmall {
-  height: 36px;
+.logo.small {
+  height: 50px;
   cursor: pointer;
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  position: relative;
   margin-bottom: 20px;
 }
 
-.backIcon {
+.backBtn {
+  position: absolute;
+  left: 0;
   font-size: 26px;
+  background: none;
+  border: none;
+  color: #00e5ff;
   cursor: pointer;
 }
 
-h1,
-h2 {
-  margin: 10px 0;
+.field {
+  margin-bottom: 18px;
+}
+
+.field label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: #0f1a23;
+  color: #fff;
+  font-size: 16px;
 }
 
 .primaryBtn {
-  background: #00e5ff;
-  color: #071018;
-  border: none;
-  border-radius: 16px;
-  padding: 14px;
-  font-weight: 700;
-  cursor: pointer;
   width: 100%;
-  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #00e5ff;
+  color: #000;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
 }
 
 .primaryBtn.big {
-  font-size: 18px;
-  padding: 18px;
+  font-size: 20px;
 }
 
-.questionCard {
-  background: #111c26;
+.questionCard.dark {
+  background: #0f1a23;
+  padding: 18px;
   border-radius: 18px;
-  padding: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .questionText {
-  margin-bottom: 10px;
-}
-
-input,
-select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
+  font-size: 16px;
+  margin-bottom: 12px;
 }
 
 .buttonRow {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
-.buttonRow button {
+.answerBtn {
   flex: 1;
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid #00e5ff;
-  background: transparent;
-  color: white;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  background: #111c26;
+  color: #fff;
+  font-size: 14px;
   cursor: pointer;
 }
 
-.buttonRow button.active {
+.answerBtn.active {
   background: #00e5ff;
-  color: #071018;
-}
-
-.heroCard {
-  background: #111c26;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 20px;
+  color: #000;
+  font-weight: bold;
 }
 
 .ringWrap {
   position: relative;
   display: flex;
   justify-content: center;
+  margin: 30px 0;
 }
 
 .ringCenter {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
+  transform: translateY(-50%);
+  font-size: 32px;
+  font-weight: bold;
 }
 
-.percent {
-  font-size: 36px;
-  font-weight: 800;
-}
-
-.sub {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.categoryItem {
+.categoryLine {
   display: flex;
   justify-content: space-between;
-  background: #0f1a23;
-  border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 10px;
+  margin: 10px 0;
+  font-size: 15px;
 }
 
-.contactLink {
-  margin-top: 20px;
-  color: #00e5ff;
+.contactFixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px;
+  display: flex;
+  justify-content: center;
+  background: #071018;
+}
+
+.contactFixed a {
+  width: 90%;
+  text-align: center;
+  padding: 16px;
+  border-radius: 18px;
+  background: #00e5ff;
+  color: #000;
+  font-weight: bold;
   text-decoration: none;
-  cursor: pointer;
+  font-size: 16px;
 }
