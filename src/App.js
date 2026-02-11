@@ -108,7 +108,7 @@ function getScore(key) {
     if (questionsInCategory.length === 0) {
       acc[cat] = 0;
     } else {
-      const sum = keys.reduce((s, k) => s + getScore(k), 0);
+      const sum = questionsInCategory.reduce((s, k) => s + getScore(k), 0);
       acc[cat] = Math.round(sum / questionsInCategory.length);
     }
 
