@@ -20,15 +20,7 @@ const CATEGORY_LABELS = {
 };
 
 const QUESTIONS = {
-  /* ================= EXISTENZ ================= */
-
-
-  bu: {
-    label: "Berufsunfähigkeitsversicherung vorhanden?",
-    category: "existenz",
-    type: "yesno",
-  },
-
+  bu: { label: "Berufsunfähigkeitsversicherung vorhanden?", category: "existenz", type: "yesno" },
   ktg: {
     label: "Krankentagegeld vorhanden?",
     category: "existenz",
@@ -38,28 +30,16 @@ const QUESTIONS = {
       url: "https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner?prd=Apps%2Bund%2BRechner&dom=www.barmenia.de&p0=334300",
     },
   },
+  unfall: { label: "Unfallversicherung vorhanden?", category: "existenz", type: "yesno" },
 
-  unfall: {
-    label: "Unfallversicherung vorhanden?",
-    category: "existenz",
-    type: "yesno",
-  },
-
-  /* ================= HAFTUNG ================= */
-
-  haftpflicht: {
-    label: "Private Haftpflicht vorhanden?",
-    category: "haftung",
-    type: "yesno",
-  },
+  haftpflicht: { label: "Private Haftpflicht vorhanden?", category: "haftung", type: "yesno" },
 
   tierhaft: {
     label: "Tierhalterhaftpflicht vorhanden?",
     category: "haftung",
     type: "yesno",
     condition: (baseData) =>
-      baseData.tiere === "Hund" ||
-      baseData.tiere === "Hund und Katze",
+      baseData.tiere === "Hund" || baseData.tiere === "Hund und Katze",
   },
 
   rechtsschutz: {
@@ -69,22 +49,17 @@ const QUESTIONS = {
     modules: ["Privat", "Beruf", "Verkehr", "Immobilie/Mietrecht"],
   },
 
-  /* ================= WOHNEN ================= */
-
   hausrat: {
     label: "Hausrat ausreichend versichert?",
     category: "wohnen",
     type: "yesno",
     condition: (baseData) =>
-      baseData.wohnen &&
-      baseData.wohnen !== "Wohne bei Eltern",
+      baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern",
     info:
       "Faustregel zur Berechnung der Versicherungssumme:\n\n" +
       "Wohnfläche × 650 € = empfohlene Versicherungssumme.\n\n" +
-      "Beispiel:\n" +
-      "80 m² × 650 € = 52.000 €\n\n" +
-      "Hausrat wird zum Neuwert versichert.\n" +
-      "Eine zu niedrige Summe führt zur Unterversicherung.",
+      "Beispiel:\n80 m² × 650 € = 52.000 €\n\n" +
+      "Hausrat wird zum Neuwert versichert.\nEine zu niedrige Summe führt zur Unterversicherung.",
   },
 
   elementar: {
@@ -92,26 +67,21 @@ const QUESTIONS = {
     category: "wohnen",
     type: "yesno",
     condition: (baseData) =>
-      baseData.wohnen &&
-      baseData.wohnen !== "Wohne bei Eltern",
+      baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern",
   },
 
   gebaeude: {
     label: "Wohngebäudeversicherung vorhanden?",
     category: "wohnen",
     type: "yesno",
-    condition: (baseData) =>
-      baseData.wohnen === "Eigentum Haus",
+    condition: (baseData) => baseData.wohnen === "Eigentum Haus",
   },
-
-  /* ================= MOBILITÄT ================= */
 
   kfz_haftpflicht: {
     label: "KFZ-Haftpflicht vorhanden?",
     category: "mobilitaet",
     type: "yesno",
-    condition: (baseData) =>
-      baseData.kfz === "Ja",
+    condition: (baseData) => baseData.kfz === "Ja",
   },
 
   kasko: {
@@ -119,19 +89,15 @@ const QUESTIONS = {
     category: "mobilitaet",
     type: "select",
     options: ["Haftpflicht", "Teilkasko", "Vollkasko", "Weiß nicht"],
-    condition: (baseData) =>
-      baseData.kfz === "Ja",
+    condition: (baseData) => baseData.kfz === "Ja",
   },
 
   schutzbrief: {
     label: "Schutzbrief vorhanden?",
     category: "mobilitaet",
     type: "yesno",
-    condition: (baseData) =>
-      baseData.kfz === "Ja",
+    condition: (baseData) => baseData.kfz === "Ja",
   },
-
-  /* ================= GESUNDHEIT ================= */
 
   kv_typ: {
     label: "Welche Krankenversicherung?",
@@ -141,8 +107,7 @@ const QUESTIONS = {
   },
 
   zahn: {
-    label:
-      "Krankenzusatzversicherung vorhanden? (Zahn, Ambulant, Stationär...)",
+    label: "Krankenzusatzversicherung vorhanden? (Zahn, Ambulant, Stationär...)",
     category: "gesundheit",
     type: "yesno",
   },
@@ -152,8 +117,6 @@ const QUESTIONS = {
     category: "gesundheit",
     type: "yesno",
   },
-
-  /* ================= VORSORGE ================= */
 
   private_rente: {
     label: "Sorgst du privat für deine Rente vor?",
@@ -171,7 +134,6 @@ const QUESTIONS = {
       url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke",
     },
   },
-
 };
 
 export default function App() {
@@ -198,7 +160,6 @@ export default function App() {
   function answer(key, value) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
-
   function getScore(key) {
     const value = answers[key];
 
@@ -258,6 +219,39 @@ export default function App() {
     return () => clearInterval(i);
   }, [totalScore]);
 
+  const ResetOverlay = showResetConfirm && (
+    <div
+      className="infoOverlay"
+      onClick={() => setShowResetConfirm(false)}
+    >
+      <div
+        className="infoBox"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p>Möchtest du von vorne beginnen?</p>
+
+        <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
+          <button
+            className="primaryBtn"
+            onClick={() => {
+              setShowResetConfirm(false);
+              resetAll();
+            }}
+          >
+            Ja
+          </button>
+
+          <button
+            className="answerBtn"
+            onClick={() => setShowResetConfirm(false)}
+          >
+            Nein
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   /* ================= WELCOME ================= */
 
   if (step === "welcome") {
@@ -275,6 +269,7 @@ export default function App() {
         </button>
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
+        {ResetOverlay}
       </div>
     );
   }
@@ -282,372 +277,321 @@ export default function App() {
   /* ================= BASISDATEN ================= */
 
   if (step === "base") {
-  return (
-    <div className="screen">
-      <Header reset={resetAll} back={() => setStep("welcome")} />
+    return (
+      <div className="screen">
+        <Header reset={resetAll} back={() => setStep("welcome")} />
 
-      <h2>Persönliche Angaben</h2>
+        <h2>Persönliche Angaben</h2>
 
-      <Select
-        label="Geschlecht"
-        options={["Herr", "Frau", "Divers"]}
-        onChange={(v) =>
-          setBaseData({ ...baseData, geschlecht: v })
-        }
-      />
-
-      <Input
-        label="Vorname"
-        onChange={(v) =>
-          setBaseData({ ...baseData, vorname: v })
-        }
-      />
-
-      <Input
-        label="Nachname"
-        onChange={(v) =>
-          setBaseData({ ...baseData, nachname: v })
-        }
-      />
-
-      <Input
-        label="Alter"
-        type="number"
-        onChange={(v) =>
-          setBaseData({ ...baseData, alter: v })
-        }
-      />
-
-      <Input
-        label="Monatliches Netto-Gehalt (€)"
-        type="number"
-        onChange={(v) =>
-          setBaseData({ ...baseData, gehalt: v })
-        }
-      />
-
-      <Select
-        label="Berufliche Situation"
-        options={[
-          "Angestellt",
-          "Öffentlicher Dienst",
-          "Selbstständig",
-          "Nicht berufstätig",
-        ]}
-        onChange={(v) =>
-          setBaseData({ ...baseData, beruf: v })
-        }
-      />
-
-      <Select
-        label="Hast du Kinder?"
-        options={["Nein", "Ja"]}
-        onChange={(v) =>
-          setBaseData({ ...baseData, kinder: v })
-        }
-      />
-
-      {baseData.kinder === "Ja" && (
-        <Input
-          label="Anzahl Kinder"
-          type="number"
+        <Select
+          label="Geschlecht"
+          options={["Herr", "Frau", "Divers"]}
           onChange={(v) =>
-            setBaseData({
-              ...baseData,
-              kinderAnzahl: v,
-            })
+            setBaseData({ ...baseData, geschlecht: v })
           }
         />
-      )}
 
-      <Select
-        label="Haustiere"
-        options={[
-          "Keine Tiere",
-          "Katze",
-          "Hund",
-          "Hund und Katze",
-        ]}
-        onChange={(v) =>
-          setBaseData({ ...baseData, tiere: v })
-        }
-      />
-
-      <Select
-        label="Wie wohnst du?"
-        options={[
-          "Wohne bei Eltern",
-          "Miete Wohnung",
-          "Miete Haus",
-          "Eigentumswohnung",
-          "Eigentum Haus",
-        ]}
-        onChange={(v) =>
-          setBaseData({ ...baseData, wohnen: v })
-        }
-      />
-
-      <Select
-        label="Besitzt du ein KFZ?"
-        options={["Nein", "Ja"]}
-        onChange={(v) =>
-          setBaseData({ ...baseData, kfz: v })
-        }
-      />
-
-      {baseData.kfz === "Ja" && (
         <Input
-          label="Anzahl Fahrzeuge"
-          type="number"
+          label="Vorname"
           onChange={(v) =>
-            setBaseData({
-              ...baseData,
-              kfzAnzahl: v,
-            })
+            setBaseData({ ...baseData, vorname: v })
           }
         />
-      )}
 
-      <button
-        className="primaryBtn"
-        onClick={() => setStep("category")}
-      >
-        Weiter
-      </button>
+        <Input
+          label="Nachname"
+          onChange={(v) =>
+            setBaseData({ ...baseData, nachname: v })
+          }
+        />
 
-      <ContactButton onReset={() => setShowResetConfirm(true)} />
-    </div>
-  );
-}
+        <Input
+          label="Alter"
+          type="number"
+          onChange={(v) =>
+            setBaseData({ ...baseData, alter: v })
+          }
+        />
 
+        <Input
+          label="Monatliches Netto-Gehalt (€)"
+          type="number"
+          onChange={(v) =>
+            setBaseData({ ...baseData, gehalt: v })
+          }
+        />
+
+        <Select
+          label="Berufliche Situation"
+          options={[
+            "Angestellt",
+            "Öffentlicher Dienst",
+            "Selbstständig",
+            "Nicht berufstätig",
+          ]}
+          onChange={(v) =>
+            setBaseData({ ...baseData, beruf: v })
+          }
+        />
+
+        <Select
+          label="Hast du Kinder?"
+          options={["Nein", "Ja"]}
+          onChange={(v) =>
+            setBaseData({ ...baseData, kinder: v })
+          }
+        />
+
+        {baseData.kinder === "Ja" && (
+          <Input
+            label="Anzahl Kinder"
+            type="number"
+            onChange={(v) =>
+              setBaseData({
+                ...baseData,
+                kinderAnzahl: v,
+              })
+            }
+          />
+        )}
+
+        <Select
+          label="Haustiere"
+          options={[
+            "Keine Tiere",
+            "Katze",
+            "Hund",
+            "Hund und Katze",
+          ]}
+          onChange={(v) =>
+            setBaseData({ ...baseData, tiere: v })
+          }
+        />
+
+        <Select
+          label="Wie wohnst du?"
+          options={[
+            "Wohne bei Eltern",
+            "Miete Wohnung",
+            "Miete Haus",
+            "Eigentumswohnung",
+            "Eigentum Haus",
+          ]}
+          onChange={(v) =>
+            setBaseData({ ...baseData, wohnen: v })
+          }
+        />
+
+        <Select
+          label="Besitzt du ein KFZ?"
+          options={["Nein", "Ja"]}
+          onChange={(v) =>
+            setBaseData({ ...baseData, kfz: v })
+          }
+        />
+
+        {baseData.kfz === "Ja" && (
+          <Input
+            label="Anzahl Fahrzeuge"
+            type="number"
+            onChange={(v) =>
+              setBaseData({
+                ...baseData,
+                kfzAnzahl: v,
+              })
+            }
+          />
+        )}
+
+        <button
+          className="primaryBtn"
+          onClick={() => setStep("category")}
+        >
+          Weiter
+        </button>
+
+        <ContactButton onReset={() => setShowResetConfirm(true)} />
+        {ResetOverlay}
+      </div>
+    );
+  }
   /* ================= KATEGORIEN-FRAGEN ================= */
 
   if (step === "category") {
-  const questionsOfCategory = Object.keys(QUESTIONS).filter((id) => {
-    const q = QUESTIONS[id];
+    const questionsOfCategory = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
 
-    if (q.category !== currentCategory) return false;
+      if (q.category !== currentCategory) return false;
+      if (q.condition) return q.condition(baseData);
 
-    if (q.condition) {
-      return q.condition(baseData);
-    }
+      return true;
+    });
 
-    return true;
-  });
-
-  return (
-    <div className="screen">
-      <Header
-      reset={resetAll}
-      back={() => {
-        if (currentCategoryIndex > 0) {
-          setCurrentCategoryIndex((prev) => prev - 1);
-        } else {
-          setStep("base");
-        }
-      }}
-    />
-
-
-      {/* Progress */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 14, opacity: 0.7 }}>
-          Kategorie {currentCategoryIndex + 1} von {categories.length}
-        </div>
-
-        <div style={{ fontSize: 20, fontWeight: "bold" }}>
-          {CATEGORY_LABELS[currentCategory]}
-        </div>
-
-        <div
-          style={{
-            height: 6,
-            background: "#1a2a36",
-            borderRadius: 6,
-            marginTop: 8,
-            overflow: "hidden",
+    return (
+      <div className="screen">
+        <Header
+          reset={resetAll}
+          back={() => {
+            if (currentCategoryIndex > 0) {
+              setCurrentCategoryIndex((prev) => prev - 1);
+            } else {
+              setStep("base");
+            }
           }}
-        >
+        />
+
+        {/* Progress */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 14, opacity: 0.7 }}>
+            Kategorie {currentCategoryIndex + 1} von {categories.length}
+          </div>
+
+          <div style={{ fontSize: 20, fontWeight: "bold" }}>
+            {CATEGORY_LABELS[currentCategory]}
+          </div>
+
           <div
             style={{
-              width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`,
-              height: "100%",
-              background: "linear-gradient(135deg, #8B7CF6, #5E4AE3)",
-              transition: "0.3s ease",
+              height: 6,
+              background: "#1a2a36",
+              borderRadius: 6,
+              marginTop: 8,
+              overflow: "hidden",
             }}
-          />
-        </div>
-      </div>
-
-      {/* Fragen */}
-      {questionsOfCategory.map((id) => {
-        const q = QUESTIONS[id];
-
-        return (
-          <div key={id} className="questionCard dark">
-            <div className="questionText">
-              {q.label}
-
-              {q.info && (
-                <span
-                  className="infoIcon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowInfo(q.info);
-                  }}
-                >
-                  i
-                </span>
-              )}
-            </div>
-
-            {q.link && (
-              <a
-                href={q.link.url}
-                target="_blank"
-                rel="noreferrer"
-                className="inlineLink"
-              >
-                {q.link.label}
-              </a>
-            )}
-
-            {q.type === "select" && (
-              <Select
-              label=""
-              options={q.options}
-              onChange={(v) => {
-                if (id === "kasko") {
-                  if (v === "Haftpflicht") answer(id, "haftpflicht");
-                  else if (v === "Teilkasko") answer(id, "teilkasko");
-                  else if (v === "Vollkasko") answer(id, "vollkasko");
-                  else answer(id, "unbekannt");
-                } else {
-                  answer(id, v === "Weiß nicht" ? "unbekannt" : "ja");
-                }
+          >
+            <div
+              style={{
+                width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`,
+                height: "100%",
+                background: "linear-gradient(135deg, #8B7CF6, #5E4AE3)",
+                transition: "0.3s ease",
               }}
             />
-            )}
-
-            {/* NUMBER */}
-            {q.type === "number" && (
-              <Input
-                label=""
-                type="number"
-                onChange={(v) =>
-                  setBaseData({
-                    ...baseData,
-                    [id]: v,
-                  })
-                }
-              />
-            )}
-
-            {/* YES / NO */}
-            {q.type === "yesno" && (
-              <div className="buttonRow">
-                {["ja", "nein", "unbekannt"].map((v) => (
-                  <button
-                    key={v}
-                    className={`answerBtn ${answers[id] === v ? "active" : ""}`}
-                    onClick={() => answer(id, v)}
-                  >
-                    {v === "ja"
-                      ? "Ja"
-                      : v === "nein"
-                      ? "Nein"
-                      : "Weiß ich nicht"}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* MODULES */}
-            {q.modules && answers[id] === "ja" && (
-              <div className="subOptions">
-                {q.modules.map((mod) => (
-                  <Checkbox
-                    key={mod}
-                    label={mod}
-                    checked={modules[id]?.[mod]}
-                    onChange={() =>
-                      setModules({
-                        ...modules,
-                        [id]: {
-                          ...modules[id],
-                          [mod]: !modules[id]?.[mod],
-                        },
-                      })
-                    }
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })}
-
-      <button
-        className="primaryBtn"
-        onClick={() => {
-          if (currentCategoryIndex < categories.length - 1) {
-            setCurrentCategoryIndex((prev) => prev + 1);
-          } else {
-            setStep("dashboard");
-          }
-        }}
-      >
-        {currentCategoryIndex < categories.length - 1
-          ? "Weiter"
-          : "Auswertung"}
-      </button>
-
-      {showInfo && (
-        <div className="infoOverlay" onClick={() => setShowInfo(null)}>
-          <div className="infoBox">
-            {showInfo.split("\n").map((l, i) => (
-              <p key={i}>{l}</p>
-            ))}
           </div>
         </div>
-      )}
 
-      <ContactButton onReset={() => setShowResetConfirm(true)} />
-    </div>
-  );
+        {/* Fragen */}
+        {questionsOfCategory.map((id) => {
+          const q = QUESTIONS[id];
 
-  {showResetConfirm && (
-  <div
-    className="infoOverlay"
-    onClick={() => setShowResetConfirm(false)}
-  >
-    <div
-      className="infoBox"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <p>Möchtest du von vorne beginnen?</p>
+          return (
+            <div key={id} className="questionCard dark">
+              <div className="questionText">
+                {q.label}
 
-      <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
+                {q.info && (
+                  <span
+                    className="infoIcon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowInfo(q.info);
+                    }}
+                  >
+                    i
+                  </span>
+                )}
+              </div>
+
+              {q.link && (
+                <a
+                  href={q.link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inlineLink"
+                >
+                  {q.link.label}
+                </a>
+              )}
+
+              {q.type === "select" && (
+                <Select
+                  label=""
+                  options={q.options}
+                  onChange={(v) => {
+                    if (id === "kasko") {
+                      if (v === "Haftpflicht") answer(id, "haftpflicht");
+                      else if (v === "Teilkasko") answer(id, "teilkasko");
+                      else if (v === "Vollkasko") answer(id, "vollkasko");
+                      else answer(id, "unbekannt");
+                    } else {
+                      answer(id, v === "Weiß nicht" ? "unbekannt" : v);
+                    }
+                  }}
+                />
+              )}
+
+              {q.type === "yesno" && (
+                <div className="buttonRow">
+                  {["ja", "nein", "unbekannt"].map((v) => (
+                    <button
+                      key={v}
+                      className={`answerBtn ${answers[id] === v ? "active" : ""}`}
+                      onClick={() => answer(id, v)}
+                    >
+                      {v === "ja"
+                        ? "Ja"
+                        : v === "nein"
+                        ? "Nein"
+                        : "Weiß ich nicht"}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {q.modules && answers[id] === "ja" && (
+                <div className="subOptions">
+                  {q.modules.map((mod) => (
+                    <Checkbox
+                      key={mod}
+                      label={mod}
+                      checked={modules[id]?.[mod]}
+                      onChange={() =>
+                        setModules({
+                          ...modules,
+                          [id]: {
+                            ...modules[id],
+                            [mod]: !modules[id]?.[mod],
+                          },
+                        })
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
         <button
           className="primaryBtn"
           onClick={() => {
-            setShowResetConfirm(false);
-            resetAll();
+            if (currentCategoryIndex < categories.length - 1) {
+              setCurrentCategoryIndex((prev) => prev + 1);
+            } else {
+              setStep("dashboard");
+            }
           }}
         >
-          Ja
+          {currentCategoryIndex < categories.length - 1
+            ? "Weiter"
+            : "Auswertung"}
         </button>
 
-        <button
-          className="answerBtn"
-          onClick={() => setShowResetConfirm(false)}
-        >
-          Nein
-        </button>
+        {showInfo && (
+          <div className="infoOverlay" onClick={() => setShowInfo(null)}>
+            <div className="infoBox">
+              {showInfo.split("\n").map((l, i) => (
+                <p key={i}>{l}</p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <ContactButton onReset={() => setShowResetConfirm(true)} />
+        {ResetOverlay}
       </div>
-    </div>
-  </div>
-)}
+    );
+  }
 
   /* ================= DASHBOARD ================= */
 
@@ -706,34 +650,10 @@ export default function App() {
       </div>
 
       <ContactButton onReset={() => setShowResetConfirm(true)} />
+      {ResetOverlay}
     </div>
   );
-{showResetConfirm && (
-  <div className="infoOverlay">
-    <div className="infoBox">
-      <p>Möchtest du von vorne beginnen?</p>
-
-      <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
-        <button
-          className="primaryBtn"
-          onClick={() => {
-            setShowResetConfirm(false);
-            resetAll();
-          }}
-        >
-          Ja
-        </button>
-
-        <button
-          className="answerBtn"
-          onClick={() => setShowResetConfirm(false)}
-        >
-          Nein
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+}
 
 /* ================= UI COMPONENTS ================= */
 
