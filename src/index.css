@@ -155,6 +155,8 @@ body {
 
 /* ================= FIXED CONTACT AREA ================= */
 
+/* ================= FIXED CONTACT AREA ================= */
+
 .contactFixed {
   position: fixed;
   bottom: 0;
@@ -167,10 +169,13 @@ body {
   gap: 10px;
 }
 
-.contactBtn {
+/* Basis für BEIDE Buttons */
+.contactFixed button {
   flex: 1;
   max-width: 200px;
+
   height: 56px;
+  padding: 0;
 
   display: flex;
   align-items: center;
@@ -179,7 +184,9 @@ body {
   border-radius: 18px;
   font-weight: bold;
   font-size: 15px;
+  line-height: 1;
 
+  box-sizing: border-box;
   border: none;
   cursor: pointer;
   transition: 0.2s ease;
@@ -194,16 +201,11 @@ body {
 /* Neustart */
 .contactBtn.secondary {
   background: #1a2a36;
-  border: 1px solid #5E4AE3;
   color: white;
+  border: 1px solid #5E4AE3;
 }
 
-/* Hover */
-.contactBtn:hover {
-  filter: brightness(1.1);
-}
-
-.contactBtn:active {
+.contactFixed button:active {
   transform: scale(0.97);
 }
 
