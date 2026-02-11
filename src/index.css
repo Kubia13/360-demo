@@ -167,9 +167,9 @@ body {
   gap: 10px;
 }
 
-/* Beide Buttons exakt gleich */
+/* Beide exakt gleich */
 .contactFixed a,
-.contactFixed button {
+.contactFixed button.secondaryBtn {
   flex: 1;
   max-width: 200px;
 
@@ -186,11 +186,10 @@ body {
   line-height: 1;
 
   box-sizing: border-box;
-  appearance: none;           /* wichtig */
-  -webkit-appearance: none;   /* Safari */
-  border: none;               /* Reset */
+  appearance: none;
+  -webkit-appearance: none;
 
-  transition: 0.2s ease;
+  margin: 0;              /* wichtig */
 }
 
 /* Kontakt */
@@ -198,10 +197,11 @@ body {
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
   color: white;
   text-decoration: none;
+  border: none;
 }
 
-/* Neustart */
-.contactFixed button {
+/* Reset */
+.contactFixed button.secondaryBtn {
   background: #1a2a36;
   color: white;
   border: 1px solid #5E4AE3;
