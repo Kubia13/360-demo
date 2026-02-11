@@ -62,8 +62,6 @@ export default function App() {
     return SCORE[answers[key]] || 0;
   }
 
-  /* ================= KATEGORIE-SCORES ================= */
-
   const categoryScores = Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
     const questionsInCategory = Object.keys(QUESTION_CATEGORY_MAP).filter(
       (q) => QUESTION_CATEGORY_MAP[q] === cat && answers[q]
@@ -134,44 +132,6 @@ export default function App() {
         <Input label="Alter" type="number" onChange={(v) => setBaseData({ ...baseData, alter: v })} />
         <Input label="Monatliches Netto-Gehalt (€)" type="number" onChange={(v) => setBaseData({ ...baseData, gehalt: v })} />
 
-        <Select
-          label="Berufliche Situation"
-          options={["Angestellt", "Öffentlicher Dienst", "Selbstständig", "Nicht berufstätig"]}
-          onChange={(v) => setBaseData({ ...baseData, beruf: v })}
-        />
-
-        <Select
-          label="Hast du Kinder?"
-          options={["Nein", "Ja"]}
-          onChange={(v) => setBaseData({ ...baseData, kinder: v })}
-        />
-
-        {baseData.kinder === "Ja" && (
-          <Input
-            label="Anzahl Kinder"
-            type="number"
-            onChange={(v) => setBaseData({ ...baseData, kinderAnzahl: v })}
-          />
-        )}
-
-        <Select
-          label="Haustiere"
-          options={["Keine Tiere", "Katze", "Hund", "Hund und Katze"]}
-          onChange={(v) => setBaseData({ ...baseData, tiere: v })}
-        />
-
-        <Select
-          label="Wie wohnst du?"
-          options={[
-            "Wohne bei Eltern",
-            "Miete Wohnung",
-            "Miete Haus",
-            "Eigentumswohnung",
-            "Eigentum Haus",
-          ]}
-          onChange={(v) => setBaseData({ ...baseData, wohnen: v })}
-        />
-
         <button className="primaryBtn" onClick={() => setStep("questions")}>
           Weiter
         </button>
@@ -208,45 +168,6 @@ export default function App() {
           label="Private Haftpflicht (mind. 10 Mio €)?"
           id="haftpflicht"
           {...{ answers, answer }}
-        />
-
-        {(baseData.tiere === "Hund" || baseData.tiere === "Hund und Katze") && (
-          <>
-            <Question label="Tierhalterhaftpflicht vorhanden?" id="tierhaft" {...{ answers, answer }} />
-
-            <Select
-              label="Tier-Kranken-/OP-Versicherung"
-              options={["Keine", "Krankenversicherung", "OP-Versicherung", "Weiß nicht"]}
-              onChange={(v) =>
-                answer("tierkranken", v === "Weiß nicht" || v === "Keine" ? "nein" : "ja")
-              }
-            />
-          </>
-        )}
-
-        {baseData.wohnen !== "Wohne bei Eltern" && (
-          <>
-            <Question
-              label="Hausrat ausreichend versichert?"
-              id="hausrat"
-              info="Faustregel: Wohnfläche × 650 €.\nHausrat wird zum Neuwert versichert."
-              {...{ answers, answer, setShowInfo }}
-            />
-
-            <Question label="Elementarversicherung vorhanden?" id="elementar" {...{ answers, answer }} />
-          </>
-        )}
-
-        {baseData.wohnen === "Eigentum Haus" && (
-          <Question label="Wohngebäudeversicherung vorhanden?" id="gebaeude" {...{ answers, answer }} />
-        )}
-
-        <Question label="Rechtsschutz vorhanden?" id="rechtsschutz" {...{ answers, answer }} />
-
-        <Select
-          label="KFZ-Kasko"
-          options={["Teilkasko", "Vollkasko", "Weiß nicht"]}
-          onChange={(v) => answer("kasko", v === "Weiß nicht" ? "nein" : "ja")}
         />
 
         <Question
@@ -313,16 +234,79 @@ export default function App() {
         <div className="ringCenter">{animatedScore}%</div>
       </div>
 
-      <div className="categoryList">
-        {Object.keys(categoryScores).map((cat) => (
-          <div key={cat} className="categoryRow">
-            <span>{CATEGORY_LABELS[cat]}</span>
-            <span>{categoryScores[cat]}%</span>
-          </div>
+      <ContactButton />
+    </div>
+  );
+}
+
+/* ================= UI KOMPONENTEN ================= */
+
+function Header({ reset, back }) {
+  return (
+    <div className="header">
+      <img src="/logo.jpg" className="logo small" onClick={reset} />
+      <button className="backBtn" onClick={back}>
+        ⬅
+      </button>
+    </div>
+  );
+}
+
+function Question({ label, id, answers, answer, link }) {
+  return (
+    <div className="questionCard dark">
+      <div className="questionText">{label}</div>
+
+      {link && (
+        <a href={link.url} target="_blank" rel="noreferrer" className="inlineLink">
+          {link.label}
+        </a>
+      )}
+
+      <div className="buttonRow">
+        {["ja", "nein", "unbekannt"].map((v) => (
+          <button
+            key={v}
+            className={`answerBtn ${answers[id] === v ? "active" : ""}`}
+            onClick={() => answer(id, v)}
+          >
+            {v === "ja" ? "Ja" : v === "nein" ? "Nein" : "Weiß ich nicht"}
+          </button>
         ))}
       </div>
+    </div>
+  );
+}
 
-      <ContactButton />
+function Input({ label, type = "text", onChange }) {
+  return (
+    <div className="field">
+      <label>{label}</label>
+      <input type={type} onChange={(e) => onChange(e.target.value)} />
+    </div>
+  );
+}
+
+function Select({ label, options, onChange }) {
+  return (
+    <div className="field">
+      <label>{label}</label>
+      <select onChange={(e) => onChange(e.target.value)}>
+        <option value="">Bitte wählen</option>
+        {options.map((o) => (
+          <option key={o}>{o}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function ContactButton() {
+  return (
+    <div className="contactFixed">
+      <a href="https://agentur.barmenia.de/florian_loeffler" target="_blank" rel="noreferrer">
+        Kontakt aufnehmen
+      </a>
     </div>
   );
 }
