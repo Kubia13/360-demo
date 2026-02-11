@@ -733,18 +733,21 @@ function Checkbox({ label, checked, onChange }) {
 function ContactButton({ onReset }) {
   return (
     <div className="contactFixed">
-      <a
-        href="https://agentur.barmenia.de/florian_loeffler"
-        target="_blank"
-        rel="noreferrer"
+      <button
+        className="contactBtn"
+        onClick={() =>
+          window.open(
+            "https://agentur.barmenia.de/florian_loeffler",
+            "_blank"
+          )
+        }
       >
         Kontakt aufnehmen
-      </a>
+      </button>
 
       <button
-        className="secondaryBtn"
+        className="contactBtn secondary"
         onClick={onReset}
-        style={{ marginTop: 10 }}
       >
         Neustart
       </button>
