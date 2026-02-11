@@ -54,7 +54,7 @@ const QUESTIONS = {
   /* ===== HAFTUNG ===== */
 
   haftpflicht: {
-    label: "Private Haftpflicht vorhanden?",
+    label: "Private Haftpflicht vorhanden? (Min.10 Mio€)",
     category: "haftung",
     type: "yesno",
   },
