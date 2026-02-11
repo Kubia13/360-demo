@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   background: #071018;
@@ -43,6 +47,7 @@ body {
 
 .field {
   margin-bottom: 16px;
+  width: 100%;
 }
 
 .field label {
@@ -53,8 +58,8 @@ body {
 .field input,
 .field select {
   width: 100%;
-  padding: 14px;
-  border-radius: 14px;
+  padding: 16px;              /* angepasst */
+  border-radius: 18px;        /* angepasst */
   border: none;
   background: #0f1a23;
   color: white;
@@ -148,6 +153,8 @@ body {
   border-bottom: 1px solid #1a2a36;
 }
 
+/* ================= FIXED CONTACT AREA ================= */
+
 .contactFixed {
   position: fixed;
   bottom: 0;
@@ -160,21 +167,11 @@ body {
   gap: 10px;
 }
 
-.contactFixed a {
-  flex: 1.2;
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-  text-decoration: none;
-}
-
-.contactFixed .secondaryBtn {
-  flex: 0.8;
-}
-
 .contactFixed a,
 .contactFixed .secondaryBtn {
+  flex: 1;
   max-width: 200px;
-  height: 54px;
+  height: 56px;               /* exakt gleiche Höhe */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,6 +179,7 @@ body {
   font-weight: bold;
   transition: 0.2s ease;
 }
+/* ================= CONTACT BUTTON STYLES ================= */
 
 .contactFixed a {
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
@@ -197,14 +195,19 @@ body {
   transform: scale(0.97);
 }
 
-
-.contactFixed a:hover {
-  filter: brightness(1.1);
+.secondaryBtn {
+  background: #1a2a36;
+  color: white;
+  border: 1px solid #5E4AE3;
+  cursor: pointer;
 }
 
-.contactFixed a:active {
-  transform: scale(0.97);
+.secondaryBtn:hover {
+  background: #223445;
 }
+
+/* ================= SUB OPTIONS ================= */
+
 .subOptions {
   margin-top: 10px;
   margin-bottom: 20px;
@@ -216,6 +219,8 @@ body {
   margin-bottom: 6px;
 }
 
+/* ================= INFO OVERLAY ================= */
+
 .infoOverlay {
   position: fixed;
   inset: 0;
@@ -224,6 +229,7 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  cursor: pointer;
 }
 
 .infoBox {
@@ -233,7 +239,11 @@ body {
   max-width: 320px;
   line-height: 1.4;
   text-align: left;
+  cursor: default;
 }
+
+/* ================= INFO ICON ================= */
+
 .infoIcon {
   margin-left: 8px;
   width: 18px;
@@ -256,24 +266,4 @@ body {
 
 .infoIcon:active {
   transform: scale(0.9);
-}
-
-.secondaryBtn {
-  padding: 16px;
-  border-radius: 18px;
-  background: #1a2a36;
-  color: white;
-  border: 1px solid #5E4AE3;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.secondaryBtn:hover {
-  background: #223445;
-}
-.infoOverlay {
-  cursor: pointer;
-}
-.infoBox {
-  cursor: default;
 }
