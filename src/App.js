@@ -171,13 +171,33 @@ export default function App() {
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  const categories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
-  if (cat === "kinder") {
-    return baseData.kinder === "Ja";
-  }
-  return true;
+  /* ================= DYNAMISCHE KATEGORIEN ================= */
+
+const categories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
+  const questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
+    const q = QUESTIONS[id];
+
+    if (q.category !== cat) return false;
+
+    if (q.condition) {
+      return q.condition(baseData);
+    }
+
+    return true;
+  });
+
+  return questionsInCategory.length > 0;
 });
-  const currentCategory = categories[currentCategoryIndex];
+
+const currentCategory = categories[currentCategoryIndex];
+
+/* ===== Sauberer Flow-Schutz ===== */
+
+useEffect(() => {
+  if (currentCategoryIndex >= categories.length) {
+    setCurrentCategoryIndex(0);
+  }
+}, [categories, currentCategoryIndex]);
 
   function resetAll() {
     setStep("welcome");
