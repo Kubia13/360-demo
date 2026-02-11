@@ -459,17 +459,17 @@ function Question({ label, id, answers, answer, link, info, setShowInfo }) {
     <div className="questionCard dark">
       <div className="questionText">
         {label}
-        {info && setShowInfo && (
-          <span
-            className="infoIcon"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowInfo(info);
-            }}
-          >
-            ℹ️
-          </span>
-        )}
+        {typeof info === "string" && setShowInfo && (
+  <span
+    className="infoIcon"
+    onClick={(e) => {
+      e.stopPropagation();
+      setShowInfo(info);
+    }}
+  >
+    i
+  </span>
+)}
       </div>
 
       {link && (

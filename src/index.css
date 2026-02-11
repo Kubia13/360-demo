@@ -208,3 +208,27 @@ body {
   line-height: 1.4;
   text-align: left;
 }
+.infoIcon {
+  margin-left: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.infoIcon:hover {
+  filter: brightness(1.15);
+}
+
+.infoIcon:active {
+  transform: scale(0.9);
+}
+
