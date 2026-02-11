@@ -9,7 +9,7 @@ body {
   padding: 20px;
   max-width: 420px;
   margin: auto;
-  padding-bottom: 40px;
+  padding-bottom: 180px;
 }
 
 .center {
@@ -149,26 +149,42 @@ body {
 }
 
 .contactFixed {
-  margin-top: 30px;
-  padding: 14px 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #071018;
+  padding: 14px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
   gap: 10px;
 }
 
 
-.contactFixed a {
-  width: 90%;
+.contactFixed a,
+.contactFixed .secondaryBtn {
+  flex: 1;
+  max-width: 180px;
   text-align: center;
   padding: 16px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
   font-weight: bold;
-  text-decoration: none;
   transition: 0.2s ease;
 }
+.contactFixed a {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+  text-decoration: none;
+}
+
+.contactFixed a:hover {
+  filter: brightness(1.1);
+}
+
+.contactFixed a:active {
+  transform: scale(0.97);
+}
+
 
 .contactFixed a:hover {
   filter: brightness(1.1);
@@ -231,9 +247,8 @@ body {
 }
 
 .secondaryBtn {
-  width: 90%;
-  padding: 12px;
-  border-radius: 14px;
+  padding: 16px;
+  border-radius: 18px;
   background: #1a2a36;
   color: white;
   border: 1px solid #5E4AE3;
