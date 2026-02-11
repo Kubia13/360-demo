@@ -182,10 +182,10 @@ body {
   margin-top: 10px;
   margin-bottom: 20px;
   padding-left: 10px;
+  border-left: 2px solid #5E4AE3;
 }
 
-.checkbox {
-  display: block;
+.checkbox Input {
   margin-bottom: 6px;
   font-size: 14px;
 }
