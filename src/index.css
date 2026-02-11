@@ -69,6 +69,17 @@ body {
   transform: scale(0.95);
 }
 
+.arrowIcon {
+  width: 14px;
+  height: 14px;
+
+  border-left: 3px solid #8B7CF6;
+  border-bottom: 3px solid #8B7CF6;
+
+  transform: rotate(45deg);
+}
+
+
 .field {
   margin-bottom: 16px;
   width: 100%;
