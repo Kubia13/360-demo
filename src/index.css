@@ -156,7 +156,9 @@ body {
   background: #071018;
   padding: 14px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;   /* wichtig */
+  align-items: center;      /* wichtig */
+  gap: 10px;                /* Abstand zwischen Buttons */
 }
 
 .contactFixed a {
@@ -231,3 +233,23 @@ body {
   transform: scale(0.9);
 }
 
+.secondaryBtn {
+  width: 90%;
+  padding: 12px;
+  border-radius: 14px;
+  background: #1a2a36;
+  color: white;
+  border: 1px solid #5E4AE3;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: #223445;
+}
+.infoOverlay {
+  cursor: pointer;
+}
+.infoBox {
+  cursor: default;
+}

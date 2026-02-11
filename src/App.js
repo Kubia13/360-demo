@@ -182,6 +182,7 @@ export default function App() {
   const [animatedScore, setAnimatedScore] = useState(0);
   const [showInfo, setShowInfo] = useState(null);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const categories = Object.keys(CATEGORY_WEIGHTS);
   const currentCategory = categories[currentCategoryIndex];
@@ -256,6 +257,7 @@ export default function App() {
     }, 10);
     return () => clearInterval(i);
   }, [totalScore]);
+
   /* ================= WELCOME ================= */
 
   if (step === "welcome") {
@@ -272,7 +274,7 @@ export default function App() {
           Jetzt starten
         </button>
 
-        <ContactButton />
+        <ContactButton onReset={() => setShowResetConfirm(true)} />
       </div>
     );
   }
@@ -413,7 +415,7 @@ export default function App() {
         Weiter
       </button>
 
-      <ContactButton />
+      <ContactButton onReset={() => setShowResetConfirm(true)} />
     </div>
   );
 }
@@ -435,7 +437,17 @@ export default function App() {
 
   return (
     <div className="screen">
-      <Header reset={resetAll} back={() => setStep("base")} />
+      <Header
+      reset={resetAll}
+      back={() => {
+        if (currentCategoryIndex > 0) {
+          setCurrentCategoryIndex((prev) => prev - 1);
+        } else {
+          setStep("base");
+        }
+      }}
+    />
+
 
       {/* Progress */}
       <div style={{ marginBottom: 20 }}>
@@ -600,10 +612,42 @@ export default function App() {
         </div>
       )}
 
-      <ContactButton />
+      <ContactButton onReset={() => setShowResetConfirm(true)} />
     </div>
   );
-}
+
+  {showResetConfirm && (
+  <div
+    className="infoOverlay"
+    onClick={() => setShowResetConfirm(false)}
+  >
+    <div
+      className="infoBox"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <p>Möchtest du von vorne beginnen?</p>
+
+      <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
+        <button
+          className="primaryBtn"
+          onClick={() => {
+            setShowResetConfirm(false);
+            resetAll();
+          }}
+        >
+          Ja
+        </button>
+
+        <button
+          className="answerBtn"
+          onClick={() => setShowResetConfirm(false)}
+        >
+          Nein
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
   /* ================= DASHBOARD ================= */
 
@@ -661,10 +705,35 @@ export default function App() {
         ))}
       </div>
 
-      <ContactButton />
+      <ContactButton onReset={() => setShowResetConfirm(true)} />
     </div>
   );
-}
+{showResetConfirm && (
+  <div className="infoOverlay">
+    <div className="infoBox">
+      <p>Möchtest du von vorne beginnen?</p>
+
+      <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
+        <button
+          className="primaryBtn"
+          onClick={() => {
+            setShowResetConfirm(false);
+            resetAll();
+          }}
+        >
+          Ja
+        </button>
+
+        <button
+          className="answerBtn"
+          onClick={() => setShowResetConfirm(false)}
+        >
+          Nein
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 /* ================= UI COMPONENTS ================= */
 
@@ -711,7 +780,7 @@ function Checkbox({ label, checked, onChange }) {
   );
 }
 
-function ContactButton() {
+function ContactButton({ onReset }) {
   return (
     <div className="contactFixed">
       <a
@@ -721,6 +790,14 @@ function ContactButton() {
       >
         Kontakt aufnehmen
       </a>
+
+      <button
+        className="secondaryBtn"
+        onClick={onReset}
+        style={{ marginTop: 10 }}
+      >
+        Neustart
+      </button>
     </div>
   );
 }
