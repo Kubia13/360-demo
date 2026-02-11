@@ -3,11 +3,12 @@ import "./index.css";
 
 const CATEGORY_WEIGHTS = {
   existenz: 0.3,
-  haftung: 0.2,
+  haftung: 0.15,
   gesundheit: 0.15,
-  wohnen: 0.15,
+  wohnen: 0.1,
   mobilitaet: 0.1,
   vorsorge: 0.1,
+  kinder: 0.1,   // NEU
 };
 
 const CATEGORY_LABELS = {
@@ -17,6 +18,7 @@ const CATEGORY_LABELS = {
   wohnen: "Wohnen",
   mobilitaet: "Mobilität",
   vorsorge: "Vorsorge",
+  kinder: "Kinder",   // NEU
 };
 
 const QUESTIONS = {
@@ -134,6 +136,29 @@ const QUESTIONS = {
       url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke",
     },
   },
+
+  /* ================= KINDER ================= */
+
+  kinder_unfall: {
+    label: "Unfallversicherung für dein Kind vorhanden?",
+    category: "kinder",
+    type: "yesno",
+    condition: (baseData) => baseData.kinder === "Ja",
+  },
+
+  kinder_zahn: {
+    label: "Krankenzusatzversicherung für dein Kind vorhanden? (Zahn, Ambulant, Stationär...)",
+    category: "kinder",
+    type: "yesno",
+    condition: (baseData) => baseData.kinder === "Ja",
+  },
+
+  kinder_vorsorge: {
+    label: "Wird für dein Kind privat vorgesorgt?",
+    category: "kinder",
+    type: "yesno",
+    condition: (baseData) => baseData.kinder === "Ja",
+  },
 };
 
 export default function App() {
@@ -146,7 +171,12 @@ export default function App() {
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  const categories = Object.keys(CATEGORY_WEIGHTS);
+  const categories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
+  if (cat === "kinder") {
+    return baseData.kinder === "Ja";
+  }
+  return true;
+});
   const currentCategory = categories[currentCategoryIndex];
 
   function resetAll() {
