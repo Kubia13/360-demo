@@ -313,7 +313,7 @@ body {
   gap: 10px;
 }
 
-/* Beide Footer Buttons absolut identisch */
+/* Beide Footer Buttons IDENTISCH */
 .contactFixed button {
   flex: 1;
   max-width: 200px;
@@ -331,7 +331,6 @@ body {
   line-height: 1;
 
   box-sizing: border-box;
-  border: none;
   cursor: pointer;
   transition: 0.2s ease;
 }
@@ -340,6 +339,7 @@ body {
 .contactBtn {
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
   color: white;
+  border: none;
 }
 
 .contactBtn:hover {
@@ -384,17 +384,17 @@ body {
   cursor: default;
 }
 
-/* Overlay Button Container */
+/* Button Container */
 .overlayButtons {
   display: flex;
   gap: 10px;
   margin-top: 20px;
 }
 
-/* Overlay Buttons identisch */
+/* Beide Overlay Buttons IDENTISCH */
 .overlayBtn {
   flex: 1;
-  height: 50px;
+  height: 56px;
   padding: 0;
 
   display: flex;
@@ -407,7 +407,6 @@ body {
   line-height: 1;
 
   box-sizing: border-box;
-  border: none;
   cursor: pointer;
   transition: 0.2s ease;
 }
@@ -416,13 +415,14 @@ body {
 .overlayBtn.primary {
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
   color: white;
+  border: none;
 }
 
 .overlayBtn.primary:hover {
   filter: brightness(1.1);
 }
 
-/* Nein */
+/* Nein (wie Neustart) */
 .overlayBtn.secondary {
   background: #1a2a36;
   color: white;
@@ -435,43 +435,4 @@ body {
 
 .overlayBtn:active {
   transform: scale(0.97);
-}
-
-/* ================= SUB OPTIONS ================= */
-
-.subOptions {
-  margin-top: 10px;
-  margin-bottom: 20px;
-  padding-left: 10px;
-  border-left: 2px solid #5E4AE3;
-}
-
-.checkbox input {
-  margin-bottom: 6px;
-}
-
-/* ================= INFO ICON ================= */
-
-.infoIcon {
-  margin-left: 8px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.infoIcon:hover {
-  filter: brightness(1.15);
-}
-
-.infoIcon:active {
-  transform: scale(0.9);
 }
