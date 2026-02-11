@@ -4,7 +4,7 @@
 
 body {
   margin: 0;
-  background: #071018;
+  background: radial-gradient(circle at top, #0c1824 0%, #071018 60%);
   color: #fff;
   font-family: system-ui, sans-serif;
 }
@@ -27,65 +27,46 @@ body {
 }
 
 .logo.small {
-  height: 50px;
+  height: 48px;
   cursor: pointer;
 }
-
-/* ================= HEADER PREMIUM ================= */
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  background: rgba(7, 16, 24, 0.6);
-  backdrop-filter: blur(6px);
   padding: 8px 0;
   margin-bottom: 10px;
-  border-bottom: 1px solid rgba(139,124,246,0.1);
+  backdrop-filter: blur(6px);
 }
 
 .backBtn {
   width: 44px;
   height: 44px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 14px;
-
-  background: #111c26;
-  border: 1px solid #8B7CF6;
-
+  background: rgba(17, 28, 38, 0.9);
+  border: 1px solid rgba(139,124,246,0.4);
   cursor: pointer;
   transition: 0.2s ease;
 }
 
 .backBtn:hover {
-  background: #1a2a36;
+  transform: translateY(-2px);
   border-color: #A99BFF;
-}
-
-.backBtn:active {
-  transform: scale(0.95);
 }
 
 .arrowIcon {
   width: 16px;
   height: 16px;
-
-  border-left: 3px solid #8B7CF6;
-  border-bottom: 3px solid #8B7CF6;
-
+  border-left: 4px solid #8B7CF6;
+  border-bottom: 4px solid #8B7CF6;
   transform: rotate(45deg);
 }
-
-/* ================= FORM ================= */
-
 .field {
   margin-bottom: 16px;
-  width: 100%;
 }
 
 .field label {
@@ -103,70 +84,6 @@ body {
   color: white;
 }
 
-/* ================= CARDS PREMIUM ================= */
-
-.questionCard.dark {
-  background: rgba(15, 26, 35, 0.85);
-  backdrop-filter: blur(8px);
-
-  padding: 20px;
-  border-radius: 20px;
-  margin-bottom: 20px;
-
-  border: 1px solid rgba(139,124,246,0.08);
-
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.4);
-
-  transition: 0.25s ease;
-}
-
-.questionCard.dark:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 8px 22px rgba(0, 0, 0, 0.6);
-}
-
-.questionText {
-  margin-bottom: 12px;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-.buttonRow {
-  display: flex;
-  gap: 8px;
-}
-
-.answerBtn {
-  flex: 1;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid transparent;
-
-  background: #111c26;
-  color: white;
-
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.answerBtn:hover {
-  background: #1a2a36;
-}
-
-.answerBtn:active {
-  transform: scale(0.95);
-}
-
-.answerBtn.active {
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-  font-weight: bold;
-}
-
-/* ================= PRIMARY BUTTON ================= */
-
 .primaryBtn {
   width: 100%;
   padding: 16px;
@@ -177,37 +94,63 @@ body {
   border: none;
   cursor: pointer;
   margin-top: 20px;
-  transition: all 0.2s ease;
+  transition: 0.2s ease;
 }
 
 .primaryBtn:hover {
   transform: translateY(-2px);
-  filter: brightness(1.1);
+  box-shadow: 0 6px 20px rgba(139,124,246,0.4);
 }
 
-.primaryBtn:active {
-  transform: scale(0.97);
+.questionCard.dark {
+  background: rgba(15, 26, 35, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(139,124,246,0.15);
+  transition: 0.25s ease;
 }
 
-/* ================= RING PREMIUM ================= */
+.questionCard.dark:hover {
+  transform: translateY(-3px);
+  border-color: rgba(139,124,246,0.4);
+}
 
+.questionText {
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 8px;
+}
+
+.answerBtn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: #111c26;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.answerBtn:hover {
+  background: #1a2a36;
+}
+
+.answerBtn.active {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  font-weight: bold;
+}
 .ringWrap {
   display: flex;
   justify-content: center;
   position: relative;
-  margin: 40px 0;
-}
-
-/* Subtiler Glow hinter dem Ring */
-.ringWrap::before {
-  content: "";
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(139,124,246,0.35) 0%, transparent 70%);
-  filter: blur(25px);
-  z-index: 0;
+  margin: 30px 0;
 }
 
 .ringCenter {
@@ -216,20 +159,16 @@ body {
   transform: translateY(-50%);
   font-size: 36px;
   font-weight: 700;
-
   background: linear-gradient(135deg, #8B7CF6, #A99BFF);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-
-  letter-spacing: 1px;
   animation: softPulse 3s ease-in-out infinite;
 }
 
 @keyframes softPulse {
-  0%, 100% { opacity: 1; }
+  0%,100% { opacity: 1; }
   50% { opacity: 0.85; }
 }
-/* ================= SCORE LABEL ================= */
 
 .scoreLabel {
   text-align: center;
@@ -237,10 +176,7 @@ body {
   margin-bottom: 25px;
   font-weight: 500;
   color: #A99BFF;
-  opacity: 0.9;
 }
-
-/* ================= CATEGORY LIST PREMIUM ================= */
 
 .categoryList {
   margin-top: 20px;
@@ -250,21 +186,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   padding: 14px 16px;
   margin-bottom: 10px;
-
   border-radius: 14px;
   background: #111c26;
-
   border: 1px solid rgba(139,124,246,0.15);
-
   transition: 0.2s ease;
 }
 
 .categoryRow:hover {
+  transform: translateY(-2px);
   border-color: rgba(139,124,246,0.4);
-  transform: translateY(-1px);
 }
 
 .categoryRow span:last-child {
@@ -272,16 +204,28 @@ body {
   color: #A99BFF;
 }
 
-/* Mini Icon links (optional nutzbar im JSX) */
-.categoryRow::before {
-  content: "●";
-  color: #8B7CF6;
-  margin-right: 10px;
-  font-size: 10px;
+/* Calculator Icon */
+.calculatorIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #1a2a36;
+  border: 1px solid #8B7CF6;
+  font-size: 16px;
+  text-decoration: none;
+  transition: 0.2s ease;
 }
 
-/* ================= FIXED CONTACT AREA ================= */
+.calculatorIcon:hover {
+  border-color: #A99BFF;
+  transform: translateY(-2px);
+}
 
+/* Fixed Contact Area */
 .contactFixed {
   position: fixed;
   bottom: 0;
@@ -289,9 +233,7 @@ body {
   right: 0;
   background: #071018;
   padding: 14px;
-
   display: flex;
-  align-items: stretch;
   justify-content: center;
   gap: 10px;
 }
@@ -299,37 +241,22 @@ body {
 .contactBtn {
   flex: 1;
   max-width: 200px;
-
   height: 56px;
-  min-height: 56px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 15px;
-  font-weight: bold;
-
   border-radius: 18px;
-
-  border: 1px solid transparent;
-
+  border: none;
+  font-weight: bold;
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
   color: white;
-
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.contactBtn.secondary {
-  background: #1a2a36;
-  border: 1px solid #5E4AE3;
+  transition: 0.2s ease;
 }
 
 .contactBtn:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139,124,246,0.4);
 }
 
-.contactBtn.secondary:hover {
-  background: #223445;
+.contactBtn.secondary {
+  background: #1a2a36;
+  border: 1px solid #8B7CF6;
 }
