@@ -427,3 +427,33 @@ body {
 .calculatorIcon:active {
   transform: scale(0.95);
 }
+/* ================= CALCULATOR ICON ================= */
+
+.calculatorIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 8px;
+  margin-left: 8px;
+
+  width: 28px;
+  height: 28px;
+
+  border-radius: 8px;
+  background: #1a2a36;
+  border: 1px solid #8B7CF6;
+
+  font-size: 16px;
+  text-decoration: none;
+
+  transition: 0.2s ease;
+}
+
+.calculatorIcon:hover {
+  background: #223445;
+}
+
+.calculatorIcon:active {
+  transform: scale(0.95);
+}
