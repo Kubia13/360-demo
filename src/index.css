@@ -299,3 +299,179 @@ body {
 .infoIcon:active {
   transform: scale(0.9);
 }
+/* ================= FIXED CONTACT AREA ================= */
+
+.contactFixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #071018;
+  padding: 14px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Beide Footer Buttons absolut identisch */
+.contactFixed button {
+  flex: 1;
+  max-width: 200px;
+
+  height: 56px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+  font-weight: bold;
+  font-size: 15px;
+  line-height: 1;
+
+  box-sizing: border-box;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+/* Kontakt */
+.contactBtn {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+}
+
+.contactBtn:hover {
+  filter: brightness(1.1);
+}
+
+/* Neustart */
+.contactBtn.secondary {
+  background: #1a2a36;
+  color: white;
+  border: 1px solid #5E4AE3;
+}
+
+.contactBtn.secondary:hover {
+  background: #223445;
+}
+
+.contactFixed button:active {
+  transform: scale(0.97);
+}
+
+/* ================= RESET OVERLAY ================= */
+
+.infoOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: pointer;
+}
+
+.infoBox {
+  background: #111c26;
+  padding: 22px;
+  border-radius: 18px;
+  max-width: 320px;
+  line-height: 1.4;
+  text-align: left;
+  cursor: default;
+}
+
+/* Overlay Button Container */
+.overlayButtons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Overlay Buttons identisch */
+.overlayBtn {
+  flex: 1;
+  height: 50px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+  font-weight: bold;
+  font-size: 15px;
+  line-height: 1;
+
+  box-sizing: border-box;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+/* Ja */
+.overlayBtn.primary {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+}
+
+.overlayBtn.primary:hover {
+  filter: brightness(1.1);
+}
+
+/* Nein */
+.overlayBtn.secondary {
+  background: #1a2a36;
+  color: white;
+  border: 1px solid #5E4AE3;
+}
+
+.overlayBtn.secondary:hover {
+  background: #223445;
+}
+
+.overlayBtn:active {
+  transform: scale(0.97);
+}
+
+/* ================= SUB OPTIONS ================= */
+
+.subOptions {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding-left: 10px;
+  border-left: 2px solid #5E4AE3;
+}
+
+.checkbox input {
+  margin-bottom: 6px;
+}
+
+/* ================= INFO ICON ================= */
+
+.infoIcon {
+  margin-left: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.infoIcon:hover {
+  filter: brightness(1.15);
+}
+
+.infoIcon:active {
+  transform: scale(0.9);
+}
