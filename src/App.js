@@ -295,9 +295,9 @@ function getScore(key) {
 
     <Select
       label="Welche KFZ-Kaskoversicherung besteht?"
-      options={["Haftpflicht", "Teilkasko", "Vollkasko", "Weiß nicht"]}
+      options={["Keine", "Teilkasko", "Vollkasko", "Weiß nicht"]}
       onChange={(v) => {
-        if (v === "Haftpflicht") answer("kasko", "haftpflicht");
+        if (v === "Keine") answer("kasko", "keine");
         else if (v === "Teilkasko") answer("kasko", "teilkasko");
         else if (v === "Vollkasko") answer("kasko", "vollkasko");
         else answer("kasko", "unbekannt");
