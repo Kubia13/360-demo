@@ -323,7 +323,7 @@ function getScore(key) {
           onChange={(v) => answer("kv_typ", v === "Weiß nicht" ? "nein" : "ja")}
         />
 
-        <Question label="Zahnzusatzversicherung vorhanden?" id="zahn" {...{ answers, answer }} />
+        <Question label="Krankenzusatzversicherung vorhanden? (Zahn, Ambulant, Stationär...)" id="zahn" {...{ answers, answer }} />
         <Question label="Private Pflegezusatz vorhanden?" id="pflege" {...{ answers, answer }} />
 
         <Question
