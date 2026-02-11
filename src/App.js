@@ -3,8 +3,6 @@ import "./index.css";
 
 const SCORE = { ja: 100, nein: 0, unbekannt: 0 };
 
-/* ================= DIN GEWICHTUNG ================= */
-
 const CATEGORY_WEIGHTS = {
   existenz: 0.3,
   haftung: 0.2,
@@ -36,9 +34,15 @@ const QUESTION_CATEGORY_MAP = {
   elementar: "wohnen",
   gebaeude: "wohnen",
 
+  kfz_haftpflicht: "mobilitaet",
   kasko: "mobilitaet",
+  schutzbrief: "mobilitaet",
 
   rentenluecke: "vorsorge",
+
+  zahn: "gesundheit",
+  pflege: "gesundheit",
+  kv_typ: "gesundheit",
 };
 
 export default function App() {
@@ -62,11 +66,9 @@ export default function App() {
     return SCORE[answers[key]] || 0;
   }
 
-  /* ================= KATEGORIE-SCORES ================= */
-
   const categoryScores = Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
     const questionsInCategory = Object.keys(QUESTION_CATEGORY_MAP).filter(
-      (q) => QUESTION_CATEGORY_MAP[q] === cat && answers[q]
+      (q) => QUESTION_CATEGORY_MAP[q] === cat && answers[q] !== undefined
     );
 
     if (questionsInCategory.length === 0) {
@@ -80,9 +82,10 @@ export default function App() {
   }, {});
 
   const totalScore = Math.round(
-    Object.keys(CATEGORY_WEIGHTS).reduce((sum, cat) => {
-      return sum + categoryScores[cat] * CATEGORY_WEIGHTS[cat];
-    }, 0)
+    Object.keys(CATEGORY_WEIGHTS).reduce(
+      (sum, cat) => sum + categoryScores[cat] * CATEGORY_WEIGHTS[cat],
+      0
+    )
   );
 
   useEffect(() => {
@@ -172,6 +175,20 @@ export default function App() {
           onChange={(v) => setBaseData({ ...baseData, wohnen: v })}
         />
 
+        <Select
+          label="Besitzt du ein KFZ?"
+          options={["Nein", "Ja"]}
+          onChange={(v) => setBaseData({ ...baseData, kfz: v })}
+        />
+
+        {baseData.kfz === "Ja" && (
+          <Input
+            label="Anzahl Fahrzeuge"
+            type="number"
+            onChange={(v) => setBaseData({ ...baseData, kfzAnzahl: v })}
+          />
+        )}
+
         <button className="primaryBtn" onClick={() => setStep("questions")}>
           Weiter
         </button>
@@ -187,7 +204,6 @@ export default function App() {
     return (
       <div className="screen">
         <Header reset={resetAll} back={() => setStep("base")} />
-
         <h2>Absicherungsfragen</h2>
 
         <Question label="Berufsunfähigkeitsversicherung vorhanden?" id="bu" {...{ answers, answer }} />
@@ -203,12 +219,12 @@ export default function App() {
         />
 
         <Question label="Unfallversicherung vorhanden?" id="unfall" {...{ answers, answer }} />
-
-        <Question label="Private Haftpflicht (mind. 10 Mio €)?" id="haftpflicht" {...{ answers, answer }} />
+        <Question label="Private Haftpflicht vorhanden?" id="haftpflicht" {...{ answers, answer }} />
 
         {(baseData.tiere === "Hund" || baseData.tiere === "Hund und Katze") && (
           <>
             <Question label="Tierhalterhaftpflicht vorhanden?" id="tierhaft" {...{ answers, answer }} />
+            <Question label="Tier-OP/Krankenversicherung vorhanden?" id="tierkranken" {...{ answers, answer }} />
           </>
         )}
 
@@ -220,7 +236,6 @@ export default function App() {
               info="Faustregel: Wohnfläche × 650 €.\nHausrat wird zum Neuwert versichert."
               {...{ answers, answer, setShowInfo }}
             />
-
             <Question label="Elementarversicherung vorhanden?" id="elementar" {...{ answers, answer }} />
           </>
         )}
@@ -229,13 +244,24 @@ export default function App() {
           <Question label="Wohngebäudeversicherung vorhanden?" id="gebaeude" {...{ answers, answer }} />
         )}
 
+        {baseData.kfz === "Ja" && (
+          <>
+            <Question label="KFZ-Haftpflicht vorhanden?" id="kfz_haftpflicht" {...{ answers, answer }} />
+            <Question label="Schutzbrief vorhanden?" id="schutzbrief" {...{ answers, answer }} />
+            <Question label="Teilkasko oder Vollkasko vorhanden?" id="kasko" {...{ answers, answer }} />
+          </>
+        )}
+
         <Question label="Rechtsschutz vorhanden?" id="rechtsschutz" {...{ answers, answer }} />
 
         <Select
-          label="KFZ-Kasko"
-          options={["Teilkasko", "Vollkasko", "Weiß nicht"]}
-          onChange={(v) => answer("kasko", v === "Weiß nicht" ? "nein" : "ja")}
+          label="Welche Krankenversicherung?"
+          options={["Gesetzlich", "Privat", "Weiß nicht"]}
+          onChange={(v) => answer("kv_typ", v === "Weiß nicht" ? "nein" : "ja")}
         />
+
+        <Question label="Zahnzusatzversicherung vorhanden?" id="zahn" {...{ answers, answer }} />
+        <Question label="Private Pflegezusatz vorhanden?" id="pflege" {...{ answers, answer }} />
 
         <Question
           label="Kennst du deine Rentenlücke?"
@@ -271,7 +297,6 @@ export default function App() {
   return (
     <div className="screen">
       <Header reset={resetAll} back={() => setStep("questions")} />
-
       <h2>
         {baseData.vorname ? `${baseData.vorname}, dein Status` : "Dein Status"}
       </h2>
@@ -335,7 +360,7 @@ function Question({ label, id, answers, answer, link, info, setShowInfo }) {
         {label}
         {info && (
           <span className="infoIcon" onClick={() => setShowInfo(info)}>
-            !
+            ℹ️
           </span>
         )}
       </div>
