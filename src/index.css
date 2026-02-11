@@ -167,14 +167,10 @@ body {
   gap: 10px;
 }
 
-/* Beide exakt gleich */
-.contactFixed a,
-.contactFixed button.secondaryBtn {
+.contactBtn {
   flex: 1;
   max-width: 200px;
-
   height: 56px;
-  padding: 0;
 
   display: flex;
   align-items: center;
@@ -183,66 +179,34 @@ body {
   border-radius: 18px;
   font-weight: bold;
   font-size: 15px;
-  line-height: 1;
 
-  box-sizing: border-box;
-  appearance: none;
-  -webkit-appearance: none;
-
-  margin: 0;              /* wichtig */
-}
-
-/* Kontakt */
-.contactFixed a {
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-  text-decoration: none;
   border: none;
-}
-
-/* Reset */
-.contactFixed button.secondaryBtn {
-  background: #1a2a36;
-  color: white;
-  border: 1px solid #5E4AE3;
   cursor: pointer;
+  transition: 0.2s ease;
 }
-
-/* Hover */
-.contactFixed a:hover {
-  filter: brightness(1.1);
-}
-
-.contactFixed a:active,
-.contactFixed button:active {
-  transform: scale(0.97);
-}
-
 
 /* Kontakt */
-.contactFixed a {
+.contactBtn {
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
   color: white;
-  text-decoration: none;
 }
 
 /* Neustart */
-.contactFixed > button {
+.contactBtn.secondary {
   background: #1a2a36;
-  color: white;
   border: 1px solid #5E4AE3;
-  cursor: pointer;
+  color: white;
 }
 
 /* Hover */
-.contactFixed a:hover {
+.contactBtn:hover {
   filter: brightness(1.1);
 }
 
-.contactFixed a:active,
-.contactFixed .secondaryBtn:active {
+.contactBtn:active {
   transform: scale(0.97);
 }
+
 /* ================= CONTACT BUTTON STYLES ================= */
 
 .contactFixed a {
