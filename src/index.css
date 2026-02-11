@@ -187,50 +187,6 @@ body {
 .infoIcon:active {
   transform: scale(0.9);
 }
-/* ================= BUTTON SYSTEM ================= */
-
-.btn {
-  height: 56px;
-  padding: 0 16px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 18px;
-  font-weight: bold;
-  font-size: 15px;
-  line-height: 1;
-
-  box-sizing: border-box;
-  cursor: pointer;
-  transition: 0.2s ease;
-  border: none;
-}
-
-.btn.primary {
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-}
-
-.btn.primary:hover {
-  filter: brightness(1.1);
-}
-
-.btn.secondary {
-  background: #1a2a36;
-  color: white;
-  border: 1px solid #5E4AE3;
-}
-
-.btn.secondary:hover {
-  background: #223445;
-}
-
-.btn:active {
-  transform: scale(0.97);
-}
-
 /* ================= FIXED CONTACT AREA ================= */
 
 .contactFixed {
@@ -240,18 +196,22 @@ body {
   right: 0;
   background: #071018;
   padding: 14px;
+
   display: flex;
+  align-items: stretch;
   gap: 10px;
 }
 
-/* WICHTIG: a UND button identisch behandeln */
-.contactFixed .contactBtn,
-.contactFixed .contactBtn.secondary {
+/* Basis Button */
+.contactBtn {
   flex: 1;
   max-width: 200px;
 
   height: 56px;
+  min-height: 56px;
+
   padding: 0;
+  margin: 0;
 
   display: flex;
   align-items: center;
@@ -264,57 +224,72 @@ body {
   border-radius: 18px;
 
   box-sizing: border-box;
-  margin: 0;
-
   appearance: none;
   -webkit-appearance: none;
 
-  text-decoration: none;
+  border: 1px solid transparent;
+
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+
   cursor: pointer;
   transition: 0.2s ease;
 }
 
-/* Kontakt */
-.contactFixed .contactBtn {
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-  border: 1px solid transparent; /* WICHTIG für gleiche Höhe */
-}
-
 /* Neustart */
-.contactFixed .contactBtn.secondary {
+.contactBtn.secondary {
   background: #1a2a36;
-  color: white;
   border: 1px solid #5E4AE3;
 }
 
-.contactFixed .contactBtn:hover {
+.contactBtn:hover {
   filter: brightness(1.1);
 }
 
-.contactFixed .contactBtn.secondary:hover {
+.contactBtn.secondary:hover {
   background: #223445;
 }
 
-.contactFixed .contactBtn:active {
+.contactBtn:active {
   transform: scale(0.97);
 }
 
 
 /* ================= RESET OVERLAY ================= */
 
+.infoOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.infoBox {
+  background: #111c26;
+  padding: 22px;
+  border-radius: 18px;
+  max-width: 320px;
+  text-align: left;
+}
+
 .overlayButtons {
   display: flex;
+  align-items: stretch;
   gap: 10px;
   margin-top: 20px;
 }
 
-/* Ja & Nein exakt gleich */
-.overlayButtons .overlayBtn {
+.overlayBtn {
   flex: 1;
 
   height: 56px;
+  min-height: 56px;
+
   padding: 0;
+  margin: 0;
 
   display: flex;
   align-items: center;
@@ -327,38 +302,37 @@ body {
   border-radius: 18px;
 
   box-sizing: border-box;
-  margin: 0;
-
   appearance: none;
   -webkit-appearance: none;
+
+  border: 1px solid transparent;
 
   cursor: pointer;
   transition: 0.2s ease;
 }
 
 /* Ja */
-.overlayButtons .overlayBtn.primary {
+.overlayBtn.primary {
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
   color: white;
-  border: 1px solid transparent; /* gleiche Höhe wie Nein */
 }
 
 /* Nein */
-.overlayButtons .overlayBtn.secondary {
+.overlayBtn.secondary {
   background: #1a2a36;
   color: white;
   border: 1px solid #5E4AE3;
 }
 
-.overlayButtons .overlayBtn.primary:hover {
+.overlayBtn.primary:hover {
   filter: brightness(1.1);
 }
 
-.overlayButtons .overlayBtn.secondary:hover {
+.overlayBtn.secondary:hover {
   background: #223445;
 }
 
-.overlayButtons .overlayBtn:active {
+.overlayBtn:active {
   transform: scale(0.97);
 }
 
