@@ -266,10 +266,16 @@ function getScore(key) {
         {baseData.wohnen !== "Wohne bei Eltern" && (
           <>
             <Question
-              label="Hausrat ausreichend versichert?"
-              id="hausrat"
-              info="Faustregel: Wohnfläche × 650 €.\nHausrat wird zum Neuwert versichert."
-              {...{ answers, answer, setShowInfo }}
+            label="Hausrat ausreichend versichert?"
+            id="hausrat"
+            info={
+              "Faustregel zur Berechnung der Versicherungssumme:\n\n" +
+              "Wohnfläche × 650 € = empfohlene Versicherungssumme.\n\n" +
+              "Beispiel:\n" +
+              "80 m² × 650 € = 52.000 €\n\n" +"Hausrat wird zum Neuwert versichert.\n" +
+              "Eine zu niedrige Summe führt zur Unterversicherung."
+            }
+            {...{ answers, answer, setShowInfo }}
             />
             <Question label="Elementarversicherung vorhanden?" id="elementar" {...{ answers, answer }} />
           </>
@@ -453,8 +459,14 @@ function Question({ label, id, answers, answer, link, info, setShowInfo }) {
     <div className="questionCard dark">
       <div className="questionText">
         {label}
-        {info && (
-          <span className="infoIcon" onClick={() => setShowInfo(info)}>
+        {info && setShowInfo && (
+          <span
+            className="infoIcon"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowInfo(info);
+            }}
+          >
             ℹ️
           </span>
         )}
