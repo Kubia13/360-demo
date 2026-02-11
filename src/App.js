@@ -38,6 +38,7 @@ const QUESTION_CATEGORY_MAP = {
   kasko: "mobilitaet",
   schutzbrief: "mobilitaet",
 
+  private_rente: "vorsorge",
   rentenluecke: "vorsorge",
 
   zahn: "gesundheit",
@@ -326,6 +327,37 @@ function getScore(key) {
         <Question label="Krankenzusatzversicherung vorhanden? (Zahn, Ambulant, Stationär...)" id="zahn" {...{ answers, answer }} />
         <Question label="Private Pflegezusatz vorhanden?" id="pflege" {...{ answers, answer }} />
 
+        <Question
+  label="Sorgst du privat für deine Rente vor?"
+  id="private_rente"
+  {...{
+    answers,
+    answer: (id, value) => {
+      answer(id, value);
+    },
+  }}
+/>
+
+{answers.private_rente === "ja" && (
+  <div className="subOptions">
+    {["Private Vorsorge", "Rürup", "Riester"].map((mod) => (
+      <Checkbox
+        key={mod}
+        label={mod}
+        checked={modules.private_rente?.[mod]}
+        onChange={() =>
+          setModules({
+            ...modules,
+            private_rente: {
+              ...modules.private_rente,
+              [mod]: !modules.private_rente?.[mod],
+            },
+          })
+        }
+      />
+    ))}
+  </div>
+)}
         <Question
           label="Kennst du deine Rentenlücke?"
           id="rentenluecke"
