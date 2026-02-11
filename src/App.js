@@ -3,6 +3,45 @@ import "./index.css";
 
 const SCORE = { ja: 100, nein: 0, unbekannt: 0 };
 
+/* ================= DIN GEWICHTUNG ================= */
+
+const CATEGORY_WEIGHTS = {
+  existenz: 0.3,
+  haftung: 0.2,
+  gesundheit: 0.15,
+  wohnen: 0.15,
+  mobilitaet: 0.1,
+  vorsorge: 0.1,
+};
+
+const CATEGORY_LABELS = {
+  existenz: "Existenz",
+  haftung: "Haftung",
+  gesundheit: "Gesundheit",
+  wohnen: "Wohnen",
+  mobilitaet: "Mobilität",
+  vorsorge: "Vorsorge",
+};
+
+/* Frage → Kategorie Mapping */
+const QUESTION_CATEGORY_MAP = {
+  bu: "existenz",
+  ktg: "existenz",
+  unfall: "existenz",
+
+  haftpflicht: "haftung",
+  tierhaft: "haftung",
+  rechtsschutz: "haftung",
+
+  hausrat: "wohnen",
+  elementar: "wohnen",
+  gebaeude: "wohnen",
+
+  kasko: "mobilitaet",
+
+  rentenluecke: "vorsorge",
+};
+
 export default function App() {
   const [step, setStep] = useState("welcome");
   const [answers, setAnswers] = useState({});
@@ -24,11 +63,35 @@ export default function App() {
     return SCORE[answers[key]] || 0;
   }
 
-  const totalScore =
-    Math.round(
-      (Object.keys(answers).reduce((s, k) => s + score(k), 0) /
-        (Object.keys(answers).length || 1))
-    ) || 0;
+  /* ================= KATEGORIE-SCORES ================= */
+
+  const categoryScores = Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
+    const questionsInCategory = Object.keys(QUESTION_CATEGORY_MAP).filter(
+      (q) => QUESTION_CATEGORY_MAP[q] === cat && answers[q]
+    );
+
+    if (questionsInCategory.length === 0) {
+      acc[cat] = 0;
+    } else {
+      const sum = questionsInCategory.reduce(
+        (s, q) => s + score(q),
+        0
+      );
+      acc[cat] = Math.round(sum / questionsInCategory.length);
+    }
+
+    return acc;
+  }, {});
+
+  /* ================= GESAMT-SCORE (GEWICHTET) ================= */
+
+  const totalScore = Math.round(
+    Object.keys(CATEGORY_WEIGHTS).reduce((sum, cat) => {
+      return sum + categoryScores[cat] * CATEGORY_WEIGHTS[cat];
+    }, 0)
+  );
+
+  /* ================= RING ANIMATION ================= */
 
   useEffect(() => {
     let c = 0;
@@ -130,89 +193,13 @@ export default function App() {
         <h2>Absicherungsfragen</h2>
 
         <Question label="Berufsunfähigkeitsversicherung vorhanden?" id="bu" {...{ answers, answer }} />
-
-        <Question
-          label="Krankentagegeld vorhanden?"
-          id="ktg"
-          link={{
-            label: "Krankentagegeld-Rechner",
-            url: "https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner?prd=Apps%2Bund%2BRechner&dom=www.barmenia.de&p0=334300",
-          }}
-          {...{ answers, answer }}
-        />
-
+        <Question label="Krankentagegeld vorhanden?" id="ktg" {...{ answers, answer }} />
         <Question label="Unfallversicherung vorhanden?" id="unfall" {...{ answers, answer }} />
-
-        <Question
-          label="Private Haftpflicht (mind. 10 Mio €)?"
-          id="haftpflicht"
-          {...{ answers, answer }}
-        />
-
-        {(baseData.tiere === "Hund" || baseData.tiere === "Hund und Katze") && (
-          <>
-            <Question label="Tierhalterhaftpflicht vorhanden?" id="tierhaft" {...{ answers, answer }} />
-
-            <Select
-              label="Tier-Kranken-/OP-Versicherung"
-              options={["Keine", "Krankenversicherung", "OP-Versicherung", "Weiß nicht"]}
-              onChange={(v) =>
-                answer("tierkranken", v === "Weiß nicht" ? "nein" : v === "Keine" ? "nein" : "ja")
-              }
-            />
-          </>
-        )}
-
-        {baseData.wohnen !== "Wohne bei Eltern" && (
-          <>
-            <Question
-              label="Hausrat ausreichend versichert?"
-              id="hausrat"
-              info="Faustregel: Wohnfläche × 650 €.\nHausrat wird zum Neuwert versichert."
-              {...{ answers, answer, setShowInfo }}
-            />
-
-            <Question label="Elementarversicherung vorhanden?" id="elementar" {...{ answers, answer }} />
-          </>
-        )}
-
-        {baseData.wohnen === "Eigentum Haus" && (
-          <Question label="Wohngebäudeversicherung vorhanden?" id="gebaeude" {...{ answers, answer }} />
-        )}
-
-        <Question label="Rechtsschutz vorhanden?" id="rechtsschutz" {...{ answers, answer }} />
-
-        <Select
-          label="KFZ-Kasko"
-          options={["Teilkasko", "Vollkasko", "Weiß nicht"]}
-          onChange={(v) =>
-            answer("kasko", v === "Weiß nicht" ? "nein" : "ja")
-          }
-        />
-
-        <Question
-          label="Kennst du deine Rentenlücke?"
-          id="rentenluecke"
-          link={{
-            label: "Rentenlückenrechner",
-            url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke",
-          }}
-          {...{ answers, answer }}
-        />
+        <Question label="Private Haftpflicht (mind. 10 Mio €)?" id="haftpflicht" {...{ answers, answer }} />
 
         <button className="primaryBtn" onClick={() => setStep("dashboard")}>
           Auswertung
         </button>
-
-        {showInfo && (
-          <div className="infoOverlay" onClick={() => setShowInfo(null)}>
-            <div className="infoBox">
-              {showInfo.split("\n").map((l, i) => (
-                <p key={i}>{l}</p>
-              ))}
-            </div>
-          </div>
-        )}
 
         <ContactButton />
       </div>
@@ -236,7 +223,7 @@ export default function App() {
             cx="110"
             cy="110"
             r="90"
-            stroke="#00e5ff"
+            stroke="url(#grad)"
             strokeWidth="16"
             fill="none"
             strokeDasharray="565"
@@ -244,8 +231,23 @@ export default function App() {
             strokeLinecap="round"
             transform="rotate(-90 110 110)"
           />
+          <defs>
+            <linearGradient id="grad">
+              <stop offset="0%" stopColor="#8B7CF6" />
+              <stop offset="100%" stopColor="#5E4AE3" />
+            </linearGradient>
+          </defs>
         </svg>
         <div className="ringCenter">{animatedScore}%</div>
+      </div>
+
+      <div className="categoryList">
+        {Object.keys(categoryScores).map((cat) => (
+          <div key={cat} className="categoryRow">
+            <span>{CATEGORY_LABELS[cat]}</span>
+            <span>{categoryScores[cat]}%</span>
+          </div>
+        ))}
       </div>
 
       <ContactButton />
@@ -266,24 +268,10 @@ function Header({ reset, back }) {
   );
 }
 
-function Question({ label, id, answers, answer, link, info, setShowInfo }) {
+function Question({ label, id, answers, answer }) {
   return (
     <div className="questionCard dark">
-      <div className="questionText">
-        {label}
-        {info && (
-          <span className="infoIcon" onClick={() => setShowInfo(info)}>
-            !
-          </span>
-        )}
-      </div>
-
-      {link && (
-        <a href={link.url} target="_blank" rel="noreferrer" className="inlineLink">
-          {link.label}
-        </a>
-      )}
-
+      <div className="questionText">{label}</div>
       <div className="buttonRow">
         {["ja", "nein", "unbekannt"].map((v) => (
           <button

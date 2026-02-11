@@ -7,7 +7,7 @@ body {
 
 .screen {
   padding: 20px;
-  max-width: 480px;
+  max-width: 420px;
   margin: auto;
   padding-bottom: 120px;
 }
@@ -64,12 +64,21 @@ body {
   width: 100%;
   padding: 16px;
   border-radius: 18px;
-  background: #00e5ff;
-  color: black;
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
   font-weight: bold;
   border: none;
   cursor: pointer;
   margin-top: 20px;
+  transition: 0.2s ease;
+}
+
+.primaryBtn:hover {
+  filter: brightness(1.1);
+}
+
+.primaryBtn:active {
+  transform: scale(0.97);
 }
 
 .primaryBtn.big {
@@ -100,48 +109,17 @@ body {
   background: #111c26;
   color: white;
   cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.answerBtn:active {
+  transform: scale(0.95);
 }
 
 .answerBtn.active {
-  background: #00e5ff;
-  color: black;
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
   font-weight: bold;
-}
-
-.inlineLink {
-  color: #8b7cf6;
-  font-size: 13px;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.infoIcon {
-  margin-left: 6px;
-  background: #00e5ff;
-  color: black;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.infoOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.infoBox {
-  background: #111c26;
-  padding: 20px;
-  border-radius: 18px;
-  max-width: 300px;
 }
 
 .ringWrap {
@@ -157,6 +135,17 @@ body {
   transform: translateY(-50%);
   font-size: 32px;
   font-weight: bold;
+}
+
+.categoryList {
+  margin-top: 20px;
+}
+
+.categoryRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #1a2a36;
 }
 
 .contactFixed {
@@ -175,8 +164,17 @@ body {
   text-align: center;
   padding: 16px;
   border-radius: 18px;
-  background: #00e5ff;
-  color: black;
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
   font-weight: bold;
   text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.contactFixed a:hover {
+  filter: brightness(1.1);
+}
+
+.contactFixed a:active {
+  transform: scale(0.97);
 }
