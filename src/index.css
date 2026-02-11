@@ -38,11 +38,35 @@ body {
 }
 
 .backBtn {
-  font-size: 24px;
-  background: none;
-  border: none;
-  color: white;
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  font-weight: bold;
+
+  border-radius: 14px;
+
+  background: #111c26;
+  border: 1px solid #8B7CF6;
+
+  color: #8B7CF6;
+
   cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.backBtn:hover {
+  background: #1a2a36;
+  border-color: #A99BFF;
+  color: #A99BFF;
+}
+
+.backBtn:active {
+  transform: scale(0.95);
 }
 
 .field {
@@ -358,4 +382,37 @@ body {
 
 .inlineLink:active {
   transform: scale(0.97);
+}
+.calculatorIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 8px;
+
+  width: 32px;
+  height: 32px;
+
+  font-size: 18px;
+
+  border-radius: 10px;
+
+  background: #111c26;
+  border: 1px solid #8B7CF6;
+
+  color: #8B7CF6;
+
+  text-decoration: none;
+
+  transition: 0.2s ease;
+}
+
+.calculatorIcon:hover {
+  background: #1a2a36;
+  border-color: #A99BFF;
+  color: #A99BFF;
+}
+
+.calculatorIcon:active {
+  transform: scale(0.95);
 }

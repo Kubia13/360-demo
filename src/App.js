@@ -586,14 +586,16 @@ export default function App() {
 
               {q.link && (
                 <a
-                  href={q.link.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inlineLink"
+                href={q.link.url}
+                target="_blank"
+                rel="noreferrer"
+                className="calculatorIcon"
+                title={q.link.label}
                 >
-                  {q.link.label}
-                </a>
-              )}
+                  🧮
+                  </a>
+                )}
+
 
               {q.type === "select" && (
                 <Select
@@ -745,7 +747,7 @@ function Header({ reset, back }) {
         alt="Logo"
       />
       <button className="backBtn" onClick={back}>
-        ⬅
+       ←
       </button>
     </div>
   );
