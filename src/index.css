@@ -31,10 +31,18 @@ body {
   cursor: pointer;
 }
 
+/* ================= HEADER PREMIUM ================= */
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  background: rgba(7, 16, 24, 0.6);
+  backdrop-filter: blur(6px);
+  padding: 8px 0;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(139,124,246,0.1);
 }
 
 .backBtn {
@@ -45,15 +53,10 @@ body {
   align-items: center;
   justify-content: center;
 
-  font-size: 22px;
-  font-weight: bold;
-
   border-radius: 14px;
 
   background: #111c26;
   border: 1px solid #8B7CF6;
-
-  color: #8B7CF6;
 
   cursor: pointer;
   transition: 0.2s ease;
@@ -62,7 +65,6 @@ body {
 .backBtn:hover {
   background: #1a2a36;
   border-color: #A99BFF;
-  color: #A99BFF;
 }
 
 .backBtn:active {
@@ -70,8 +72,8 @@ body {
 }
 
 .arrowIcon {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 
   border-left: 3px solid #8B7CF6;
   border-bottom: 3px solid #8B7CF6;
@@ -79,6 +81,7 @@ body {
   transform: rotate(45deg);
 }
 
+/* ================= FORM ================= */
 
 .field {
   margin-bottom: 16px;
@@ -100,48 +103,28 @@ body {
   color: white;
 }
 
-.primaryBtn {
-  width: 100%;
-  padding: 16px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: 0.2s ease;
-}
-
-.primaryBtn:hover {
-  filter: brightness(1.1);
-}
-
-.primaryBtn:active {
-  transform: scale(0.97);
-}
-
-.primaryBtn.big {
-  font-size: 18px;
-}
+/* ================= CARDS PREMIUM ================= */
 
 .questionCard.dark {
-  background: linear-gradient(145deg, #0f1a23, #0c1620);
+  background: rgba(15, 26, 35, 0.85);
+  backdrop-filter: blur(8px);
+
   padding: 20px;
   border-radius: 20px;
   margin-bottom: 20px;
 
-  border: 1px solid rgba(139, 124, 246, 0.15);
+  border: 1px solid rgba(139,124,246,0.08);
 
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 4px 12px rgba(0, 0, 0, 0.4);
 
-  transition: 0.3s ease;
+  transition: 0.25s ease;
 }
+
 .questionCard.dark:hover {
   transform: translateY(-2px);
-  border-color: rgba(139, 124, 246, 0.35);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.6);
 }
 
 .questionText {
@@ -150,7 +133,6 @@ body {
   font-weight: 500;
   line-height: 1.4;
 }
-
 .buttonRow {
   display: flex;
   gap: 8px;
@@ -168,10 +150,10 @@ body {
   cursor: pointer;
   transition: 0.2s ease;
 }
-.answerBtn:hover {
-  background: #162432;
-}
 
+.answerBtn:hover {
+  background: #1a2a36;
+}
 
 .answerBtn:active {
   transform: scale(0.95);
@@ -183,18 +165,55 @@ body {
   font-weight: bold;
 }
 
+/* ================= PRIMARY BUTTON ================= */
+
+.primaryBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.2s ease;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.primaryBtn:active {
+  transform: scale(0.97);
+}
+
+/* ================= RING PREMIUM ================= */
+
 .ringWrap {
   display: flex;
   justify-content: center;
   position: relative;
-  margin: 30px 0;
+  margin: 40px 0;
+}
+
+/* Subtiler Glow hinter dem Ring */
+.ringWrap::before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,124,246,0.35) 0%, transparent 70%);
+  filter: blur(25px);
+  z-index: 0;
 }
 
 .ringCenter {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-
   font-size: 36px;
   font-weight: 700;
 
@@ -203,7 +222,25 @@ body {
   -webkit-text-fill-color: transparent;
 
   letter-spacing: 1px;
+  animation: softPulse 3s ease-in-out infinite;
 }
+
+@keyframes softPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+/* ================= SCORE LABEL ================= */
+
+.scoreLabel {
+  text-align: center;
+  margin-top: -8px;
+  margin-bottom: 25px;
+  font-weight: 500;
+  color: #A99BFF;
+  opacity: 0.9;
+}
+
+/* ================= CATEGORY LIST PREMIUM ================= */
 
 .categoryList {
   margin-top: 20px;
@@ -224,49 +261,25 @@ body {
 
   transition: 0.2s ease;
 }
+
 .categoryRow:hover {
   border-color: rgba(139,124,246,0.4);
   transform: translateY(-1px);
 }
+
 .categoryRow span:last-child {
   font-weight: 600;
   color: #A99BFF;
 }
 
-.subOptions {
-  margin-top: 10px;
-  margin-bottom: 20px;
-  padding-left: 10px;
-  border-left: 2px solid #5E4AE3;
+/* Mini Icon links (optional nutzbar im JSX) */
+.categoryRow::before {
+  content: "●";
+  color: #8B7CF6;
+  margin-right: 10px;
+  font-size: 10px;
 }
 
-.checkbox input {
-  margin-bottom: 6px;
-}
-
-.infoIcon {
-  margin-left: 8px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.infoIcon:hover {
-  filter: brightness(1.15);
-}
-
-.infoIcon:active {
-  transform: scale(0.9);
-}
 /* ================= FIXED CONTACT AREA ================= */
 
 .contactFixed {
@@ -283,7 +296,6 @@ body {
   gap: 10px;
 }
 
-/* Basis Button */
 .contactBtn {
   flex: 1;
   max-width: 200px;
@@ -291,22 +303,14 @@ body {
   height: 56px;
   min-height: 56px;
 
-  padding: 0;
-  margin: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
 
   font-size: 15px;
   font-weight: bold;
-  line-height: 1;
 
   border-radius: 18px;
-
-  box-sizing: border-box;
-  appearance: none;
-  -webkit-appearance: none;
 
   border: 1px solid transparent;
 
@@ -314,182 +318,18 @@ body {
   color: white;
 
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-/* Neustart */
 .contactBtn.secondary {
   background: #1a2a36;
   border: 1px solid #5E4AE3;
 }
 
 .contactBtn:hover {
-  filter: brightness(1.1);
+  transform: translateY(-2px);
 }
 
 .contactBtn.secondary:hover {
   background: #223445;
-}
-
-.contactBtn:active {
-  transform: scale(0.97);
-}
-
-
-/* ================= RESET OVERLAY ================= */
-
-.infoOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.infoBox {
-  background: #111c26;
-  padding: 22px;
-  border-radius: 18px;
-  max-width: 320px;
-  text-align: left;
-}
-
-.overlayButtons {
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.overlayBtn {
-  flex: 1;
-
-  height: 56px;
-  min-height: 56px;
-
-  padding: 0;
-  margin: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 15px;
-  font-weight: bold;
-  line-height: 1;
-
-  border-radius: 18px;
-
-  box-sizing: border-box;
-  appearance: none;
-  -webkit-appearance: none;
-
-  border: 1px solid transparent;
-
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-/* Ja */
-.overlayBtn.primary {
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-}
-
-/* Nein */
-.overlayBtn.secondary {
-  background: #1a2a36;
-  color: white;
-  border: 1px solid #5E4AE3;
-}
-
-.overlayBtn.primary:hover {
-  filter: brightness(1.1);
-}
-
-.overlayBtn.secondary:hover {
-  background: #223445;
-}
-
-.overlayBtn:active {
-  transform: scale(0.97);
-}
-
-
-/* ================= INLINE LINK ================= */
-
-.inlineLink {
-  display: inline-block;
-  margin-top: 8px;
-
-  color: #A99BFF;
-  text-decoration: none;
-  font-weight: 500;
-
-  transition: 0.2s ease;
-}
-
-.inlineLink:hover {
-  color: #A99BFF;
-  text-decoration: underline;
-}
-
-.inlineLink:active {
-  transform: scale(0.97);
-}
-
-/* ================= CALCULATOR ICON ================= */
-
-.calculatorIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  margin-top: 8px;
-  margin-left: 8px;
-
-  width: 28px;
-  height: 28px;
-
-  border-radius: 8px;
-  background: #1a2a36;
-  border: 1px solid #8B7CF6;
-
-  font-size: 16px;
-  text-decoration: none;
-
-  transition: 0.2s ease;
-}
-
-.calculatorIcon:hover {
-  background: #223445;
-  border-color: #A99BFF;
-}
-
-.calculatorIcon:active {
-  transform: scale(0.95);
-}
-
-.scoreLabel {
-  text-align: center;
-  margin-top: -10px;
-  margin-bottom: 20px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  opacity: 0.85;
-}
-
-.categoryRow span:last-child {
-  font-weight: 600;
-  color: #A99BFF;
-}
-.scoreLabel {
-  text-align: center;
-  margin-top: -8px;
-  margin-bottom: 25px;
-  font-weight: 500;
-  color: #A99BFF;
-  opacity: 0.9;
 }
