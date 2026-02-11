@@ -260,23 +260,24 @@ export default function App() {
       >
         <p>Möchtest du von vorne beginnen?</p>
 
-        <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
+        <div className="overlayButtons">
           <button
-            className="primaryBtn"
-            onClick={() => {
-              setShowResetConfirm(false);
-              resetAll();
+          className="overlayBtn primary"
+          onClick={() => {
+            setShowResetConfirm(false);
+            resetAll();
             }}
-          >
-            Ja
-          </button>
+            >
+              Ja
+              </button>
+              
+              <button
+              className="overlayBtn secondary"
+              onClick={() => setShowResetConfirm(false)}
+              >
+                Nein
+                </button>
 
-          <button
-            className="answerBtn"
-            onClick={() => setShowResetConfirm(false)}
-          >
-            Nein
-          </button>
         </div>
       </div>
     </div>
@@ -753,4 +754,47 @@ function ContactButton({ onReset }) {
       </button>
     </div>
   );
+}
+/* ================= RESET OVERLAY BUTTONS ================= */
+
+.overlayButtons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.overlayBtn {
+  flex: 1;
+
+  height: 50px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+  font-weight: bold;
+  font-size: 15px;
+
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+/* JA */
+.overlayBtn.primary {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+}
+
+/* NEIN */
+.overlayBtn.secondary {
+  background: #1a2a36;
+  color: white;
+  border: 1px solid #5E4AE3;
+}
+
+.overlayBtn:active {
+  transform: scale(0.97);
 }
