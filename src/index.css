@@ -394,39 +394,7 @@ body {
 .inlineLink:active {
   transform: scale(0.97);
 }
-.calculatorIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 
-  margin-top: 8px;
-
-  width: 32px;
-  height: 32px;
-
-  font-size: 18px;
-
-  border-radius: 10px;
-
-  background: #111c26;
-  border: 1px solid #8B7CF6;
-
-  color: #8B7CF6;
-
-  text-decoration: none;
-
-  transition: 0.2s ease;
-}
-
-.calculatorIcon:hover {
-  background: #1a2a36;
-  border-color: #A99BFF;
-  color: #A99BFF;
-}
-
-.calculatorIcon:active {
-  transform: scale(0.95);
-}
 /* ================= CALCULATOR ICON ================= */
 
 .calculatorIcon {
@@ -452,6 +420,7 @@ body {
 
 .calculatorIcon:hover {
   background: #223445;
+  border-color: #A99BFF;
 }
 
 .calculatorIcon:active {
