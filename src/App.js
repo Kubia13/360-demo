@@ -203,6 +203,15 @@ export default function App() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showInfo, setShowInfo] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
+  const inputRefs = {
+    vorname: React.useRef(null),
+    nachname: React.useRef(null),
+    alter: React.useRef(null),
+    gehalt: React.useRef(null),
+    kinderAnzahl: React.useRef(null),
+    kfzAnzahl: React.useRef(null),
+  };
+
 
   /* ================= DYNAMISCHE KATEGORIEN ================= */
 
@@ -661,15 +670,6 @@ export default function App() {
   /* ================= BASISDATEN ================= */
 
   if (step === "base") {
-
-    const inputRefs = {
-      vorname: React.createRef(),
-      nachname: React.createRef(),
-      alter: React.createRef(),
-      gehalt: React.createRef(),
-      kinderAnzahl: React.createRef(),
-      kfzAnzahl: React.createRef(),
-    };
 
     return (
       <div className="screen">
