@@ -140,10 +140,11 @@ const QUESTIONS = {
 
   /* ===== GESUNDHEIT ===== */
 
-  zahn: {
+  krankenzusatz: {
     label: "Krankenzusatzversicherung vorhanden?",
     category: "gesundheit",
     type: "yesno",
+    hasSubOptions: true
   },
 
   pflege: {
@@ -179,11 +180,12 @@ const QUESTIONS = {
     condition: (baseData) => baseData.kinder === "Ja",
   },
 
-  kinder_zahn: {
+  kinder_krankenzusatz: {
     label: "Krankenzusatz für dein Kind vorhanden?",
     category: "kinder",
     type: "yesno",
     condition: (baseData) => baseData.kinder === "Ja",
+    hasSubOptions: true
   },
 
   kinder_vorsorge: {
@@ -390,26 +392,26 @@ export default function App() {
 
   /* ================= BASE FORM REFS ================= */
 
-  const baseFormRefs = {
-    geschlecht: React.useRef(null),
-    vorname: React.useRef(null),
-    nachname: React.useRef(null),
-    alter: React.useRef(null),
-    gehalt: React.useRef(null),
-    beziehungsstatus: React.useRef(null),
-    beruf: React.useRef(null),
-    kinder: React.useRef(null),
-    kinderAnzahl: React.useRef(null),
-    tiere: React.useRef(null),
-    wohnen: React.useRef(null),
-    kfz: React.useRef(null),
-    kfzAnzahl: React.useRef(null),
-  };
+  const baseFormRefs = useMemo(() => ({
+    geschlecht: React.createRef(),
+    vorname: React.createRef(),
+    nachname: React.createRef(),
+    alter: React.createRef(),
+    gehalt: React.createRef(),
+    beziehungsstatus: React.createRef(),
+    beruf: React.createRef(),
+    kinder: React.createRef(),
+    kinderAnzahl: React.createRef(),
+    tiere: React.createRef(),
+    wohnen: React.createRef(),
+    kfz: React.createRef(),
+    kfzAnzahl: React.createRef(),
+  }), []);
 
 
   /* ================= BASE INPUT ORDER ================= */
 
-  const baseInputOrder = [
+  const baseInputOrder = useMemo(() => [
     baseFormRefs.geschlecht,
     baseFormRefs.vorname,
     baseFormRefs.nachname,
@@ -423,7 +425,7 @@ export default function App() {
     baseFormRefs.wohnen,
     baseFormRefs.kfz,
     baseFormRefs.kfzAnzahl,
-  ];
+  ], [baseFormRefs]);
 
 
   /* ================= FOCUS LOGIC ================= */
@@ -455,7 +457,12 @@ export default function App() {
 
       return relevantQuestions.length > 0;
     });
-  }, [baseData]);
+  }, [
+    baseData.kinder,
+    baseData.alter,
+    baseData.beziehungsstatus
+  ]);
+
 
   const currentCategory = categories[currentCategoryIndex];
 
@@ -1412,18 +1419,78 @@ export default function App() {
                   {/* RECHTSSCHUTZ SUBOPTIONEN */}
                   {id === "rechtsschutz" && answers[id] === "ja" && (
                     <div className="subOptions">
-                      {["Privat", "Beruf", "Verkehr", "Immobilie/Miete"].map((opt) => (
+                      {["Privat", "Beruf", "Verkehr", "Immobilie/Miete"].map(
+                        (opt) => (
+                          <Checkbox
+                            key={opt}
+                            label={opt}
+                            checked={answers["rechtsschutz_" + opt]}
+                            onChange={(e) =>
+                              answer(
+                                "rechtsschutz_" + opt,
+                                e.target.checked
+                              )
+                            }
+                          />
+                        )
+                      )}
+                    </div>
+                  )}
+
+                  {/* KRANKENZUSATZ SUBOPTIONEN */}
+                  {id === "krankenzusatz" && answers[id] === "ja" && (
+                    <div className="subOptions">
+                      {[
+                        "Ambulant",
+                        "Stationär",
+                        "Zähne",
+                        "Brille",
+                        "Krankenhaustagegeld",
+                      ].map((opt) => (
                         <Checkbox
                           key={opt}
                           label={opt}
-                          checked={answers["rechtsschutz_" + opt]}
+                          checked={answers["krankenzusatz_" + opt]}
                           onChange={(e) =>
-                            answer("rechtsschutz_" + opt, e.target.checked)
+                            answer(
+                              "krankenzusatz_" + opt,
+                              e.target.checked
+                            )
                           }
                         />
                       ))}
                     </div>
                   )}
+
+                  {/* KINDER KRANKENZUSATZ SUBOPTIONEN */}
+                  {id === "kinder_krankenzusatz" &&
+                    answers[id] === "ja" && (
+                      <div className="subOptions">
+                        {[
+                          "Ambulant",
+                          "Stationär",
+                          "Zähne",
+                          "Brille",
+                          "Krankenhaustagegeld",
+                        ].map((opt) => (
+                          <Checkbox
+                            key={opt}
+                            label={opt}
+                            checked={
+                              answers[
+                              "kinder_krankenzusatz_" + opt
+                              ]
+                            }
+                            onChange={(e) =>
+                              answer(
+                                "kinder_krankenzusatz_" + opt,
+                                e.target.checked
+                              )
+                            }
+                          />
+                        ))}
+                      </div>
+                    )}
                 </>
               )}
             </div>
@@ -1477,6 +1544,7 @@ export default function App() {
       </div>
     );
   }
+
   /* ================= DASHBOARD ================= */
 
   if (step === "dashboard") {
@@ -1647,6 +1715,9 @@ export default function App() {
       </div>
     );
   }
+
+}
+
   /* ================= UI COMPONENTS ================= */
 
   function Header({ reset, back }) {
@@ -1735,13 +1806,24 @@ export default function App() {
     label,
     checked,
     onChange,
+    inputRef,
+    onEnter,
   }) {
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter" && onEnter) {
+        e.preventDefault();
+        onEnter();
+      }
+    };
+
     return (
       <label className="checkbox">
         <input
+          ref={inputRef}
           type="checkbox"
           checked={!!checked}
           onChange={onChange}
+          onKeyDown={handleKeyDown}
         />
         {label}
       </label>
@@ -1772,5 +1854,3 @@ export default function App() {
       </div>
     );
   }
-
-}

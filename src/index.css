@@ -230,38 +230,81 @@ body {
 }
 
 .subOptions {
-  margin-top: 10px;
-  margin-bottom: 20px;
-  padding-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  margin-top: 14px;
+  padding-left: 12px;
+
   border-left: 2px solid #5E4AE3;
 }
 
-.checkbox input {
-  margin-bottom: 6px;
+/* ===== PREMIUM CHECKBOX CLEAN ===== */
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  position: relative;
+  line-height: 1.4;
 }
 
-.infoIcon {
-  margin-left: 8px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  display: inline-flex;
+/* Native Checkbox komplett entfernen */
+.checkbox input {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 6px;
+  border: 1px solid rgba(139, 124, 246, 0.35);
+
+  background: rgba(20, 30, 45, 0.8);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  display: flex;
   align-items: center;
   justify-content: center;
+
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.infoIcon:hover {
-  filter: brightness(1.15);
+/* Hover */
+.checkbox input:hover {
+  border-color: rgba(139, 124, 246, 0.6);
 }
 
-.infoIcon:active {
-  transform: scale(0.9);
+/* Checked Zustand */
+.checkbox input:checked {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  border-color: #8B7CF6;
+
+  box-shadow:
+    0 0 10px rgba(139,124,246,0.6),
+    0 0 18px rgba(94,74,227,0.4);
+}
+
+/* Häkchen */
+.checkbox input:checked::after {
+  content: "";
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Text */
+.checkbox span {
+  font-size: 14px;
+  color: #fff;
 }
 
 /* ================= FIXED CONTACT AREA ================= */
