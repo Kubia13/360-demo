@@ -483,14 +483,20 @@ export default function App() {
 
     if (!value || value === "ja") return null
 
+    const unsicher = value === "unbekannt"
+
     switch (id) {
 
       case "bu":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung deiner Einkommensabsicherung ist sinnvoll."
         if (verheiratet)
           return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung."
-        return "Die Absicherung der eigenen Arbeitskraft ist eine der wichtigsten Grundlagen finanzieller Stabilität."
+        return "Die Absicherung der eigenen Arbeitskraft zählt zu den wichtigsten finanziellen Grundlagen."
 
       case "private_rente":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine strukturierte Ruhestandsplanung schafft Klarheit über Versorgungslücken."
         if (age >= 50)
           return "Im fortgeschrittenen Erwerbsleben lassen sich Vorsorgelücken nur noch begrenzt aufholen."
         if (age >= 30)
@@ -498,6 +504,8 @@ export default function App() {
         return "Früher Vorsorgebeginn schafft langfristige finanzielle Flexibilität."
 
       case "pflege":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung der Pflegeabsicherung kann finanzielle Risiken reduzieren."
         if (age >= 50)
           return "Mit steigendem Alter erhöhen sich Eintrittswahrscheinlichkeit und Beitragshöhe."
         if (age >= 30)
@@ -505,30 +513,48 @@ export default function App() {
         return "Frühe Gesundheitsabsicherung sichert langfristig günstige Beiträge."
 
       case "zahn":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung des Leistungsumfangs schafft Transparenz."
         return "Eine Krankenzusatzversicherung kann Eigenkosten im Leistungsfall deutlich reduzieren."
 
       case "hausrat":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Versicherungssumme schützt vor Unterversicherung."
         return "Der Schutz deines beweglichen Eigentums sollte regelmäßig am Neuwert ausgerichtet sein."
 
       case "elementar":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Elementarschäden sind häufig nicht automatisch eingeschlossen."
         return "Naturgefahren nehmen statistisch zu. Elementarschutz ergänzt die Wohnabsicherung sinnvoll."
 
       case "gebaeude":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine vollständige Gebäudeabsicherung ist essenziell."
         return "Als Eigentümer ist eine vollständige Gebäudeabsicherung essenziell."
 
       case "haftpflicht":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Deckungssumme ist sinnvoll."
         return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen."
 
       case "rechtsschutz":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Analyse der abgedeckten Bereiche schafft Klarheit."
         return "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen."
 
       case "kfz_haftpflicht":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Die gesetzliche Haftpflicht sollte eindeutig geprüft werden."
         return "Die KFZ-Haftpflicht schützt vor existenzbedrohenden Schadenersatzforderungen."
 
       case "kasko":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Der passende Kaskoschutz hängt vom Fahrzeugwert ab."
         return "Der passende Kaskoschutz hängt vom Fahrzeugwert und deiner Risikobereitschaft ab."
 
       case "schutzbrief":
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Ein Schutzbrief kann im Notfall organisatorische Sicherheit bieten."
         return "Ein Schutzbrief reduziert organisatorische und finanzielle Belastungen im Notfall."
 
       default:
