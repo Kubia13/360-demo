@@ -87,14 +87,14 @@ const QUESTIONS = {
   /* ===== WOHNEN ===== */
 
   hausrat: {
-  label: "Hausrat ausreichend versichert?",
-  category: "wohnen",
-  type: "yesno",
-  condition: (baseData) =>
-    baseData.wohnen &&
-    baseData.wohnen !== "Wohne bei Eltern",
-  info: "Die Hausratversicherung schützt dein gesamtes bewegliches Eigentum (Möbel, Kleidung, Technik usw.).\n\nEntscheidend ist der Neuwert – also der Betrag, den du heute für eine Neuanschaffung zahlen müsstest.\n\nAls Orientierung gelten ca. 650 € pro m² Wohnfläche.\nBeispiel: 80 m² × 650 € = 52.000 € Versicherungssumme.\n\nIst die Summe zu niedrig, droht im Schadenfall eine Kürzung wegen Unterversicherung."
-},
+    label: "Hausrat ausreichend versichert?",
+    category: "wohnen",
+    type: "yesno",
+    condition: (baseData) =>
+      baseData.wohnen &&
+      baseData.wohnen !== "Wohne bei Eltern",
+    info: "Die Hausratversicherung schützt dein gesamtes bewegliches Eigentum (Möbel, Kleidung, Technik usw.).\n\nEntscheidend ist der Neuwert – also der Betrag, den du heute für eine Neuanschaffung zahlen müsstest.\n\nAls Orientierung gelten ca. 650 € pro m² Wohnfläche.\nBeispiel: 80 m² × 650 € = 52.000 € Versicherungssumme.\n\nIst die Summe zu niedrig, droht im Schadenfall eine Kürzung wegen Unterversicherung."
+  },
 
   elementar: {
     label: "Elementarversicherung vorhanden?",
@@ -116,10 +116,10 @@ const QUESTIONS = {
   /* ===== MOBILITÄT ===== */
 
   kfz_haftpflicht: {
-   label: "Haftpflichtversicherung für dein Fahrzeug vorhanden? (z. B. Auto, Motorrad, Roller, Mofa)",
-   category: "mobilitaet",
-   type: "yesno",
-   condition: (baseData) => baseData.kfz === "Ja",
+    label: "Haftpflichtversicherung für dein Fahrzeug vorhanden? (z. B. Auto, Motorrad, Roller, Mofa)",
+    category: "mobilitaet",
+    type: "yesno",
+    condition: (baseData) => baseData.kfz === "Ja",
   },
 
 
@@ -253,168 +253,168 @@ export default function App() {
 
   /* ================= SCORE ================= */
 
-function getScore(key) {
+  function getScore(key) {
 
-  const value = answers[key];
-  const age = Number(baseData.alter);
-  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+    const value = answers[key];
+    const age = Number(baseData.alter);
+    const verheiratet = baseData.beziehungsstatus === "Verheiratet";
 
-  if (!value) return 0;
+    if (!value) return 0;
 
-  /* ===== RENTENLÜCKE NICHT WERTEN ===== */
-  if (key === "rentenluecke") return null;
+    /* ===== RENTENLÜCKE NICHT WERTEN ===== */
+    if (key === "rentenluecke") return null;
 
-  /* ===== PRIVATE ALTERSVORSORGE ===== */
-  if (key === "private_rente") {
+    /* ===== PRIVATE ALTERSVORSORGE ===== */
+    if (key === "private_rente") {
 
+      if (value === "ja") return 100;
+
+      // Ohne Vorsorge
+      if (age < 30) return 0;
+      if (age < 50) return 0;
+
+      return 20; // 50+
+    }
+
+    /* ===== PFLEGE ===== */
+    if (key === "pflege") {
+
+      if (value === "ja") return 100;
+
+      if (age < 30) return 40;
+      if (age < 50) return 20;
+
+      return 0;
+    }
+
+    /* ===== KRANKENZUSATZ ===== */
+    if (key === "zahn") {
+
+      if (value === "ja") return 100;
+
+      if (age < 30) return 70;
+      if (age < 50) return 40;
+
+      return 20;
+    }
+
+    /* ===== BU – MIT VERHEIRATET BONUS-RISIKO ===== */
+    if (key === "bu") {
+
+      if (value === "ja") return 100;
+
+      if (verheiratet) return 0;
+
+      return 0;
+    }
+
+    /* ===== RECHTSSCHUTZ ===== */
+    if (key === "rechtsschutz") {
+
+      if (value !== "ja") return 0;
+
+      const options = [
+        "Privat",
+        "Beruf",
+        "Verkehr",
+        "Immobilie/Miete"
+      ];
+
+      const selectedCount = options.filter(
+        (opt) => answers["rechtsschutz_" + opt]
+      ).length;
+
+      if (selectedCount === 0) return 0;
+
+      return Math.round((selectedCount / options.length) * 100);
+    }
+
+    /* ===== STANDARD YES / NO ===== */
     if (value === "ja") return 100;
+    if (value === "nein" || value === "unbekannt") return 0;
 
-    // Ohne Vorsorge
-    if (age < 30) return 0;
-    if (age < 50) return 0;
-
-    return 20; // 50+
-  }
-
-  /* ===== PFLEGE ===== */
-  if (key === "pflege") {
-
-    if (value === "ja") return 100;
-
-    if (age < 30) return 40;
-    if (age < 50) return 20;
+    /* ===== KASKO ===== */
+    if (key === "kasko") {
+      if (value === "vollkasko") return 100;
+      if (value === "teilkasko") return 50;
+      return 0;
+    }
 
     return 0;
   }
 
-  /* ===== KRANKENZUSATZ ===== */
-  if (key === "zahn") {
+  const categoryScores = useMemo(() => {
 
-    if (value === "ja") return 100;
+    return Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
 
-    if (age < 30) return 70;
-    if (age < 50) return 40;
+      const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
 
-    return 20;
-  }
+        const q = QUESTIONS[id];
 
-  /* ===== BU – MIT VERHEIRATET BONUS-RISIKO ===== */
-  if (key === "bu") {
+        if (q.category !== cat) return false;
+        if (q.condition && !q.condition(baseData)) return false;
+        if (answers[id] === undefined) return false;
 
-    if (value === "ja") return 100;
+        return true;
+      });
 
-    if (verheiratet) return 0;
-
-    return 0;
-  }
-
-  /* ===== RECHTSSCHUTZ ===== */
-  if (key === "rechtsschutz") {
-
-    if (value !== "ja") return 0;
-
-    const options = [
-      "Privat",
-      "Beruf",
-      "Verkehr",
-      "Immobilie/Miete"
-    ];
-
-    const selectedCount = options.filter(
-      (opt) => answers["rechtsschutz_" + opt]
-    ).length;
-
-    if (selectedCount === 0) return 0;
-
-    return Math.round((selectedCount / options.length) * 100);
-  }
-
-  /* ===== STANDARD YES / NO ===== */
-  if (value === "ja") return 100;
-  if (value === "nein" || value === "unbekannt") return 0;
-
-  /* ===== KASKO ===== */
-  if (key === "kasko") {
-    if (value === "vollkasko") return 100;
-    if (value === "teilkasko") return 50;
-    return 0;
-  }
-
-  return 0;
-}
-
-const categoryScores = useMemo(() => {
-
-  return Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
-
-    const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
-
-      const q = QUESTIONS[id];
-
-      if (q.category !== cat) return false;
-      if (q.condition && !q.condition(baseData)) return false;
-      if (answers[id] === undefined) return false;
-
-      return true;
-    });
-
-    if (!relevantQuestions.length) {
-      acc[cat] = 0;
-    } else {
-
-      const scoredQuestions = relevantQuestions.filter(
-        (id) => getScore(id) !== null
-      );
-
-      if (!scoredQuestions.length) {
+      if (!relevantQuestions.length) {
         acc[cat] = 0;
       } else {
 
-        const sum = scoredQuestions.reduce(
-          (total, id) => total + getScore(id),
-          0
+        const scoredQuestions = relevantQuestions.filter(
+          (id) => getScore(id) !== null
         );
 
-        acc[cat] = Math.round(sum / scoredQuestions.length);
+        if (!scoredQuestions.length) {
+          acc[cat] = 0;
+        } else {
+
+          const sum = scoredQuestions.reduce(
+            (total, id) => total + getScore(id),
+            0
+          );
+
+          acc[cat] = Math.round(sum / scoredQuestions.length);
+        }
       }
-    }
 
-    return acc;
+      return acc;
 
-  }, {});
+    }, {});
 
-}, [answers, baseData]);
+  }, [answers, baseData]);
 
-const totalScore = useMemo(() => {
+  const totalScore = useMemo(() => {
 
-  const activeCategories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
+    const activeCategories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
 
-    const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
-      const q = QUESTIONS[id];
+      const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+        const q = QUESTIONS[id];
 
-      if (q.category !== cat) return false;
-      if (q.condition && !q.condition(baseData)) return false;
+        if (q.category !== cat) return false;
+        if (q.condition && !q.condition(baseData)) return false;
 
-      return true;
+        return true;
+      });
+
+      return relevantQuestions.length > 0;
     });
 
-    return relevantQuestions.length > 0;
-  });
+    const totalWeight = activeCategories.reduce(
+      (sum, cat) => sum + CATEGORY_WEIGHTS[cat],
+      0
+    );
 
-  const totalWeight = activeCategories.reduce(
-    (sum, cat) => sum + CATEGORY_WEIGHTS[cat],
-    0
-  );
+    if (totalWeight === 0) return 0;
 
-  if (totalWeight === 0) return 0;
+    const weightedScore = activeCategories.reduce((sum, cat) => {
+      return sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat];
+    }, 0);
 
-  const weightedScore = activeCategories.reduce((sum, cat) => {
-    return sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat];
-  }, 0);
+    return Math.round(weightedScore / totalWeight);
 
-  return Math.round(weightedScore / totalWeight);
-
-}, [categoryScores, baseData]);
+  }, [categoryScores, baseData]);
 
   /* ===== SCORE ANIMATION ===== */
 
@@ -441,38 +441,100 @@ const totalScore = useMemo(() => {
 
   /* ===== DYNAMISCHER DASHBOARD-HINWEIS ===== */
 
-function getDynamicHint() {
+  function getDynamicHint() {
 
-  const age = Number(baseData.alter);
-  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+    const age = Number(baseData.alter);
+    const verheiratet = baseData.beziehungsstatus === "Verheiratet";
 
-  // Pflege-Risiko
-  if (answers.pflege !== "ja") {
+    // Pflege-Risiko
+    if (answers.pflege !== "ja") {
 
-    if (age >= 50)
-      return "Mit steigendem Alter wird Pflegeabsicherung zunehmend relevanter – und teurer.";
+      if (age >= 50)
+        return "Mit steigendem Alter wird Pflegeabsicherung zunehmend relevanter – und teurer.";
 
-    if (age >= 30)
-      return "Pflegeabsicherung wird mit zunehmendem Alter deutlich kostenintensiver.";
+      if (age >= 30)
+        return "Pflegeabsicherung wird mit zunehmendem Alter deutlich kostenintensiver.";
+    }
+
+    // Altersvorsorge
+    if (answers.private_rente !== "ja") {
+
+      if (age >= 50)
+        return "Im späteren Erwerbsleben sind Vorsorgelücken schwerer auszugleichen.";
+
+      if (age >= 30)
+        return "Je früher Altersvorsorge startet, desto geringer ist der monatliche Aufwand.";
+    }
+
+    // Verheiratet & BU
+    if (verheiratet && answers.bu !== "ja")
+      return "Als verheiratete Person spielt Einkommensabsicherung eine zentrale Rolle.";
+
+    // Standard
+    return "Dein Ergebnis zeigt eine strukturierte Übersicht deiner aktuellen Absicherung.";
   }
+  /* ===== STRATEGISCHE EMPFEHLUNGEN ===== */
 
-  // Altersvorsorge
-  if (answers.private_rente !== "ja") {
+  function getStrategicRecommendation(id) {
 
-    if (age >= 50)
-      return "Im späteren Erwerbsleben sind Vorsorgelücken schwerer auszugleichen.";
+    const value = answers[id]
+    const age = Number(baseData.alter)
+    const verheiratet = baseData.beziehungsstatus === "Verheiratet"
 
-    if (age >= 30)
-      return "Je früher Altersvorsorge startet, desto geringer ist der monatliche Aufwand.";
+    if (!value || value === "ja") return null
+
+    switch (id) {
+
+      case "bu":
+        if (verheiratet)
+          return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung."
+        return "Die Absicherung der eigenen Arbeitskraft ist eine der wichtigsten Grundlagen finanzieller Stabilität."
+
+      case "private_rente":
+        if (age >= 50)
+          return "Im fortgeschrittenen Erwerbsleben lassen sich Vorsorgelücken nur noch begrenzt aufholen."
+        if (age >= 30)
+          return "Je früher private Altersvorsorge beginnt, desto geringer ist der monatliche Aufwand."
+        return "Früher Vorsorgebeginn schafft langfristige finanzielle Flexibilität."
+
+      case "pflege":
+        if (age >= 50)
+          return "Mit steigendem Alter erhöhen sich Eintrittswahrscheinlichkeit und Beitragshöhe."
+        if (age >= 30)
+          return "Pflegekosten können erhebliche Eigenanteile verursachen."
+        return "Frühe Gesundheitsabsicherung sichert langfristig günstige Beiträge."
+
+      case "zahn":
+        return "Eine Krankenzusatzversicherung kann Eigenkosten im Leistungsfall deutlich reduzieren."
+
+      case "hausrat":
+        return "Der Schutz deines beweglichen Eigentums sollte regelmäßig am Neuwert ausgerichtet sein."
+
+      case "elementar":
+        return "Naturgefahren nehmen statistisch zu. Elementarschutz ergänzt die Wohnabsicherung sinnvoll."
+
+      case "gebaeude":
+        return "Als Eigentümer ist eine vollständige Gebäudeabsicherung essenziell."
+
+      case "haftpflicht":
+        return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen."
+
+      case "rechtsschutz":
+        return "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen."
+
+      case "kfz_haftpflicht":
+        return "Die KFZ-Haftpflicht schützt vor existenzbedrohenden Schadenersatzforderungen."
+
+      case "kasko":
+        return "Der passende Kaskoschutz hängt vom Fahrzeugwert und deiner Risikobereitschaft ab."
+
+      case "schutzbrief":
+        return "Ein Schutzbrief reduziert organisatorische und finanzielle Belastungen im Notfall."
+
+      default:
+        return null
+    }
   }
-
-  // Verheiratet & BU
-  if (verheiratet && answers.bu !== "ja")
-    return "Als verheiratete Person spielt Einkommensabsicherung eine zentrale Rolle.";
-
-  // Standard
-  return "Dein Ergebnis zeigt eine strukturierte Übersicht deiner aktuellen Absicherung.";
-}
 
   /* ================= RESET OVERLAY ================= */
 
@@ -511,202 +573,202 @@ function getDynamicHint() {
 
   /* ================= WELCOME ================= */
 
-if (step === "welcome") {
-  return (
-    <div className="screen center">
-      <img
-        src="/logo.jpg"
-        className="logo large"
-        onClick={resetAll}
-        alt="Logo"
-      />
+  if (step === "welcome") {
+    return (
+      <div className="screen center">
+        <img
+          src="/logo.jpg"
+          className="logo large"
+          onClick={resetAll}
+          alt="Logo"
+        />
 
-      <h1>360° Absicherungscheck</h1>
+        <h1>360° Absicherungscheck</h1>
 
-      <p style={{ opacity: 0.85, lineHeight: 1.5 }}>
-        In wenigen Minuten erhältst du eine strukturierte Übersicht
-        deiner aktuellen Absicherung – klar, verständlich und
-        kategorisiert nach Risiko­bereichen.
-      </p>
+        <p style={{ opacity: 0.85, lineHeight: 1.5 }}>
+          In wenigen Minuten erhältst du eine strukturierte Übersicht
+          deiner aktuellen Absicherung – klar, verständlich und
+          kategorisiert nach Risiko­bereichen.
+        </p>
 
-      <p style={{ opacity: 0.65, fontSize: 14, marginTop: 6 }}>
-        Keine Anmeldung. Keine Datenspeicherung. Nur Transparenz.
-      </p>
+        <p style={{ opacity: 0.65, fontSize: 14, marginTop: 6 }}>
+          Keine Anmeldung. Keine Datenspeicherung. Nur Transparenz.
+        </p>
 
-      <button
-        className="primaryBtn big"
-        onClick={() => setStep("base")}
-      >
-        Jetzt Check starten
-      </button>
+        <button
+          className="primaryBtn big"
+          onClick={() => setStep("base")}
+        >
+          Jetzt Check starten
+        </button>
 
-      <ContactButton onReset={() => setShowResetConfirm(true)} />
-      {ResetOverlay}
-    </div>
-  );
-}
+        <ContactButton onReset={() => setShowResetConfirm(true)} />
+        {ResetOverlay}
+      </div>
+    );
+  }
 
- 
+
   /* ================= BASISDATEN ================= */
 
   if (step === "base") {
-  return (
-    <div className="screen">
-      <Header reset={resetAll} back={() => setStep("welcome")} />
+    return (
+      <div className="screen">
+        <Header reset={resetAll} back={() => setStep("welcome")} />
 
-      <h2>Persönliche Angaben</h2>
+        <h2>Persönliche Angaben</h2>
 
-      <Select
-        label="Geschlecht"
-        options={["Herr", "Frau", "Divers"]}
-        value={baseData.geschlecht}
-        onChange={(v) =>
-          setBaseData({ ...baseData, geschlecht: v })
-        }
-      />
-
-      <Input
-        label="Vorname"
-        onChange={(v) =>
-          setBaseData({ ...baseData, vorname: v })
-        }
-      />
-
-      <Input
-        label="Nachname"
-        onChange={(v) =>
-          setBaseData({ ...baseData, nachname: v })
-        }
-      />
-
-      <Input
-        label="Alter"
-        type="number"
-        onChange={(v) =>
-          setBaseData({ ...baseData, alter: v })
-        }
-      />
-
-      <Input
-        label="Monatliches Netto-Gehalt (€)"
-        type="number"
-        onChange={(v) =>
-          setBaseData({ ...baseData, gehalt: v })
-        }
-      />
-
-      <Select
-        label="Beziehungsstatus"
-        options={[
-          "Single",
-          "Partnerschaft",
-          "Verheiratet"
-        ]}
-        value={baseData.beziehungsstatus}
-        onChange={(v) =>
-          setBaseData({ ...baseData, beziehungsstatus: v })
-        }
-      />
-
-      <Select
-        label="Berufliche Situation"
-        options={[
-          "Angestellt",
-          "Öffentlicher Dienst",
-          "Selbstständig",
-          "Nicht berufstätig",
-        ]}
-        value={baseData.beruf}
-        onChange={(v) =>
-          setBaseData({ ...baseData, beruf: v })
-        }
-      />
-
-      <Select
-        label="Hast du Kinder?"
-        options={["Nein", "Ja"]}
-        value={baseData.kinder}
-        onChange={(v) =>
-          setBaseData({ ...baseData, kinder: v })
-        }
-      />
-
-      {baseData.kinder === "Ja" && (
-        <Input
-          label="Anzahl Kinder"
-          type="number"
+        <Select
+          label="Geschlecht"
+          options={["Herr", "Frau", "Divers"]}
+          value={baseData.geschlecht}
           onChange={(v) =>
-            setBaseData({
-              ...baseData,
-              kinderAnzahl: v,
-            })
+            setBaseData({ ...baseData, geschlecht: v })
           }
         />
-      )}
 
-      <Select
-        label="Haustiere"
-        options={[
-          "Keine Tiere",
-          "Katze",
-          "Hund",
-          "Hund und Katze",
-        ]}
-        value={baseData.tiere}
-        onChange={(v) =>
-          setBaseData({ ...baseData, tiere: v })
-        }
-      />
-
-      <Select
-        label="Wie wohnst du?"
-        options={[
-          "Wohne bei Eltern",
-          "Miete Wohnung",
-          "Miete Haus",
-          "Eigentumswohnung",
-          "Eigentum Haus",
-        ]}
-        value={baseData.wohnen}
-        onChange={(v) =>
-          setBaseData({ ...baseData, wohnen: v })
-        }
-      />
-
-      <Select
-        label="Besitzt du ein Fahrzeug? (z. B. Auto, Motorrad, Roller, Mofa)"
-        options={["Nein", "Ja"]}
-        value={baseData.kfz}
-        onChange={(v) =>
-          setBaseData({ ...baseData, kfz: v })
-        }
-      />
-
-      {baseData.kfz === "Ja" && (
         <Input
-          label="Anzahl Fahrzeuge"
-          type="number"
+          label="Vorname"
           onChange={(v) =>
-            setBaseData({
-              ...baseData,
-              kfzAnzahl: v,
-            })
+            setBaseData({ ...baseData, vorname: v })
           }
         />
-      )}
 
-      <button
-        className="primaryBtn"
-        onClick={() => setStep("category")}
-      >
-        Weiter
-      </button>
+        <Input
+          label="Nachname"
+          onChange={(v) =>
+            setBaseData({ ...baseData, nachname: v })
+          }
+        />
 
-      <ContactButton onReset={() => setShowResetConfirm(true)} />
-      {ResetOverlay}
-    </div>
-  );
-}
+        <Input
+          label="Alter"
+          type="number"
+          onChange={(v) =>
+            setBaseData({ ...baseData, alter: v })
+          }
+        />
+
+        <Input
+          label="Monatliches Netto-Gehalt (€)"
+          type="number"
+          onChange={(v) =>
+            setBaseData({ ...baseData, gehalt: v })
+          }
+        />
+
+        <Select
+          label="Beziehungsstatus"
+          options={[
+            "Single",
+            "Partnerschaft",
+            "Verheiratet"
+          ]}
+          value={baseData.beziehungsstatus}
+          onChange={(v) =>
+            setBaseData({ ...baseData, beziehungsstatus: v })
+          }
+        />
+
+        <Select
+          label="Berufliche Situation"
+          options={[
+            "Angestellt",
+            "Öffentlicher Dienst",
+            "Selbstständig",
+            "Nicht berufstätig",
+          ]}
+          value={baseData.beruf}
+          onChange={(v) =>
+            setBaseData({ ...baseData, beruf: v })
+          }
+        />
+
+        <Select
+          label="Hast du Kinder?"
+          options={["Nein", "Ja"]}
+          value={baseData.kinder}
+          onChange={(v) =>
+            setBaseData({ ...baseData, kinder: v })
+          }
+        />
+
+        {baseData.kinder === "Ja" && (
+          <Input
+            label="Anzahl Kinder"
+            type="number"
+            onChange={(v) =>
+              setBaseData({
+                ...baseData,
+                kinderAnzahl: v,
+              })
+            }
+          />
+        )}
+
+        <Select
+          label="Haustiere"
+          options={[
+            "Keine Tiere",
+            "Katze",
+            "Hund",
+            "Hund und Katze",
+          ]}
+          value={baseData.tiere}
+          onChange={(v) =>
+            setBaseData({ ...baseData, tiere: v })
+          }
+        />
+
+        <Select
+          label="Wie wohnst du?"
+          options={[
+            "Wohne bei Eltern",
+            "Miete Wohnung",
+            "Miete Haus",
+            "Eigentumswohnung",
+            "Eigentum Haus",
+          ]}
+          value={baseData.wohnen}
+          onChange={(v) =>
+            setBaseData({ ...baseData, wohnen: v })
+          }
+        />
+
+        <Select
+          label="Besitzt du ein Fahrzeug? (z. B. Auto, Motorrad, Roller, Mofa)"
+          options={["Nein", "Ja"]}
+          value={baseData.kfz}
+          onChange={(v) =>
+            setBaseData({ ...baseData, kfz: v })
+          }
+        />
+
+        {baseData.kfz === "Ja" && (
+          <Input
+            label="Anzahl Fahrzeuge"
+            type="number"
+            onChange={(v) =>
+              setBaseData({
+                ...baseData,
+                kfzAnzahl: v,
+              })
+            }
+          />
+        )}
+
+        <button
+          className="primaryBtn"
+          onClick={() => setStep("category")}
+        >
+          Weiter
+        </button>
+
+        <ContactButton onReset={() => setShowResetConfirm(true)} />
+        {ResetOverlay}
+      </div>
+    );
+  }
   /* ================= KATEGORIEN ================= */
 
   if (step === "category") {
@@ -807,12 +869,12 @@ if (step === "welcome") {
                       ? answers[id] === "haftpflicht"
                         ? "Haftpflicht"
                         : answers[id] === "teilkasko"
-                        ? "Teilkasko"
-                        : answers[id] === "vollkasko"
-                        ? "Vollkasko"
-                        : answers[id] === "unbekannt"
-                        ? "Weiß nicht"
-                        : ""
+                          ? "Teilkasko"
+                          : answers[id] === "vollkasko"
+                            ? "Vollkasko"
+                            : answers[id] === "unbekannt"
+                              ? "Weiß nicht"
+                              : ""
                       : answers[id] || ""
                   }
                   onChange={(v) => {
@@ -851,8 +913,8 @@ if (step === "welcome") {
                           {v === "ja"
                             ? "Ja"
                             : v === "nein"
-                            ? "Nein"
-                            : "Weiß ich nicht"}
+                              ? "Nein"
+                              : "Weiß ich nicht"}
                         </button>
                       );
                     })}
@@ -918,280 +980,215 @@ if (step === "welcome") {
 
   /* ================= DASHBOARD ================= */
 
-return (
-  <div className="screen">
-    <Header reset={resetAll} back={() => setStep("category")} />
-
-    <h2>
-      {baseData.vorname
-        ? `${baseData.vorname}, dein Status`
-        : "Dein Status"}
-    </h2>
-
-    {/* Score Ring */}
-    <div className="ringWrap">
-      <svg width="220" height="220">
-        <circle
-          cx="110"
-          cy="110"
-          r="90"
-          stroke="#1a2a36"
-          strokeWidth="16"
-          fill="none"
-        />
-
-        <circle
-          cx="110"
-          cy="110"
-          r="90"
-          stroke="url(#grad)"
-          strokeWidth="16"
-          fill="none"
-          strokeDasharray="565"
-          strokeDashoffset={565 - (565 * animatedScore) / 100}
-          strokeLinecap="round"
-          transform="rotate(-90 110 110)"
-          style={{
-            filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
-            transition: "0.6s ease",
-          }}
-        />
-
-        <defs>
-          <linearGradient id="grad">
-            <stop offset="0%" stopColor="#8B7CF6" />
-            <stop offset="100%" stopColor="#5E4AE3" />
-          </linearGradient>
-        </defs>
-      </svg>
-
-      <div className="ringCenter">{animatedScore}%</div>
-    </div>
-
-    {/* Bewertung + Hinweis */}
-    <div className="scoreLabel">
-      <p>
-        {animatedScore >= 80
-          ? "Sehr gut abgesichert"
-          : animatedScore >= 60
-          ? "Solide Basis"
-          : "Optimierung sinnvoll"}
-      </p>
-
-      <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
-        {getDynamicHint()}
-      </p>
-    </div>
-
-    {/* Kategorien Übersicht */}
-    <div className="categoryList">
-      {categories.map((cat) => {
-
-        const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
-          const q = QUESTIONS[id];
-
-          if (q.category !== cat) return false;
-          if (q.condition && !q.condition(baseData)) return false;
-          if (!answers[id]) return false;
-
-          return true;
-        });
-
-        const needsOptimization = questionsInCat.filter(
-          (id) => getStrategicRecommendation(id)
-        );
-
-        const isOpen = expandedCategory === cat;
-
-        return (
-          <div key={cat}>
-
-            <div
-              className="categoryRow"
-              onClick={() =>
-                setExpandedCategory(isOpen ? null : cat)
-              }
-              style={{ cursor: "pointer" }}
-            >
-              <span>{CATEGORY_LABELS[cat]}</span>
-              <span>{categoryScores[cat] || 0}%</span>
-            </div>
-
-            {isOpen && (
-              <div className="categoryDetails open">
-                {needsOptimization.length > 0 ? (
-                  needsOptimization.map((id) => (
-                    <div key={id} className="recommendationItem">
-                      <strong>{QUESTIONS[id].label}</strong>
-                      <p>{getStrategicRecommendation(id)}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="noIssues">
-                    Kein unmittelbarer Optimierungsbedarf.
-                  </p>
-                )}
-              </div>
-            )}
-
-          </div>
-        );
-      })}
-    </div>
-
-    <ContactButton onReset={() => setShowResetConfirm(true)} />
-    {ResetOverlay}
-  </div>
-);
-
-/* ===== STRATEGISCHE EMPFEHLUNGEN ===== */
-
-function getStrategicRecommendation(id) {
-
-  const value = answers[id];
-  const age = Number(baseData.alter);
-  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
-
-  if (!value || value === "ja") return null;
-
-  switch (id) {
-
-    case "bu":
-      if (verheiratet)
-        return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung.";
-      return "Die Absicherung der eigenen Arbeitskraft ist eine der wichtigsten Grundlagen finanzieller Stabilität.";
-
-    case "private_rente":
-      if (age >= 50)
-        return "Im fortgeschrittenen Erwerbsleben lassen sich Vorsorgelücken nur noch begrenzt aufholen. Eine strukturierte Ruhestandsplanung gewinnt deutlich an Bedeutung.";
-      if (age >= 30)
-        return "Je früher private Altersvorsorge beginnt, desto geringer ist der monatliche Aufwand zur Zielerreichung.";
-      return "Früher Vorsorgebeginn schafft langfristige finanzielle Flexibilität.";
-
-    case "pflege":
-      if (age >= 50)
-        return "Mit steigendem Alter erhöhen sich Eintrittswahrscheinlichkeit und Beitragshöhe. Eine frühzeitige Pflegeabsicherung stabilisiert deine finanzielle Planbarkeit.";
-      if (age >= 30)
-        return "Pflegekosten können erhebliche Eigenanteile verursachen. Eine Zusatzabsicherung reduziert spätere Belastungen.";
-      return "Frühe Gesundheitsabsicherung sichert langfristig günstige Beiträge.";
-
-    case "zahn":
-      if (age >= 40)
-        return "Mit zunehmendem Alter steigen erfahrungsgemäß zahnmedizinische Eigenanteile. Eine Zusatzversicherung kann Liquiditätsbelastungen reduzieren.";
-      return "Eine Krankenzusatzversicherung kann Eigenkosten im Leistungsfall spürbar abfedern.";
-
-    case "hausrat":
-      return "Der Schutz deines beweglichen Eigentums sollte regelmäßig am Neuwert ausgerichtet sein, um Unterversicherung zu vermeiden.";
-
-    case "elementar":
-      return "Naturgefahren nehmen statistisch zu. Elementarschutz ergänzt die Wohnabsicherung sinnvoll.";
-
-    case "gebaeude":
-      return "Als Eigentümer ist eine vollständige Gebäudeabsicherung essenziell zur Werterhaltung.";
-
-    case "haftpflicht":
-      return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen.";
-
-    case "rechtsschutz":
-      return "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen. Ein passender Rechtsschutz stabilisiert die finanzielle Planung.";
-
-    case "kfz_haftpflicht":
-      return "Die KFZ-Haftpflicht ist gesetzlich vorgeschrieben und schützt vor existenzbedrohenden Schadenersatzforderungen.";
-
-    case "kasko":
-      return "Der passende Kaskoschutz hängt vom Fahrzeugwert und deiner Risikobereitschaft ab.";
-
-    case "schutzbrief":
-      return "Ein Schutzbrief reduziert organisatorische und finanzielle Belastungen im Pannen- oder Notfall.";
-
-    default:
-      return "Optimierungspotenzial prüfen.";
-  }
-}
-
-/* ================= UI COMPONENTS ================= */
-
-function Header({ reset, back }) {
   return (
-    <div className="header">
-      <img
-        src="/logo.jpg"
-        className="logo small"
-        onClick={reset}
-        alt="Logo"
-      />
-      <button className="backBtn" onClick={back}>
-        <span className="arrowIcon"></span>
-      </button>
-    </div>
-  );
-}
+    <div className="screen">
+      <Header reset={resetAll} back={() => setStep("category")} />
 
-function Input({ label, type = "text", onChange }) {
-  return (
-    <div className="field">
-      {label && <label>{label}</label>}
-      <input
-        type={type}
-        onChange={(e) => onChange(e.target.value)}
-      />
-    </div>
-  );
-}
+      <h2>
+        {baseData.vorname
+          ? `${baseData.vorname}, dein Status`
+          : "Dein Status"}
+      </h2>
 
-function Select({ label, options, onChange, value }) {
-  return (
-    <div className="field">
-      {label && <label>{label}</label>}
-      <select
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">Bitte wählen</option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
+      {/* Score Ring */}
+      <div className="ringWrap">
+        <svg width="220" height="220">
+          <circle
+            cx="110"
+            cy="110"
+            r="90"
+            stroke="#1a2a36"
+            strokeWidth="16"
+            fill="none"
+          />
 
-function Checkbox({ label, checked, onChange }) {
-  return (
-    <label className="checkbox">
-      <input
-        type="checkbox"
-        checked={!!checked}
-        onChange={onChange}
-      />
-      {label}
-    </label>
-  );
-}
+          <circle
+            cx="110"
+            cy="110"
+            r="90"
+            stroke="url(#grad)"
+            strokeWidth="16"
+            fill="none"
+            strokeDasharray="565"
+            strokeDashoffset={565 - (565 * animatedScore) / 100}
+            strokeLinecap="round"
+            transform="rotate(-90 110 110)"
+            style={{
+              filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
+              transition: "0.6s ease",
+            }}
+          />
 
-function ContactButton({ onReset }) {
-  return (
-    <div className="contactFixed">
-      <button
-        className="contactBtn"
-        onClick={() =>
-          window.open(
-            "https://agentur.barmenia.de/florian_loeffler",
-            "_blank"
+          <defs>
+            <linearGradient id="grad">
+              <stop offset="0%" stopColor="#8B7CF6" />
+              <stop offset="100%" stopColor="#5E4AE3" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <div className="ringCenter">{animatedScore}%</div>
+      </div>
+
+      {/* Bewertung + Hinweis */}
+      <div className="scoreLabel">
+        <p>
+          {animatedScore >= 80
+            ? "Sehr gut abgesichert"
+            : animatedScore >= 60
+              ? "Solide Basis"
+              : "Optimierung sinnvoll"}
+        </p>
+
+        <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
+          {getDynamicHint()}
+        </p>
+      </div>
+
+      {/* Kategorien Übersicht */}
+      <div className="categoryList">
+        {categories.map((cat) => {
+
+          const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
+            const q = QUESTIONS[id]
+
+            if (q.category !== cat) return false
+            if (q.condition && !q.condition(baseData)) return false
+            if (!answers[id]) return false
+
+            return true
+          })
+
+          const needsOptimization = questionsInCat.filter(
+            (id) => getStrategicRecommendation(id)
           )
-        }
-      >
-        Kontakt aufnehmen
-      </button>
 
-      <button
-        className="contactBtn secondary"
-        onClick={onReset}
-      >
-        Neustart
-      </button>
+          const isOpen = expandedCategory === cat
+
+          return (
+            <div key={cat}>
+
+              <div
+                className="categoryRow"
+                onClick={() =>
+                  setExpandedCategory(isOpen ? null : cat)
+                }
+                style={{ cursor: "pointer" }}
+              >
+                <span>{CATEGORY_LABELS[cat]}</span>
+                <span>{categoryScores[cat] || 0}%</span>
+              </div>
+
+              {isOpen && (
+                <div className="categoryDetails open">
+                  {needsOptimization.length > 0 ? (
+                    needsOptimization.map((id) => (
+                      <div key={id} className="recommendationItem">
+                        <strong>{QUESTIONS[id].label}</strong>
+                        <p>{getStrategicRecommendation(id)}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="noIssues">
+                      Kein unmittelbarer Optimierungsbedarf.
+                    </p>
+                  )}
+                </div>
+              )}
+
+            </div>
+          )
+        })}
+      </div>
+
+      <ContactButton onReset={() => setShowResetConfirm(true)} />
+      {ResetOverlay}
     </div>
-  );
-}
+  )
+
+  /* ================= UI COMPONENTS ================= */
+
+  function Header({ reset, back }) {
+    return (
+      <div className="header">
+        <img
+          src="/logo.jpg"
+          className="logo small"
+          onClick={reset}
+          alt="Logo"
+        />
+        <button className="backBtn" onClick={back}>
+          <span className="arrowIcon"></span>
+        </button>
+      </div>
+    );
+  }
+
+  function Input({ label, type = "text", onChange }) {
+    return (
+      <div className="field">
+        {label && <label>{label}</label>}
+        <input
+          type={type}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </div>
+    );
+  }
+
+  function Select({ label, options, onChange, value }) {
+    return (
+      <div className="field">
+        {label && <label>{label}</label>}
+        <select
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          <option value="">Bitte wählen</option>
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  function Checkbox({ label, checked, onChange }) {
+    return (
+      <label className="checkbox">
+        <input
+          type="checkbox"
+          checked={!!checked}
+          onChange={onChange}
+        />
+        {label}
+      </label>
+    );
+  }
+
+  function ContactButton({ onReset }) {
+    return (
+      <div className="contactFixed">
+        <button
+          className="contactBtn"
+          onClick={() =>
+            window.open(
+              "https://agentur.barmenia.de/florian_loeffler",
+              "_blank"
+            )
+          }
+        >
+          Kontakt aufnehmen
+        </button>
+
+        <button
+          className="contactBtn secondary"
+          onClick={onReset}
+        >
+          Neustart
+        </button>
+      </div>
+    );
+  }
