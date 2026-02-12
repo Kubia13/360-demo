@@ -1080,7 +1080,7 @@ export default function App() {
 
             if (q.category !== cat) return false
             if (q.condition && !q.condition(baseData)) return false
-            if (!answers[id]) return false
+            if (answers[id] === undefined) return false
 
             return true
           })
