@@ -14,6 +14,10 @@ body {
   max-width: 420px;
   margin: auto;
   padding-bottom: 180px;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .center {
@@ -782,4 +786,23 @@ body::before {
 
 .categoryRow:hover .categoryChevron {
   background: rgba(139, 124, 246, 0.15);
+  
+}
+.legalFooter {
+  margin-top: auto;
+  margin-bottom: 110px; /* Abstand zum fixed ContactButton */
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+.legalFooter span {
+  color: #8B7CF6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.legalFooter span:hover {
+  opacity: 1;
+  text-decoration: underline;
 }

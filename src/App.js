@@ -232,6 +232,8 @@ export default function App() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showInfo, setShowInfo] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
+  const [legalOverlay, setLegalOverlay] = useState(null);
+  // "impressum" | "datenschutz" | null
 
 
   /* ================= BASE FORM REFS ================= */
@@ -320,10 +322,27 @@ export default function App() {
   function resetAll() {
     setStep("welcome");
     setAnswers({});
-    setBaseData({});
+    setBaseData({
+      geschlecht: "",
+      vorname: "",
+      nachname: "",
+      alter: "",
+      gehalt: "",
+      beziehungsstatus: "",
+      beruf: "",
+      kinder: "",
+      kinderAnzahl: "",
+      tiere: "",
+      wohnen: "",
+      kfz: "",
+      kfzAnzahl: ""
+    });
     setCurrentCategoryIndex(0);
     setAnimatedScore(0);
+    setExpandedCategory(null);
+    setLegalOverlay(null);
   }
+
 
   /* ================= ANSWER ================= */
 
@@ -701,6 +720,53 @@ export default function App() {
       </div>
     </div>
   );
+  /* ================= LEGAL OVERLAY ================= */
+
+  const LegalOverlay = legalOverlay && (
+    <div
+      className="infoOverlay"
+      onClick={() => setLegalOverlay(null)}
+    >
+      <div
+        className="infoBox legalBox"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ marginBottom: 12 }}>
+          {legalOverlay === "impressum" ? "Impressum" : "Datenschutz"}
+        </h3>
+
+        {legalOverlay === "impressum" && (
+          <>
+            <p><strong>Florian Löffler</strong></p>
+            <p>Breisacher Str. 145b<br />79110 Freiburg</p>
+            <p>Telefon: 0761-2027423<br />E-Mail: florian.loeffler@barmenia.de</p>
+            <p>Vermittlerregisternummer: D-3ED0-I0NGJ-87</p>
+            <p>
+              Registrierungsstelle:<br />
+              DIHK | Deutscher Industrie- und Handelskammertag e. V.<br />
+              www.vermittlerregister.info
+            </p>
+          </>
+        )}
+
+        {legalOverlay === "datenschutz" && (
+          <>
+            <p>
+              Diese Anwendung speichert keine personenbezogenen Daten.
+            </p>
+            <p>
+              Alle Eingaben erfolgen ausschließlich lokal im Browser
+              und werden nicht an Server übertragen.
+            </p>
+            <p>
+              Beim Klick auf externe Links (z. B. Rechner oder Kontakt)
+              gelten die Datenschutzbestimmungen der jeweiligen Anbieter.
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  );
 
   /* ================= WELCOME ================= */
 
@@ -733,12 +799,22 @@ export default function App() {
           Jetzt Check starten
         </button>
 
+        <div className="legalFooter">
+          <span onClick={() => setLegalOverlay("impressum")}>
+            Impressum
+          </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("datenschutz")}>
+            Datenschutz
+          </span>
+        </div>
+
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         {ResetOverlay}
+        {LegalOverlay}
       </div>
     );
   }
-
 
   /* ================= BASISDATEN ================= */
 
@@ -896,8 +972,19 @@ export default function App() {
           Weiter
         </button>
 
+        <div className="legalFooter">
+          <span onClick={() => setLegalOverlay("impressum")}>
+            Impressum
+          </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("datenschutz")}>
+            Datenschutz
+          </span>
+        </div>
+
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         {ResetOverlay}
+        {LegalOverlay}
       </div>
     );
   }
@@ -1121,12 +1208,22 @@ export default function App() {
           </div>
         )}
 
+        <div className="legalFooter">
+          <span onClick={() => setLegalOverlay("impressum")}>
+            Impressum
+          </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("datenschutz")}>
+            Datenschutz
+          </span>
+        </div>
+
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         {ResetOverlay}
+        {LegalOverlay}
       </div>
     );
   }
-
   /* ================= DASHBOARD ================= */
 
   if (step === "dashboard") {
@@ -1273,136 +1370,146 @@ export default function App() {
           })}
         </div>
 
+        <div className="legalFooter">
+          <span onClick={() => setLegalOverlay("impressum")}>
+            Impressum
+          </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("datenschutz")}>
+            Datenschutz
+          </span>
+        </div>
+
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         {ResetOverlay}
+        {LegalOverlay}
+      </div>
+    );
+  }
+  /* ================= UI COMPONENTS ================= */
+
+  function Header({ reset, back }) {
+    return (
+      <div className="header">
+        <img
+          src="/logo.jpg"
+          className="logo small"
+          onClick={reset}
+          alt="Logo"
+        />
+        <button className="backBtn" onClick={back}>
+          <span className="arrowIcon"></span>
+        </button>
       </div>
     );
   }
 
-}
+  function Input({
+    label,
+    type = "text",
+    value,
+    onChange,
+    inputRef,
+    onEnter,
+  }) {
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter" && onEnter) {
+        e.preventDefault();
+        onEnter();
+      }
+    };
 
-/* ================= UI COMPONENTS ================= */
+    return (
+      <div className="field">
+        {label && <label>{label}</label>}
 
-function Header({ reset, back }) {
-  return (
-    <div className="header">
-      <img
-        src="/logo.jpg"
-        className="logo small"
-        onClick={reset}
-        alt="Logo"
-      />
-      <button className="backBtn" onClick={back}>
-        <span className="arrowIcon"></span>
-      </button>
-    </div>
-  );
-}
+        <input
+          ref={inputRef}
+          type={type}
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
+    );
+  }
 
-function Input({
-  label,
-  type = "text",
-  value,
-  onChange,
-  inputRef,
-  onEnter,
-}) {
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && onEnter) {
-      e.preventDefault();
-      onEnter();
-    }
-  };
+  function Select({
+    label,
+    options,
+    value,
+    onChange,
+    selectRef,
+    onEnter,
+  }) {
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter" && onEnter) {
+        e.preventDefault();
+        onEnter();
+      }
+    };
 
-  return (
-    <div className="field">
-      {label && <label>{label}</label>}
+    return (
+      <div className="field">
+        {label && <label>{label}</label>}
 
-      <input
-        ref={inputRef}
-        type={type}
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-    </div>
-  );
-}
+        <select
+          ref={selectRef}
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+        >
+          <option value="">Bitte wählen</option>
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
 
-function Select({
-  label,
-  options,
-  value,
-  onChange,
-  selectRef,
-  onEnter,
-}) {
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && onEnter) {
-      e.preventDefault();
-      onEnter();
-    }
-  };
+  function Checkbox({
+    label,
+    checked,
+    onChange,
+  }) {
+    return (
+      <label className="checkbox">
+        <input
+          type="checkbox"
+          checked={!!checked}
+          onChange={onChange}
+        />
+        {label}
+      </label>
+    );
+  }
 
-  return (
-    <div className="field">
-      {label && <label>{label}</label>}
+  function ContactButton({ onReset }) {
+    return (
+      <div className="contactFixed">
+        <button
+          className="contactBtn"
+          onClick={() =>
+            window.open(
+              "https://agentur.barmenia.de/florian_loeffler",
+              "_blank"
+            )
+          }
+        >
+          Kontakt aufnehmen
+        </button>
 
-      <select
-        ref={selectRef}
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-      >
-        <option value="">Bitte wählen</option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
+        <button
+          className="contactBtn secondary"
+          onClick={onReset}
+        >
+          Neustart
+        </button>
+      </div>
+    );
+  }
 
-function Checkbox({
-  label,
-  checked,
-  onChange,
-}) {
-  return (
-    <label className="checkbox">
-      <input
-        type="checkbox"
-        checked={!!checked}
-        onChange={onChange}
-      />
-      {label}
-    </label>
-  );
-}
-
-function ContactButton({ onReset }) {
-  return (
-    <div className="contactFixed">
-      <button
-        className="contactBtn"
-        onClick={() =>
-          window.open(
-            "https://agentur.barmenia.de/florian_loeffler",
-            "_blank"
-          )
-        }
-      >
-        Kontakt aufnehmen
-      </button>
-
-      <button
-        className="contactBtn secondary"
-        onClick={onReset}
-      >
-        Neustart
-      </button>
-    </div>
-  );
 }
