@@ -215,20 +215,8 @@ export default function App() {
 /* ================= DYNAMISCHE KATEGORIEN ================= */
 
 const categories = useMemo(() => {
-  return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
-
-    const questionsInCategory = Object.keys(QUESTIONS).filter((id) => {
-      const q = QUESTIONS[id];
-
-      if (q.category !== cat) return false;
-      if (q.condition && !q.condition(baseData)) return false;
-
-      return true;
-    });
-
-    return questionsInCategory.length > 0;
-  });
-}, [baseData]);
+  return Object.keys(CATEGORY_WEIGHTS);
+}, []);
 
 const currentCategory = categories[currentCategoryIndex];
 
@@ -681,7 +669,7 @@ if (step === "base") {
         options={["Herr", "Frau", "Divers"]}
         value={baseData.geschlecht}
         onChange={(v) =>
-          setBaseData({ ...baseData, geschlecht: v })
+          setBaseData(prev => ({ ...prev, geschlecht: v }))
         }
       />
 
@@ -710,7 +698,7 @@ if (step === "base") {
         type="number"
         value={baseData.alter}
         onChange={(v) =>
-          setBaseData({ ...baseData, alter: v })
+          setBaseData(prev => ({ ...prev, alter: v }))
         }
         onEnter={() => gehaltRef.current?.focus()}
         inputRef={alterRef}
@@ -721,7 +709,7 @@ if (step === "base") {
         type="number"
         value={baseData.gehalt}
         onChange={(v) =>
-          setBaseData({ ...baseData, gehalt: v })
+          setBaseData(prev => ({ ...prev, gehalt: v }))
         }
         inputRef={gehaltRef}
       />
@@ -735,7 +723,7 @@ if (step === "base") {
         ]}
         value={baseData.beziehungsstatus}
         onChange={(v) =>
-          setBaseData({ ...baseData, beziehungsstatus: v })
+          setBaseData(prev => ({ ...prev, beziehungsstatus: v }))
         }
       />
 
@@ -749,7 +737,7 @@ if (step === "base") {
         ]}
         value={baseData.beruf}
         onChange={(v) =>
-          setBaseData({ ...baseData, beruf: v })
+          setBaseData(prev => ({ ...prev, beruf: v }))
         }
       />
 
@@ -758,7 +746,7 @@ if (step === "base") {
         options={["Nein", "Ja"]}
         value={baseData.kinder}
         onChange={(v) =>
-          setBaseData({ ...baseData, kinder: v })
+          setBaseData(prev => ({ ...prev, kinder: v }))
         }
       />
 
@@ -768,10 +756,10 @@ if (step === "base") {
           type="number"
           value={baseData.kinderAnzahl}
           onChange={(v) =>
-            setBaseData({
-              ...baseData,
+            setBaseData(prev => ({
+              ...prev,
               kinderAnzahl: v,
-            })
+            }))
           }
           inputRef={kinderAnzahlRef}
         />
@@ -787,7 +775,7 @@ if (step === "base") {
         ]}
         value={baseData.tiere}
         onChange={(v) =>
-          setBaseData({ ...baseData, tiere: v })
+          setBaseData(prev => ({ ...prev, tiere: v }))
         }
       />
 
@@ -802,7 +790,7 @@ if (step === "base") {
         ]}
         value={baseData.wohnen}
         onChange={(v) =>
-          setBaseData({ ...baseData, wohnen: v })
+          setBaseData(prev => ({ ...prev, wohnen: v }))
         }
       />
 
@@ -811,7 +799,7 @@ if (step === "base") {
         options={["Nein", "Ja"]}
         value={baseData.kfz}
         onChange={(v) =>
-          setBaseData({ ...baseData, kfz: v })
+          setBaseData(prev => ({ ...prev, kfz: v }))
         }
       />
 
@@ -821,10 +809,10 @@ if (step === "base") {
           type="number"
           value={baseData.kfzAnzahl}
           onChange={(v) =>
-            setBaseData({
-              ...baseData,
+            setBaseData(prev => ({
+              ...prev,
               kfzAnzahl: v,
-            })
+            }))
           }
           inputRef={kfzAnzahlRef}
         />
