@@ -212,6 +212,108 @@ export default function App() {
   const kinderAnzahlRef = React.useRef(null);
   const kfzAnzahlRef = React.useRef(null);
 
+/* ================= UI COMPONENTS ================= */
+
+  function Header({ reset, back }) {
+    return (
+      <div className="header">
+        <img
+          src="/logo.jpg"
+          className="logo small"
+          onClick={reset}
+          alt="Logo"
+        />
+        <button className="backBtn" onClick={back}>
+          <span className="arrowIcon"></span>
+        </button>
+      </div>
+    );
+  }
+
+  function Input({
+    label,
+    type = "text",
+    value,
+    onChange,
+    onEnter,
+    inputRef,
+  }) {
+    return (
+      <div className="field">
+        {label && <label>{label}</label>}
+        <input
+          ref={inputRef}
+          type={type}
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && onEnter) {
+              e.preventDefault();
+              onEnter();
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
+  function Select({ label, options, onChange, value }) {
+    return (
+      <div className="field">
+        {label && <label>{label}</label>}
+        <select
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          <option value="">Bitte wählen</option>
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  function Checkbox({ label, checked, onChange }) {
+    return (
+      <label className="checkbox">
+        <input
+          type="checkbox"
+          checked={!!checked}
+          onChange={onChange}
+        />
+        {label}
+      </label>
+    );
+  }
+
+  function ContactButton({ onReset }) {
+    return (
+      <div className="contactFixed">
+        <button
+          className="contactBtn"
+          onClick={() =>
+            window.open(
+              "https://agentur.barmenia.de/florian_loeffler",
+              "_blank"
+            )
+          }
+        >
+          Kontakt aufnehmen
+        </button>
+
+        <button
+          className="contactBtn secondary"
+          onClick={onReset}
+        >
+          Neustart
+        </button>
+      </div>
+    );
+  }
+
 /* ================= DYNAMISCHE KATEGORIEN ================= */
 
 const categories = useMemo(() => {
@@ -1168,105 +1270,4 @@ if (step === "category") {
   );
   }
   
-  /* ================= UI COMPONENTS ================= */
-
-  function Header({ reset, back }) {
-    return (
-      <div className="header">
-        <img
-          src="/logo.jpg"
-          className="logo small"
-          onClick={reset}
-          alt="Logo"
-        />
-        <button className="backBtn" onClick={back}>
-          <span className="arrowIcon"></span>
-        </button>
-      </div>
-    );
-  }
-
-  function Input({
-    label,
-    type = "text",
-    value,
-    onChange,
-    onEnter,
-    inputRef,
-  }) {
-    return (
-      <div className="field">
-        {label && <label>{label}</label>}
-        <input
-          ref={inputRef}
-          type={type}
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && onEnter) {
-              e.preventDefault();
-              onEnter();
-            }
-          }}
-        />
-      </div>
-    );
-  }
-
-  function Select({ label, options, onChange, value }) {
-    return (
-      <div className="field">
-        {label && <label>{label}</label>}
-        <select
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-        >
-          <option value="">Bitte wählen</option>
-          {options.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  }
-
-  function Checkbox({ label, checked, onChange }) {
-    return (
-      <label className="checkbox">
-        <input
-          type="checkbox"
-          checked={!!checked}
-          onChange={onChange}
-        />
-        {label}
-      </label>
-    );
-  }
-
-  function ContactButton({ onReset }) {
-    return (
-      <div className="contactFixed">
-        <button
-          className="contactBtn"
-          onClick={() =>
-            window.open(
-              "https://agentur.barmenia.de/florian_loeffler",
-              "_blank"
-            )
-          }
-        >
-          Kontakt aufnehmen
-        </button>
-
-        <button
-          className="contactBtn secondary"
-          onClick={onReset}
-        >
-          Neustart
-        </button>
-      </div>
-    );
-  }
 }
