@@ -522,22 +522,46 @@ export default function App() {
 
     if (!value) return 0;
 
-    /* ===== RENTENLÜCKE NICHT WERTEN ===== */
+    /* ========================================================= */
+    /* ===== NICHT RELEVANTE FÄLLE NICHT WERTEN ================= */
+    /* ========================================================= */
+
     if (key === "rentenluecke") return null;
 
-    /* ===== PRIVATE ALTERSVORSORGE ===== */
+    if (key === "kinder_krankenzusatz" && baseData.kinder !== "Ja") return null;
+
+    if (key === "kfz_haftpflicht" && baseData.kfz !== "Ja") return null;
+    if (key === "kasko" && baseData.kfz !== "Ja") return null;
+    if (key === "schutzbrief" && baseData.kfz !== "Ja") return null;
+
+    if (key === "tierhaft" && (!baseData.tiere || baseData.tiere === "Keine Tiere")) return null;
+    if (key === "tier_op" && (!baseData.tiere || baseData.tiere === "Keine Tiere")) return null;
+
+    if ((key === "hausrat" || key === "elementar") &&
+      (!baseData.wohnen || baseData.wohnen === "Wohne bei Eltern")) return null;
+
+    if (key === "gebaeude" && baseData.wohnen !== "Eigentum Haus") return null;
+
+
+    /* ========================================================= */
+    /* ===== PRIVATE ALTERSVORSORGE (DEINE LOGIK) =============== */
+    /* ========================================================= */
+
     if (key === "private_rente") {
 
       if (value === "ja") return 100;
 
-      // Ohne Vorsorge
       if (age < 30) return 0;
       if (age < 50) return 0;
 
-      return 20; // 50+
+      return 20;
     }
 
-    /* ===== PFLEGE ===== */
+
+    /* ========================================================= */
+    /* ===== PFLEGE (DEINE LOGIK) =============================== */
+    /* ========================================================= */
+
     if (key === "pflege") {
 
       if (value === "ja") return 100;
@@ -548,28 +572,59 @@ export default function App() {
       return 0;
     }
 
-    /* ===== KRANKENZUSATZ ===== */
-    if (key === "zahn") {
 
-      if (value === "ja") return 100;
+    /* ========================================================= */
+    /* ===== KRANKENZUSATZ (ANTEILIG) =========================== */
+    /* ========================================================= */
 
-      if (age < 30) return 70;
-      if (age < 50) return 40;
+    if (key === "krankenzusatz") {
 
-      return 20;
+      if (value !== "ja") return 0;
+
+      const bereiche = [
+        "Ambulant",
+        "Stationär",
+        "Zähne",
+        "Brille",
+        "Krankenhaustagegeld"
+      ];
+
+      const abgedeckt = bereiche.filter(
+        opt => answers["krankenzusatz_" + opt]
+      );
+
+      return Math.round((abgedeckt.length / bereiche.length) * 100);
     }
 
-    /* ===== BU – MIT VERHEIRATET BONUS-RISIKO ===== */
-    if (key === "bu") {
 
-      if (value === "ja") return 100;
+    /* ========================================================= */
+    /* ===== KINDER KRANKENZUSATZ (ANTEILIG) ==================== */
+    /* ========================================================= */
 
-      if (verheiratet) return 0;
+    if (key === "kinder_krankenzusatz") {
 
-      return 0;
+      if (value !== "ja") return 0;
+
+      const bereiche = [
+        "Ambulant",
+        "Stationär",
+        "Zähne",
+        "Brille",
+        "Krankenhaustagegeld"
+      ];
+
+      const abgedeckt = bereiche.filter(
+        opt => answers["kinder_krankenzusatz_" + opt]
+      );
+
+      return Math.round((abgedeckt.length / bereiche.length) * 100);
     }
 
-    /* ===== RECHTSSCHUTZ ===== */
+
+    /* ========================================================= */
+    /* ===== RECHTSSCHUTZ (NUR RELEVANTE BEREICHE) ============== */
+    /* ========================================================= */
+
     if (key === "rechtsschutz") {
 
       if (value !== "ja") return 0;
@@ -581,72 +636,90 @@ export default function App() {
         { key: "Immobilie/Miete", relevant: baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern" }
       ];
 
-      const relevanteBereiche = rsBereiche.filter(b => b.relevant);
+      const relevante = rsBereiche.filter(b => b.relevant);
 
-      if (relevanteBereiche.length === 0) return 100;
+      if (relevante.length === 0) return 100;
 
-      const abgedeckt = relevanteBereiche.filter(
-        (b) => answers["rechtsschutz_" + b.key]
+      const abgedeckt = relevante.filter(
+        b => answers["rechtsschutz_" + b.key]
       );
 
-      return Math.round((abgedeckt.length / relevanteBereiche.length) * 100);
+      return Math.round((abgedeckt.length / relevante.length) * 100);
     }
 
 
-    /* ===== STANDARD YES / NO ===== */
-    if (value === "ja") return 100;
-    if (value === "nein" || value === "unbekannt") return 0;
+    /* ========================================================= */
+    /* ===== BU (DEINE LOGIK) ================================== */
+    /* ========================================================= */
 
-    /* ===== KASKO ===== */
+    if (key === "bu") {
+
+      if (value === "ja") return 100;
+
+      if (verheiratet) return 0;
+
+      return 0;
+    }
+
+
+    /* ========================================================= */
+    /* ===== KASKO (DEINE ORIGINALE LOGIK – UNVERÄNDERT) ======= */
+    /* ========================================================= */
+
     if (key === "kasko") {
       if (value === "vollkasko") return 100;
       if (value === "teilkasko") return 50;
       return 0;
     }
 
+
+    /* ========================================================= */
+    /* ===== STANDARD YES / NO ================================= */
+    /* ========================================================= */
+
+    if (value === "ja") return 100;
+    if (value === "nein" || value === "unbekannt") return 0;
+
     return 0;
   }
+
+  /* ================= CATEGORY SCORES ================= */
 
   const categoryScores = useMemo(() => {
 
     return categories.reduce((acc, cat) => {
 
-      const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+      const relevanteFragen = Object.keys(QUESTIONS).filter((id) => {
         const q = QUESTIONS[id];
 
         if (q.category !== cat) return false;
         if (q.condition && !q.condition(baseData)) return false;
         if (answers[id] === undefined) return false;
 
+        const score = getScore(id);
+        if (score === null) return false; // NICHT WERTEN
+
         return true;
       });
 
-      if (relevantQuestions.length === 0) {
+      if (relevanteFragen.length === 0) {
         acc[cat] = 0;
         return acc;
       }
 
-      const scoredQuestions = relevantQuestions.filter(
-        (id) => getScore(id) !== null
-      );
-
-      if (scoredQuestions.length === 0) {
-        acc[cat] = 0;
-        return acc;
-      }
-
-      const sum = scoredQuestions.reduce(
+      const sum = relevanteFragen.reduce(
         (total, id) => total + getScore(id),
         0
       );
 
-      acc[cat] = Math.round(sum / scoredQuestions.length);
+      acc[cat] = Math.round(sum / relevanteFragen.length);
 
       return acc;
 
     }, {});
 
   }, [answers, baseData, categories]);
+
 
 
   const totalScore = useMemo(() => {
@@ -833,114 +906,188 @@ export default function App() {
     // Standard
     return "Dein Ergebnis zeigt eine strukturierte Übersicht deiner aktuellen Absicherung.";
   }
+
   /* ===== STRATEGISCHE EMPFEHLUNGEN ===== */
 
-  function getStrategicRecommendation(id) {
+function getStrategicRecommendation(id) {
 
-    const value = answers[id]
-    const age = Number(baseData.alter)
-    const verheiratet = baseData.beziehungsstatus === "Verheiratet"
+  const value = answers[id];
+  const age = Number(baseData.alter);
+  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
 
-    if (!value || value === "ja") return null
+  if (!value) return null;
 
-    const unsicher = value === "unbekannt"
+  // NICHT RELEVANTE FÄLLE NICHT EMPFEHLEN
+  if (getScore(id) === null) return null;
 
-    switch (id) {
+  const unsicher = value === "unbekannt";
 
-      case "bu":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung deiner Einkommensabsicherung ist sinnvoll."
-        if (verheiratet)
-          return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung."
-        return "Die Absicherung der eigenen Arbeitskraft zählt zu den wichtigsten finanziellen Grundlagen."
+  switch (id) {
 
-      case "private_rente":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine strukturierte Ruhestandsplanung schafft Klarheit über Versorgungslücken."
-        if (age >= 50)
-          return "Im fortgeschrittenen Erwerbsleben lassen sich Vorsorgelücken nur noch begrenzt aufholen."
-        if (age >= 30)
-          return "Je früher private Altersvorsorge beginnt, desto geringer ist der monatliche Aufwand."
-        return "Früher Vorsorgebeginn schafft langfristige finanzielle Flexibilität."
+    /* ================= BU ================= */
 
-      case "pflege":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung der Pflegeabsicherung kann finanzielle Risiken reduzieren."
-        if (age >= 50)
-          return "Mit steigendem Alter erhöhen sich Eintrittswahrscheinlichkeit und Beitragshöhe."
-        if (age >= 30)
-          return "Pflegekosten können erhebliche Eigenanteile verursachen."
-        return "Frühe Gesundheitsabsicherung sichert langfristig günstige Beiträge."
+    case "bu":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung deiner Einkommensabsicherung ist sinnvoll.";
+      if (verheiratet)
+        return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung.";
+      return "Die Absicherung der eigenen Arbeitskraft zählt zu den wichtigsten finanziellen Grundlagen.";
 
-      case "zahn":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung des Leistungsumfangs schafft Transparenz."
-        return "Eine Krankenzusatzversicherung kann Eigenkosten im Leistungsfall deutlich reduzieren."
+    /* ================= PRIVATE RENTE ================= */
 
-      case "hausrat":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Versicherungssumme schützt vor Unterversicherung."
-        return "Der Schutz deines beweglichen Eigentums sollte regelmäßig am Neuwert ausgerichtet sein."
+    case "private_rente":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Eine strukturierte Ruhestandsplanung schafft Klarheit über Versorgungslücken.";
+      if (age >= 50)
+        return "Im fortgeschrittenen Erwerbsleben lassen sich Vorsorgelücken nur noch begrenzt aufholen.";
+      if (age >= 30)
+        return "Je früher private Altersvorsorge beginnt, desto geringer ist der monatliche Aufwand.";
+      return "Früher Vorsorgebeginn schafft langfristige finanzielle Flexibilität.";
 
-      case "elementar":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Elementarschäden sind häufig nicht automatisch eingeschlossen."
-        return "Naturgefahren nehmen statistisch zu. Elementarschutz ergänzt die Wohnabsicherung sinnvoll."
+    /* ================= PFLEGE ================= */
 
-      case "gebaeude":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine vollständige Gebäudeabsicherung ist essenziell."
-        return "Als Eigentümer ist eine vollständige Gebäudeabsicherung essenziell."
+    case "pflege":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung der Pflegeabsicherung kann finanzielle Risiken reduzieren.";
+      if (age >= 50)
+        return "Mit steigendem Alter erhöhen sich Eintrittswahrscheinlichkeit und Beitragshöhe.";
+      if (age >= 30)
+        return "Pflegekosten können erhebliche Eigenanteile verursachen.";
+      return "Frühe Gesundheitsabsicherung sichert langfristig günstige Beiträge.";
 
-      case "haftpflicht":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Deckungssumme ist sinnvoll."
-        return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen."
+    /* ================= KRANKENZUSATZ ================= */
 
-      case "rechtsschutz":
+    case "krankenzusatz":
 
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Analyse der abgedeckten Bereiche schafft Klarheit.";
+      if (value !== "ja") return value === "nein"
+        ? "Eine Krankenzusatzversicherung kann Eigenkosten im Leistungsfall deutlich reduzieren."
+        : null;
 
-        const rsBereiche = [
-          { key: "Privat", relevant: true },
-          { key: "Beruf", relevant: baseData.beruf && baseData.beruf !== "Nicht berufstätig" },
-          { key: "Verkehr", relevant: baseData.kfz === "Ja" },
-          { key: "Immobilie/Miete", relevant: baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern" }
-        ];
+      const kzBereiche = [
+        "Ambulant",
+        "Stationär",
+        "Zähne",
+        "Brille",
+        "Krankenhaustagegeld"
+      ];
 
-        const relevanteBereiche = rsBereiche.filter(b => b.relevant);
+      const fehlendKZ = kzBereiche.filter(
+        opt => !answers["krankenzusatz_" + opt]
+      );
 
-        const fehlendeBereiche = relevanteBereiche.filter(
-          (b) => !answers["rechtsschutz_" + b.key]
-        );
+      if (fehlendKZ.length === 0) return null;
 
-        if (fehlendeBereiche.length === 0)
-          return null;
+      return "Eine umfassende Gesundheitsabsicherung sollte mehrere Leistungsbereiche abdecken. Eine Überprüfung des Umfangs kann sinnvoll sein.";
 
-        return "In folgenden relevanten Bereichen besteht Optimierungsbedarf: " +
-          fehlendeBereiche.map(b => b.key).join(", ") + ".";
+    /* ================= KINDER KRANKENZUSATZ ================= */
 
+    case "kinder_krankenzusatz":
 
-      case "kfz_haftpflicht":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Die gesetzliche Haftpflicht sollte eindeutig geprüft werden."
-        return "Die KFZ-Haftpflicht schützt vor existenzbedrohenden Schadenersatzforderungen."
+      if (value !== "ja") return value === "nein"
+        ? "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein."
+        : null;
 
-      case "kasko":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Der passende Kaskoschutz hängt vom Fahrzeugwert ab."
-        return "Der passende Kaskoschutz hängt vom Fahrzeugwert und deiner Risikobereitschaft ab."
+      const kinderBereiche = [
+        "Ambulant",
+        "Stationär",
+        "Zähne",
+        "Brille",
+        "Krankenhaustagegeld"
+      ];
 
-      case "schutzbrief":
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Ein Schutzbrief kann im Notfall organisatorische Sicherheit bieten."
-        return "Ein Schutzbrief reduziert organisatorische und finanzielle Belastungen im Notfall."
+      const fehlendKinder = kinderBereiche.filter(
+        opt => !answers["kinder_krankenzusatz_" + opt]
+      );
 
-      default:
-        return null
-    }
+      if (fehlendKinder.length === 0) return null;
+
+      return "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein. Eine Überprüfung des Leistungsumfangs schafft Transparenz.";
+
+    /* ================= HAUSRAT ================= */
+
+    case "hausrat":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Versicherungssumme schützt vor Unterversicherung.";
+      return "Der Schutz deines beweglichen Eigentums sollte regelmäßig am Neuwert ausgerichtet sein.";
+
+    /* ================= ELEMENTAR ================= */
+
+    case "elementar":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Elementarschäden sind häufig nicht automatisch eingeschlossen.";
+      return "Naturgefahren nehmen statistisch zu. Elementarschutz ergänzt die Wohnabsicherung sinnvoll.";
+
+    /* ================= GEBÄUDE ================= */
+
+    case "gebaeude":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Eine vollständige Gebäudeabsicherung ist essenziell.";
+      return "Als Eigentümer ist eine vollständige Gebäudeabsicherung essenziell.";
+
+    /* ================= HAFTPFLICHT ================= */
+
+    case "haftpflicht":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Deckungssumme ist sinnvoll.";
+      return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen.";
+
+    /* ================= RECHTSSCHUTZ ================= */
+
+    case "rechtsschutz":
+
+      if (value !== "ja")
+        return value === "nein"
+          ? "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen."
+          : null;
+
+      const rsBereiche = [
+        { key: "Privat", relevant: true },
+        { key: "Beruf", relevant: baseData.beruf && baseData.beruf !== "Nicht berufstätig" },
+        { key: "Verkehr", relevant: baseData.kfz === "Ja" },
+        { key: "Immobilie/Miete", relevant: baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern" }
+      ];
+
+      const relevante = rsBereiche.filter(b => b.relevant);
+
+      const fehlendRS = relevante.filter(
+        b => !answers["rechtsschutz_" + b.key]
+      );
+
+      if (fehlendRS.length === 0) return null;
+
+      return "Eine vollständige Rechtsschutzabsicherung sollte alle relevanten Lebensbereiche abdecken.";
+
+    /* ================= KFZ ================= */
+
+    case "kfz_haftpflicht":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Die gesetzliche Haftpflicht sollte eindeutig geprüft werden.";
+      return "Die KFZ-Haftpflicht schützt vor existenzbedrohenden Schadenersatzforderungen.";
+
+    case "kasko":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Der passende Kaskoschutz hängt vom Fahrzeugwert ab.";
+      return "Der passende Kaskoschutz hängt vom Fahrzeugwert und deiner Risikobereitschaft ab.";
+
+    case "schutzbrief":
+      if (value === "ja") return null;
+      if (unsicher)
+        return "Hier besteht eventuell Optimierungsbedarf. Ein Schutzbrief kann im Notfall organisatorische Sicherheit bieten.";
+      return "Ein Schutzbrief reduziert organisatorische und finanzielle Belastungen im Notfall.";
+
+    default:
+      return null;
   }
+}
 
   /* ================= LEGAL OVERLAY ================= */
 
@@ -1417,6 +1564,7 @@ export default function App() {
                   </div>
 
                   {/* RECHTSSCHUTZ SUBOPTIONEN */}
+
                   {id === "rechtsschutz" && answers[id] === "ja" && (
                     <div className="subOptions">
                       {["Privat", "Beruf", "Verkehr", "Immobilie/Miete"].map(
@@ -1438,6 +1586,7 @@ export default function App() {
                   )}
 
                   {/* KRANKENZUSATZ SUBOPTIONEN */}
+
                   {id === "krankenzusatz" && answers[id] === "ja" && (
                     <div className="subOptions">
                       {[
@@ -1463,6 +1612,7 @@ export default function App() {
                   )}
 
                   {/* KINDER KRANKENZUSATZ SUBOPTIONEN */}
+
                   {id === "kinder_krankenzusatz" &&
                     answers[id] === "ja" && (
                       <div className="subOptions">
@@ -1718,139 +1868,139 @@ export default function App() {
 
 }
 
-  /* ================= UI COMPONENTS ================= */
+/* ================= UI COMPONENTS ================= */
 
-  function Header({ reset, back }) {
-    return (
-      <div className="header">
-        <img
-          src="/logo.jpg"
-          className="logo small"
-          onClick={reset}
-          alt="Logo"
-        />
-        <button className="backBtn" onClick={back}>
-          <span className="arrowIcon"></span>
-        </button>
-      </div>
-    );
-  }
+function Header({ reset, back }) {
+  return (
+    <div className="header">
+      <img
+        src="/logo.jpg"
+        className="logo small"
+        onClick={reset}
+        alt="Logo"
+      />
+      <button className="backBtn" onClick={back}>
+        <span className="arrowIcon"></span>
+      </button>
+    </div>
+  );
+}
 
-  function Input({
-    label,
-    type = "text",
-    value,
-    onChange,
-    inputRef,
-    onEnter,
-  }) {
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter" && onEnter) {
-        e.preventDefault();
-        onEnter();
-      }
-    };
+function Input({
+  label,
+  type = "text",
+  value,
+  onChange,
+  inputRef,
+  onEnter,
+}) {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && onEnter) {
+      e.preventDefault();
+      onEnter();
+    }
+  };
 
-    return (
-      <div className="field">
-        {label && <label>{label}</label>}
+  return (
+    <div className="field">
+      {label && <label>{label}</label>}
 
-        <input
-          ref={inputRef}
-          type={type}
-          value={value ?? ""}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-      </div>
-    );
-  }
+      <input
+        ref={inputRef}
+        type={type}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+    </div>
+  );
+}
 
-  function Select({
-    label,
-    options,
-    value,
-    onChange,
-    selectRef,
-    onEnter,
-  }) {
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter" && onEnter) {
-        e.preventDefault();
-        onEnter();
-      }
-    };
+function Select({
+  label,
+  options,
+  value,
+  onChange,
+  selectRef,
+  onEnter,
+}) {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && onEnter) {
+      e.preventDefault();
+      onEnter();
+    }
+  };
 
-    return (
-      <div className="field">
-        {label && <label>{label}</label>}
+  return (
+    <div className="field">
+      {label && <label>{label}</label>}
 
-        <select
-          ref={selectRef}
-          value={value ?? ""}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-        >
-          <option value="">Bitte wählen</option>
-          {options.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  }
+      <select
+        ref={selectRef}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+      >
+        <option value="">Bitte wählen</option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
-  function Checkbox({
-    label,
-    checked,
-    onChange,
-    inputRef,
-    onEnter,
-  }) {
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter" && onEnter) {
-        e.preventDefault();
-        onEnter();
-      }
-    };
+function Checkbox({
+  label,
+  checked,
+  onChange,
+  inputRef,
+  onEnter,
+}) {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && onEnter) {
+      e.preventDefault();
+      onEnter();
+    }
+  };
 
-    return (
-      <label className="checkbox">
-        <input
-          ref={inputRef}
-          type="checkbox"
-          checked={!!checked}
-          onChange={onChange}
-          onKeyDown={handleKeyDown}
-        />
-        {label}
-      </label>
-    );
-  }
+  return (
+    <label className="checkbox">
+      <input
+        ref={inputRef}
+        type="checkbox"
+        checked={!!checked}
+        onChange={onChange}
+        onKeyDown={handleKeyDown}
+      />
+      {label}
+    </label>
+  );
+}
 
-  function ContactButton({ onReset }) {
-    return (
-      <div className="contactFixed">
-        <button
-          className="contactBtn"
-          onClick={() =>
-            window.open(
-              "https://agentur.barmenia.de/florian_loeffler",
-              "_blank"
-            )
-          }
-        >
-          Kontakt aufnehmen
-        </button>
+function ContactButton({ onReset }) {
+  return (
+    <div className="contactFixed">
+      <button
+        className="contactBtn"
+        onClick={() =>
+          window.open(
+            "https://agentur.barmenia.de/florian_loeffler",
+            "_blank"
+          )
+        }
+      >
+        Kontakt aufnehmen
+      </button>
 
-        <button
-          className="contactBtn secondary"
-          onClick={onReset}
-        >
-          Neustart
-        </button>
-      </div>
-    );
-  }
+      <button
+        className="contactBtn secondary"
+        onClick={onReset}
+      >
+        Neustart
+      </button>
+    </div>
+  );
+}
