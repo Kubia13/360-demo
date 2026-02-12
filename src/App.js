@@ -210,8 +210,7 @@ export default function App() {
   const kinderAnzahlRef = React.useRef(null);
   const kfzAnzahlRef = React.useRef(null);
 
-};
-
+}
 
 /* ================= DYNAMISCHE KATEGORIEN ================= */
 
