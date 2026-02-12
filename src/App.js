@@ -193,6 +193,7 @@ const QUESTIONS = {
     condition: (baseData) => baseData.kinder === "Ja",
   },
 };
+
 export default function App() {
 
   const [step, setStep] = useState("welcome");
@@ -203,14 +204,13 @@ export default function App() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showInfo, setShowInfo] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
+
   const vornameRef = React.useRef(null);
   const nachnameRef = React.useRef(null);
   const alterRef = React.useRef(null);
   const gehaltRef = React.useRef(null);
   const kinderAnzahlRef = React.useRef(null);
   const kfzAnzahlRef = React.useRef(null);
-
-}
 
 /* ================= DYNAMISCHE KATEGORIEN ================= */
 
@@ -1282,4 +1282,7 @@ function ContactButton({ onReset }) {
       </button>
     </div>
   );
+}
+
+
 }
