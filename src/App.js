@@ -689,43 +689,42 @@ if (step === "base") {
       <Input
         label="Vorname"
         value={baseData.vorname}
-        inputRef={vornameRef}
-        onEnter={() => inputRefs.nachname.current?.focus()}
         onChange={(v) =>
           setBaseData({ ...baseData, vorname: v })
         }
+        onEnter={() => nachnameRef.current?.focus()}
+        inputRef={vornameRef}
       />
 
       <Input
         label="Nachname"
         value={baseData.nachname}
-        inputRef={nachnameRef}
-        onEnter={() => inputRefs.alter.current?.focus()}
         onChange={(v) =>
           setBaseData({ ...baseData, nachname: v })
         }
+        onEnter={() => alterRef.current?.focus()}
+        inputRef={nachnameRef}
       />
 
       <Input
         label="Alter"
         type="number"
         value={baseData.alter}
-        inputRef={alterRef}
-        onEnter={() => inputRefs.gehalt.current?.focus()}
         onChange={(v) =>
           setBaseData({ ...baseData, alter: v })
         }
+        onEnter={() => gehaltRef.current?.focus()}
+        inputRef={alterRef}
       />
 
       <Input
         label="Monatliches Netto-Gehalt (€)"
         type="number"
         value={baseData.gehalt}
-        inputRef={gehaltRef}
-        onEnter={() => inputRefs.kinderAnzahl.current?.focus()}
         onChange={(v) =>
           setBaseData({ ...baseData, gehalt: v })
         }
+        inputRef={gehaltRef}
       />
 
       <Select
@@ -769,14 +768,13 @@ if (step === "base") {
           label="Anzahl Kinder"
           type="number"
           value={baseData.kinderAnzahl}
-          inputRef={kinderAnzahlRef}
-          onEnter={() => kfzAnzahlRef.current?.focus()}
           onChange={(v) =>
             setBaseData({
               ...baseData,
               kinderAnzahl: v,
             })
           }
+          inputRef={kinderAnzahlRef}
         />
       )}
 
@@ -823,13 +821,13 @@ if (step === "base") {
           label="Anzahl Fahrzeuge"
           type="number"
           value={baseData.kfzAnzahl}
-          inputRef={kfzAnzahlRef}
           onChange={(v) =>
             setBaseData({
               ...baseData,
               kfzAnzahl: v,
             })
           }
+          inputRef={kfzAnzahlRef}
         />
       )}
 
