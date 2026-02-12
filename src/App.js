@@ -661,6 +661,16 @@ export default function App() {
   /* ================= BASISDATEN ================= */
 
   if (step === "base") {
+
+    const inputRefs = {
+      vorname: React.createRef(),
+      nachname: React.createRef(),
+      alter: React.createRef(),
+      gehalt: React.createRef(),
+      kinderAnzahl: React.createRef(),
+      kfzAnzahl: React.createRef(),
+    };
+
     return (
       <div className="screen">
         <Header reset={resetAll} back={() => setStep("welcome")} />
@@ -678,6 +688,9 @@ export default function App() {
 
         <Input
           label="Vorname"
+          value={baseData.vorname}
+          inputRef={inputRefs.vorname}
+          onEnter={() => inputRefs.nachname.current?.focus()}
           onChange={(v) =>
             setBaseData({ ...baseData, vorname: v })
           }
@@ -685,6 +698,9 @@ export default function App() {
 
         <Input
           label="Nachname"
+          value={baseData.nachname}
+          inputRef={inputRefs.nachname}
+          onEnter={() => inputRefs.alter.current?.focus()}
           onChange={(v) =>
             setBaseData({ ...baseData, nachname: v })
           }
@@ -693,6 +709,9 @@ export default function App() {
         <Input
           label="Alter"
           type="number"
+          value={baseData.alter}
+          inputRef={inputRefs.alter}
+          onEnter={() => inputRefs.gehalt.current?.focus()}
           onChange={(v) =>
             setBaseData({ ...baseData, alter: v })
           }
@@ -701,6 +720,9 @@ export default function App() {
         <Input
           label="Monatliches Netto-Gehalt (€)"
           type="number"
+          value={baseData.gehalt}
+          inputRef={inputRefs.gehalt}
+          onEnter={() => inputRefs.kinderAnzahl.current?.focus()}
           onChange={(v) =>
             setBaseData({ ...baseData, gehalt: v })
           }
@@ -746,6 +768,9 @@ export default function App() {
           <Input
             label="Anzahl Kinder"
             type="number"
+            value={baseData.kinderAnzahl}
+            inputRef={inputRefs.kinderAnzahl}
+            onEnter={() => inputRefs.kfzAnzahl.current?.focus()}
             onChange={(v) =>
               setBaseData({
                 ...baseData,
@@ -797,6 +822,8 @@ export default function App() {
           <Input
             label="Anzahl Fahrzeuge"
             type="number"
+            value={baseData.kfzAnzahl}
+            inputRef={inputRefs.kfzAnzahl}
             onChange={(v) =>
               setBaseData({
                 ...baseData,
@@ -818,6 +845,7 @@ export default function App() {
       </div>
     );
   }
+
   /* ================= KATEGORIEN ================= */
 
   if (step === "category") {
@@ -1175,13 +1203,28 @@ export default function App() {
     );
   }
 
-  function Input({ label, type = "text", onChange }) {
+  function Input({
+    label,
+    type = "text",
+    value,
+    onChange,
+    onEnter,
+    inputRef,
+  }) {
     return (
       <div className="field">
         {label && <label>{label}</label>}
         <input
+          ref={inputRef}
           type={type}
+          value={value || ""}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && onEnter) {
+              e.preventDefault();
+              onEnter();
+            }
+          }}
         />
       </div>
     );
