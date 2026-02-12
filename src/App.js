@@ -689,7 +689,7 @@ if (step === "base") {
         label="Vorname"
         value={baseData.vorname}
         onChange={(v) =>
-          setBaseData({ ...baseData, vorname: v })
+          setBaseData(prev => ({ ...prev, vorname: v }))
         }
         onEnter={() => nachnameRef.current?.focus()}
         inputRef={vornameRef}
@@ -699,7 +699,7 @@ if (step === "base") {
         label="Nachname"
         value={baseData.nachname}
         onChange={(v) =>
-          setBaseData({ ...baseData, nachname: v })
+          setBaseData(prev => ({ ...prev, nachname: v }))
         }
         onEnter={() => alterRef.current?.focus()}
         inputRef={nachnameRef}
