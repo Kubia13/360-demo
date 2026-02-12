@@ -313,21 +313,24 @@ export default function App() {
 
       if (value !== "ja") return 0;
 
-      const options = [
-        "Privat",
-        "Beruf",
-        "Verkehr",
-        "Immobilie/Miete"
+      const rsBereiche = [
+        { key: "Privat", relevant: true },
+        { key: "Beruf", relevant: baseData.beruf && baseData.beruf !== "Nicht berufstätig" },
+        { key: "Verkehr", relevant: baseData.kfz === "Ja" },
+        { key: "Immobilie/Miete", relevant: baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern" }
       ];
 
-      const selectedCount = options.filter(
-        (opt) => answers["rechtsschutz_" + opt]
-      ).length;
+      const relevanteBereiche = rsBereiche.filter(b => b.relevant);
 
-      if (selectedCount === 0) return 0;
+      if (relevanteBereiche.length === 0) return 100;
 
-      return Math.round((selectedCount / options.length) * 100);
+      const abgedeckt = relevanteBereiche.filter(
+        (b) => answers["rechtsschutz_" + b.key]
+      );
+
+      return Math.round((abgedeckt.length / relevanteBereiche.length) * 100);
     }
+
 
     /* ===== STANDARD YES / NO ===== */
     if (value === "ja") return 100;
@@ -538,9 +541,29 @@ export default function App() {
         return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen."
 
       case "rechtsschutz":
+
         if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Analyse der abgedeckten Bereiche schafft Klarheit."
-        return "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen."
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Analyse der abgedeckten Bereiche schafft Klarheit.";
+
+        const rsBereiche = [
+          { key: "Privat", relevant: true },
+          { key: "Beruf", relevant: baseData.beruf && baseData.beruf !== "Nicht berufstätig" },
+          { key: "Verkehr", relevant: baseData.kfz === "Ja" },
+          { key: "Immobilie/Miete", relevant: baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern" }
+        ];
+
+        const relevanteBereiche = rsBereiche.filter(b => b.relevant);
+
+        const fehlendeBereiche = relevanteBereiche.filter(
+          (b) => !answers["rechtsschutz_" + b.key]
+        );
+
+        if (fehlendeBereiche.length === 0)
+          return null;
+
+        return "In folgenden relevanten Bereichen besteht Optimierungsbedarf: " +
+          fehlendeBereiche.map(b => b.key).join(", ") + ".";
+
 
       case "kfz_haftpflicht":
         if (unsicher)
@@ -1010,11 +1033,13 @@ export default function App() {
     <div className="screen">
       <Header reset={resetAll} back={() => setStep("category")} />
 
-      <h2>
+      <h2 className="dashboardTitle">
         {baseData.vorname
           ? `${baseData.vorname}, dein Status`
           : "Dein Status"}
       </h2>
+
+
 
       {/* Score Ring */}
       <div className="ringWrap">
