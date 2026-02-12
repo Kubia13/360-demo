@@ -250,20 +250,64 @@ export default function App() {
     }));
   }
 
-/* ================= SCORE ================= */
+  /* ================= SCORE ================= */
 
 function getScore(key) {
 
   const value = answers[key];
+  const age = Number(baseData.alter);
+  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
 
   if (!value) return 0;
 
-  // ---- Rentenlücke NICHT werten ----
-  if (key === "rentenluecke") {
-    return null; // wird komplett aus Score entfernt
+  /* ===== RENTENLÜCKE NICHT WERTEN ===== */
+  if (key === "rentenluecke") return null;
+
+  /* ===== PRIVATE ALTERSVORSORGE ===== */
+  if (key === "private_rente") {
+
+    if (value === "ja") return 100;
+
+    // Ohne Vorsorge
+    if (age < 30) return 0;
+    if (age < 50) return 0;
+
+    return 20; // 50+
   }
 
-  // ---- Rechtsschutz mit Unteroptionen ----
+  /* ===== PFLEGE ===== */
+  if (key === "pflege") {
+
+    if (value === "ja") return 100;
+
+    if (age < 30) return 40;
+    if (age < 50) return 20;
+
+    return 0;
+  }
+
+  /* ===== KRANKENZUSATZ ===== */
+  if (key === "zahn") {
+
+    if (value === "ja") return 100;
+
+    if (age < 30) return 70;
+    if (age < 50) return 40;
+
+    return 20;
+  }
+
+  /* ===== BU – MIT VERHEIRATET BONUS-RISIKO ===== */
+  if (key === "bu") {
+
+    if (value === "ja") return 100;
+
+    if (verheiratet) return 0;
+
+    return 0;
+  }
+
+  /* ===== RECHTSSCHUTZ ===== */
   if (key === "rechtsschutz") {
 
     if (value !== "ja") return 0;
@@ -284,11 +328,11 @@ function getScore(key) {
     return Math.round((selectedCount / options.length) * 100);
   }
 
-  // ---- Standard Yes / No ----
+  /* ===== STANDARD YES / NO ===== */
   if (value === "ja") return 100;
   if (value === "nein" || value === "unbekannt") return 0;
 
-  // ---- Kasko Speziallogik ----
+  /* ===== KASKO ===== */
   if (key === "kasko") {
     if (value === "vollkasko") return 100;
     if (value === "teilkasko") return 50;
@@ -317,7 +361,6 @@ const categoryScores = useMemo(() => {
       acc[cat] = 0;
     } else {
 
-      // Fragen ohne Bewertung (z. B. rentenluecke) entfernen
       const scoredQuestions = relevantQuestions.filter(
         (id) => getScore(id) !== null
       );
@@ -325,6 +368,7 @@ const categoryScores = useMemo(() => {
       if (!scoredQuestions.length) {
         acc[cat] = 0;
       } else {
+
         const sum = scoredQuestions.reduce(
           (total, id) => total + getScore(id),
           0
@@ -393,6 +437,42 @@ const totalScore = useMemo(() => {
     return () => clearInterval(interval);
 
   }, [totalScore]);
+
+  /* ===== DYNAMISCHER DASHBOARD-HINWEIS ===== */
+
+function getDynamicHint() {
+
+  const age = Number(baseData.alter);
+  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+
+  // Pflege-Risiko
+  if (answers.pflege !== "ja") {
+
+    if (age >= 50)
+      return "Mit steigendem Alter wird Pflegeabsicherung zunehmend relevanter – und teurer.";
+
+    if (age >= 30)
+      return "Pflegeabsicherung wird mit zunehmendem Alter deutlich kostenintensiver.";
+  }
+
+  // Altersvorsorge
+  if (answers.private_rente !== "ja") {
+
+    if (age >= 50)
+      return "Im späteren Erwerbsleben sind Vorsorgelücken schwerer auszugleichen.";
+
+    if (age >= 30)
+      return "Je früher Altersvorsorge startet, desto geringer ist der monatliche Aufwand.";
+  }
+
+  // Verheiratet & BU
+  if (verheiratet && answers.bu !== "ja")
+    return "Als verheiratete Person spielt Einkommensabsicherung eine zentrale Rolle.";
+
+  // Standard
+  return "Dein Ergebnis zeigt eine strukturierte Übersicht deiner aktuellen Absicherung.";
+}
+
   /* ================= RESET OVERLAY ================= */
 
   const ResetOverlay = showResetConfirm && (
@@ -889,14 +969,22 @@ if (step === "welcome") {
         <div className="ringCenter">{animatedScore}%</div>
       </div>
 
-      {/* Score Bewertung */}
-      <p className="scoreLabel">
-        {animatedScore >= 80
-          ? "Sehr gut abgesichert"
-          : animatedScore >= 60
-          ? "Solide Basis"
-          : "Optimierung sinnvoll"}
-      </p>
+      {/* Score Bewertung + Dynamischer Hinweis */}
+<div className="scoreLabel">
+
+  <p>
+    {animatedScore >= 80
+      ? "Sehr gut abgesichert"
+      : animatedScore >= 60
+      ? "Solide Basis"
+      : "Optimierung sinnvoll"}
+  </p>
+
+  <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
+    {getDynamicHint()}
+  </p>
+
+</div>
 
       {/* Kategorien Übersicht */}
       <div className="categoryList">
