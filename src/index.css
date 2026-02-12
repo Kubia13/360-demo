@@ -25,9 +25,12 @@ body {
 }
 
 .logo.large {
-  height: 72px;
-  margin-bottom: 12px;
-  cursor: pointer;
+  width: 100%;
+  max-width: 320px;   /* kannst du anpassen */
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 20px auto;
 }
 
 .logo.small {
