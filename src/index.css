@@ -848,7 +848,9 @@ body::before {
 
 .productRow {
   display: grid;
-  grid-template-columns: 1fr 160px;
+  grid-template-columns: 1fr auto;
+  gap: 16px;              /* ← Abstand zwischen Text & Button */
+
   align-items: center;
 
   padding: 16px 18px;
@@ -903,6 +905,8 @@ body::before {
   font-size: 15px;
   font-weight: 500;
   line-height: 1.4;
+
+  padding-right: 8px; /* minimaler Sicherheitspuffer */
 }
 
 .categoryList {
@@ -940,5 +944,16 @@ body::before {
 
   .legalFooter {
     margin-bottom: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .productRow {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .productButton {
+    width: 100%;
   }
 }
