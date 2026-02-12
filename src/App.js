@@ -43,6 +43,124 @@ const PRIORITY_MAP = {
   kfz_haftpflicht: 2
 };
 
+/* ================= ACTION MAP ================= */
+
+const ACTION_MAP = {
+  /* ===== EXISTENZ ===== */
+
+  bu: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  ktg: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  unfall: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/unfallversicherung/Beitrag?adm=00840513"
+  },
+
+  /* ===== HAFTUNG ===== */
+
+  haftpflicht: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/privathaftpflicht/Beitrag?adm=00840513"
+  },
+
+  tierhaft: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/tierhalterhaftpflicht/Beitrag?adm=00840513"
+  },
+
+  tier_op: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/tierversicherung/Beitrag?adm=00840513"
+  },
+
+  rechtsschutz: {
+    type: "abschluss",
+    url: "https://www.roland-rechtsschutz.de/privatkunden/konfigurator_privatkunden/konfigurator_privatkunden_barmenia.html?prd=Rechtsschutz%2Bf_uumlr%2BPrivatkunden&produkt=67018&sparte=BA&oabezeichnung=rechtsschutzversicherung&pid=Rechtsschutzversicherung&dom=www.barmenia.de&p0=334009&adm=00840513&em=florian.loeffler#/"
+  },
+
+  /* ===== GESUNDHEIT ===== */
+
+  krankenzusatz: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/zusatzversicherung/Beitrag?adm=00840513"
+  },
+
+  pflege: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  /* ===== VORSORGE ===== */
+
+  private_rente: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  rentenluecke: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  /* ===== WOHNEN ===== */
+
+  hausrat: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/hausrat/Beitrag?adm=00840513"
+  },
+
+  elementar: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  gebaeude: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  /* ===== MOBILITÄT ===== */
+
+  kfz_haftpflicht: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/kfzversicherung/Fahrzeug?adm=00840513"
+  },
+
+  kasko: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/kfzversicherung/Fahrzeug?adm=00840513"
+  },
+
+  schutzbrief: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/kfzversicherung/Fahrzeug?adm=00840513"
+  },
+
+  /* ===== KINDER ===== */
+
+  kinder_unfall: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/kinderinvaliditaetsvorsorge/Beitrag?adm=00840513"
+  },
+
+  kinder_krankenzusatz: {
+    type: "abschluss",
+    url: "https://ssl.barmenia.de/online-versichern/#/zusatzversicherung/Beitrag?adm=00840513"
+  },
+
+  kinder_vorsorge: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  }
+};
+
 /* ================= FRAGEN ================= */
 
 const QUESTIONS = {
@@ -409,6 +527,8 @@ export default function App() {
   const [legalOverlay, setLegalOverlay] = useState(null);
   // "impressum" | "datenschutz" | null
   const [expandedProductCategory, setExpandedProductCategory] = useState(null);
+  const [actionOverlay, setActionOverlay] = useState(null);
+
 
   /* ================= BASE FORM REFS ================= */
 
@@ -463,23 +583,23 @@ export default function App() {
 
   /* ================= DYNAMISCHE KATEGORIEN ================= */
 
-const categories = useMemo(() => {
-  return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
+  const categories = useMemo(() => {
+    return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
 
-    const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
-      const q = QUESTIONS[id];
+      const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+        const q = QUESTIONS[id];
 
-      if (q.category !== cat) return false;
-      if (q.condition && !q.condition(baseData)) return false;
+        if (q.category !== cat) return false;
+        if (q.condition && !q.condition(baseData)) return false;
 
-      return true;
+        return true;
+      });
+
+      return relevantQuestions.length > 0;
     });
+  }, [baseData]);
 
-    return relevantQuestions.length > 0;
-  });
-}, [baseData]);
-
-const currentCategory = categories[currentCategoryIndex];
+  const currentCategory = categories[currentCategoryIndex];
 
   /* ===== FLOW-SCHUTZ ===== */
 
@@ -790,44 +910,44 @@ const currentCategory = categories[currentCategoryIndex];
     return () => clearInterval(interval);
   }, [totalScore, step]);
 
-/* ================= TOP 3 HANDLUNGSFELDER ================= */
+  /* ================= TOP 3 HANDLUNGSFELDER ================= */
 
-const topRecommendations = useMemo(() => {
+  const topRecommendations = useMemo(() => {
 
-  if (step !== "dashboard") return [];
+    if (step !== "dashboard") return [];
 
-  const allRecommendations = [];
+    const allRecommendations = [];
 
-  Object.keys(answers).forEach((id) => {
+    Object.keys(answers).forEach((id) => {
 
-    const score = getScore(id);
-    if (score === null) return;
+      const score = getScore(id);
+      if (score === null) return;
 
-    const text = getStrategicRecommendation(id);
-    if (!text) return;
+      const text = getStrategicRecommendation(id);
+      if (!text) return;
 
-    allRecommendations.push({
-      id,
-      text,
-      priority: PRIORITY_MAP[id] || 1,
-      score
+      allRecommendations.push({
+        id,
+        text,
+        priority: PRIORITY_MAP[id] || 1,
+        score
+      });
     });
-  });
 
-  // 1. Höchste Priorität zuerst
-  // 2. Niedrigster Score zuerst
-  allRecommendations.sort((a, b) => {
+    // 1. Höchste Priorität zuerst
+    // 2. Niedrigster Score zuerst
+    allRecommendations.sort((a, b) => {
 
-    if (b.priority !== a.priority) {
-      return b.priority - a.priority;
-    }
+      if (b.priority !== a.priority) {
+        return b.priority - a.priority;
+      }
 
-    return a.score - b.score;
-  });
+      return a.score - b.score;
+    });
 
-  return allRecommendations.slice(0, 3);
+    return allRecommendations.slice(0, 3);
 
-}, [answers, baseData, step]);
+  }, [answers, baseData, step]);
 
 
   /* ================= PRODUKTSEITE ================= */
@@ -1230,7 +1350,60 @@ const topRecommendations = useMemo(() => {
       </div>
     );
   }
- 
+/* ================= ACTION OVERLAY ================= */
+
+const ActionOverlayComponent = () => {
+  if (!actionOverlay) return null;
+
+  const action = ACTION_MAP[actionOverlay];
+  if (!action) return null;
+
+  return (
+    <div
+      className="infoOverlay"
+      onClick={() => setActionOverlay(null)}
+    >
+      <div
+        className="infoBox"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ marginBottom: 12 }}>
+          {QUESTIONS[actionOverlay]?.label}
+        </h3>
+
+        <div className="overlayButtons">
+
+          {/* Beratungstermin */}
+          <button
+            className="overlayBtn primary"
+            onClick={() =>
+              window.open(
+                action.calendar,
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
+          >
+            Termin vereinbaren
+          </button>
+
+          {/* Kontakt anzeigen */}
+          <button
+            className="overlayBtn secondary"
+            onClick={() => {
+              setActionOverlay(null);
+              setLegalOverlay("impressum");
+            }}
+          >
+            Kontakt anzeigen
+          </button>
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
   /* ================= WELCOME ================= */
 
   if (step === "welcome") {
@@ -1751,190 +1924,221 @@ const topRecommendations = useMemo(() => {
     );
   }
 
-/* ================= DASHBOARD ================= */
+  /* =================  DASHBOARD  ================= */
 
-if (step === "dashboard") {
-  return (
-    <div className="screen">
-      <Header reset={resetAll} back={() => setStep("category")} />
+  if (step === "dashboard") {
+    return (
+      <div className="screen">
+        <Header reset={resetAll} back={() => setStep("category")} />
 
-      <h2 className="dashboardTitle">
-        {baseData.vorname
-          ? `${baseData.vorname}, dein Status`
-          : "Dein Status"}
-      </h2>
+        <h2 className="dashboardTitle">
+          {baseData.vorname
+            ? `${baseData.vorname}, dein Status`
+            : "Dein Status"}
+        </h2>
 
-      {/* Score Ring */}
-      <div className="ringWrap">
-        <svg width="220" height="220">
-          <circle
-            cx="110"
-            cy="110"
-            r="90"
-            stroke="#1a2a36"
-            strokeWidth="16"
-            fill="none"
-          />
+        {/* Score Ring */}
+        <div className="ringWrap">
+          <svg width="220" height="220">
+            <circle
+              cx="110"
+              cy="110"
+              r="90"
+              stroke="#1a2a36"
+              strokeWidth="16"
+              fill="none"
+            />
 
-          <circle
-            cx="110"
-            cy="110"
-            r="90"
-            stroke="url(#grad)"
-            strokeWidth="16"
-            fill="none"
-            strokeDasharray="565"
-            strokeDashoffset={565 - (565 * animatedScore) / 100}
-            strokeLinecap="round"
-            transform="rotate(-90 110 110)"
-            style={{
-              filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
-              transition: "0.6s ease",
-            }}
-          />
+            <circle
+              cx="110"
+              cy="110"
+              r="90"
+              stroke="url(#grad)"
+              strokeWidth="16"
+              fill="none"
+              strokeDasharray="565"
+              strokeDashoffset={565 - (565 * animatedScore) / 100}
+              strokeLinecap="round"
+              transform="rotate(-90 110 110)"
+              style={{
+                filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
+                transition: "0.6s ease",
+              }}
+            />
 
-          <defs>
-            <linearGradient id="grad">
-              <stop offset="0%" stopColor="#8B7CF6" />
-              <stop offset="100%" stopColor="#5E4AE3" />
-            </linearGradient>
-          </defs>
-        </svg>
+            <defs>
+              <linearGradient id="grad">
+                <stop offset="0%" stopColor="#8B7CF6" />
+                <stop offset="100%" stopColor="#5E4AE3" />
+              </linearGradient>
+            </defs>
+          </svg>
 
-        <div className="ringCenter">{animatedScore}%</div>
-      </div>
-
-      {/* Bewertung + Hinweis */}
-      <div className="scoreLabel">
-        <p>
-          {animatedScore >= 80
-            ? "Sehr gut abgesichert"
-            : animatedScore >= 60
-              ? "Solide Basis"
-              : "Optimierung sinnvoll"}
-        </p>
-
-        <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
-          {getDynamicHint()}
-        </p>
-      </div>
-
-      {/* ================= TOP 3 HANDLUNGSFELDER ================= */}
-      {topRecommendations.length > 0 && (
-        <div className="categoryList" style={{ marginTop: 20 }}>
-          <h3 style={{ marginBottom: 12 }}>
-            Deine wichtigsten Handlungsfelder
-          </h3>
-
-          {topRecommendations.map((item) => (
-            <div key={item.id} className="recommendationItem">
-              <strong>{QUESTIONS[item.id]?.label}</strong>
-              <p>{item.text}</p>
-            </div>
-          ))}
+          <div className="ringCenter">{animatedScore}%</div>
         </div>
-      )}
 
-      {/* Kategorien Übersicht */}
-      <div className="categoryList">
-        {categories.map((cat) => {
-          const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
-            const q = QUESTIONS[id];
+        {/* Bewertung + Hinweis */}
+        <div className="scoreLabel">
+          <p>
+            {animatedScore >= 80
+              ? "Sehr gut abgesichert"
+              : animatedScore >= 60
+                ? "Solide Basis"
+                : "Optimierung sinnvoll"}
+          </p>
 
-            if (q.category !== cat) return false;
-            if (q.condition && !q.condition(baseData)) return false;
-            if (answers[id] === undefined) return false;
+          <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
+            {getDynamicHint()}
+          </p>
+        </div>
 
-            return true;
-          });
+        {/* ================= TOP 3 HANDLUNGSFELDER ================= */}
+        {topRecommendations.length > 0 && (
+          <div className="categoryList" style={{ marginTop: 20 }}>
+            <h3 style={{ marginBottom: 12 }}>
+              Deine wichtigsten Handlungsfelder
+            </h3>
 
-          const needsOptimization = questionsInCat.filter((id) =>
-            getStrategicRecommendation(id)
-          );
+            {topRecommendations.map((item) => {
 
-          const isOpen = expandedCategory === cat;
+              const action = ACTION_MAP[item.id];
 
-          return (
-            <div key={cat}>
-              <div
-                className="categoryRow"
-                onClick={() =>
-                  setExpandedCategory(isOpen ? null : cat)
-                }
-                style={{ cursor: "pointer" }}
-              >
-                <span>{CATEGORY_LABELS[cat]}</span>
+              return (
+                <div key={item.id} className="recommendationItem">
+                  <strong>{QUESTIONS[item.id]?.label}</strong>
+                  <p>{item.text}</p>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span>{categoryScores[cat] || 0}%</span>
+                  {action && (
+                    <button
+                      className="recommendationBtn"
+                      style={{ marginTop: 10 }}
+                      onClick={() => {
+                        if (action.type === "abschluss") {
+                          window.open(
+                            action.url,
+                            "_blank",
+                            "noopener,noreferrer"
+                          );
+                        }
 
-                  <div
-                    className="categoryChevron"
-                    style={{
-                      transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                    }}
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                        if (action.type === "beratung") {
+                          setActionOverlay(item.id);
+                        }
+
+                      }}
                     >
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              {isOpen && (
-                <div className="categoryDetails open">
-                  {needsOptimization.length > 0 ? (
-                    needsOptimization.map((id) => (
-                      <div key={id} className="recommendationItem">
-                        <strong>{QUESTIONS[id].label}</strong>
-                        <p>{getStrategicRecommendation(id)}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="noIssues">
-                      Kein unmittelbarer Optimierungsbedarf.
-                    </p>
+                      {action.type === "abschluss"
+                        ? "Online abschließen"
+                        : "Beratung vereinbaren"}
+                    </button>
                   )}
                 </div>
-              )}
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+        )}
+
+        {/* Kategorien Übersicht */}
+        <div className="categoryList">
+          {categories.map((cat) => {
+            const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
+              const q = QUESTIONS[id];
+
+              if (q.category !== cat) return false;
+              if (q.condition && !q.condition(baseData)) return false;
+              if (answers[id] === undefined) return false;
+
+              return true;
+            });
+
+            const needsOptimization = questionsInCat.filter((id) =>
+              getStrategicRecommendation(id)
+            );
+
+            const isOpen = expandedCategory === cat;
+
+            return (
+              <div key={cat}>
+                <div
+                  className="categoryRow"
+                  onClick={() =>
+                    setExpandedCategory(isOpen ? null : cat)
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  <span>{CATEGORY_LABELS[cat]}</span>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>{categoryScores[cat] || 0}%</span>
+
+                    <div
+                      className="categoryChevron"
+                      style={{
+                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      }}
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {isOpen && (
+                  <div className="categoryDetails open">
+                    {needsOptimization.length > 0 ? (
+                      needsOptimization.map((id) => (
+                        <div key={id} className="recommendationItem">
+                          <strong>{QUESTIONS[id].label}</strong>
+                          <p>{getStrategicRecommendation(id)}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="noIssues">
+                        Kein unmittelbarer Optimierungsbedarf.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <button
+          className="primaryBtn"
+          style={{ marginTop: 20 }}
+          onClick={() => setStep("products")}
+        >
+          Alle Abschlussmöglichkeiten anzeigen
+        </button>
+
+        <div className="legalFooter">
+          <span onClick={() => setLegalOverlay("impressum")}>
+            Impressum
+          </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("datenschutz")}>
+            Datenschutz
+          </span>
+        </div>
+
+        <ContactButton onReset={() => setShowResetConfirm(true)} />
+        <ResetOverlayComponent />
+        <ActionOverlayComponent />
+        {LegalOverlay}
       </div>
-
-      <button
-        className="primaryBtn"
-        style={{ marginTop: 20 }}
-        onClick={() => setStep("products")}
-      >
-        Alle Abschlussmöglichkeiten anzeigen
-      </button>
-
-      <div className="legalFooter">
-        <span onClick={() => setLegalOverlay("impressum")}>
-          Impressum
-        </span>
-        {" | "}
-        <span onClick={() => setLegalOverlay("datenschutz")}>
-          Datenschutz
-        </span>
-      </div>
-
-      <ContactButton onReset={() => setShowResetConfirm(true)} />
-      <ResetOverlayComponent />
-      {LegalOverlay}
-    </div>
-  );
-}
+    );
+  }
 
 }
 
