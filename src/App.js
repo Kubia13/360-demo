@@ -998,7 +998,7 @@ return (
         });
 
         const needsOptimization = questionsInCat.filter(
-          (id) => getRecommendation(id)
+          (id) => getStrategicRecommendation(id)
         );
 
         const isOpen = expandedCategory === cat;
@@ -1023,7 +1023,7 @@ return (
                   needsOptimization.map((id) => (
                     <div key={id} className="recommendationItem">
                       <strong>{QUESTIONS[id].label}</strong>
-                      <p>{getRecommendation(id)}</p>
+                      <p>{getStrategicRecommendation(id)}</p>
                     </div>
                   ))
                 ) : (
@@ -1044,111 +1044,70 @@ return (
   </div>
 );
 
-/* ===== EMPFEHLUNGEN ===== */
+/* ===== STRATEGISCHE EMPFEHLUNGEN ===== */
 
-function getRecommendation(id) {
+function getStrategicRecommendation(id) {
 
   const value = answers[id];
+  const age = Number(baseData.alter);
+  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
 
   if (!value || value === "ja") return null;
 
   switch (id) {
 
     case "bu":
-      return "Einkommensabsicherung prüfen – existenzielles Risiko.";
+      if (verheiratet)
+        return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung.";
+      return "Die Absicherung der eigenen Arbeitskraft ist eine der wichtigsten Grundlagen finanzieller Stabilität.";
 
     case "private_rente":
-      return "Private Altersvorsorge zur Schließung möglicher Rentenlücken prüfen.";
+      if (age >= 50)
+        return "Im fortgeschrittenen Erwerbsleben lassen sich Vorsorgelücken nur noch begrenzt aufholen. Eine strukturierte Ruhestandsplanung gewinnt deutlich an Bedeutung.";
+      if (age >= 30)
+        return "Je früher private Altersvorsorge beginnt, desto geringer ist der monatliche Aufwand zur Zielerreichung.";
+      return "Früher Vorsorgebeginn schafft langfristige finanzielle Flexibilität.";
 
     case "pflege":
-      return "Pflegezusatzversicherung prüfen – Beiträge steigen mit dem Alter.";
+      if (age >= 50)
+        return "Mit steigendem Alter erhöhen sich Eintrittswahrscheinlichkeit und Beitragshöhe. Eine frühzeitige Pflegeabsicherung stabilisiert deine finanzielle Planbarkeit.";
+      if (age >= 30)
+        return "Pflegekosten können erhebliche Eigenanteile verursachen. Eine Zusatzabsicherung reduziert spätere Belastungen.";
+      return "Frühe Gesundheitsabsicherung sichert langfristig günstige Beiträge.";
 
     case "zahn":
-      return "Krankenzusatz kann hohe Eigenkosten im Leistungsfall reduzieren.";
+      if (age >= 40)
+        return "Mit zunehmendem Alter steigen erfahrungsgemäß zahnmedizinische Eigenanteile. Eine Zusatzversicherung kann Liquiditätsbelastungen reduzieren.";
+      return "Eine Krankenzusatzversicherung kann Eigenkosten im Leistungsfall spürbar abfedern.";
 
     case "hausrat":
-      return "Hausratversicherung prüfen oder Versicherungssumme anpassen.";
+      return "Der Schutz deines beweglichen Eigentums sollte regelmäßig am Neuwert ausgerichtet sein, um Unterversicherung zu vermeiden.";
 
     case "elementar":
-      return "Elementarschutz gegen Naturgefahren prüfen.";
+      return "Naturgefahren nehmen statistisch zu. Elementarschutz ergänzt die Wohnabsicherung sinnvoll.";
 
     case "gebaeude":
-      return "Wohngebäudeabsicherung überprüfen.";
+      return "Als Eigentümer ist eine vollständige Gebäudeabsicherung essenziell zur Werterhaltung.";
 
     case "haftpflicht":
-      return "Private Haftpflicht ist ein elementarer Basisschutz.";
+      return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen.";
 
     case "rechtsschutz":
-      return "Rechtsschutz kann finanzielle Risiken bei Streitigkeiten reduzieren.";
+      return "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen. Ein passender Rechtsschutz stabilisiert die finanzielle Planung.";
 
     case "kfz_haftpflicht":
-      return "Gesetzlich vorgeschriebene Haftpflicht prüfen.";
+      return "Die KFZ-Haftpflicht ist gesetzlich vorgeschrieben und schützt vor existenzbedrohenden Schadenersatzforderungen.";
 
     case "kasko":
-      return "Kaskoschutz prüfen – abhängig vom Fahrzeugwert.";
+      return "Der passende Kaskoschutz hängt vom Fahrzeugwert und deiner Risikobereitschaft ab.";
 
     case "schutzbrief":
-      return "Schutzbrief kann Mobilitätskosten im Pannenfall reduzieren.";
+      return "Ein Schutzbrief reduziert organisatorische und finanzielle Belastungen im Pannen- oder Notfall.";
 
     default:
-      return "Optimierungsbedarf prüfen.";
+      return "Optimierungspotenzial prüfen.";
   }
 }
-</div>
-
-      {/* Kategorien Übersicht */}
-      <div className="categoryList">
-  {categories.map((cat) => {
-
-    const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
-      const q = QUESTIONS[id];
-
-      if (q.category !== cat) return false;
-      if (q.condition && !q.condition(baseData)) return false;
-      if (!answers[id]) return false;
-
-      return true;
-    });
-
-    const needsOptimization = questionsInCat.filter(
-      (id) => getRecommendation(id)
-    );
-
-    const isOpen = expandedCategory === cat;
-
-    return (
-      <div key={cat}>
-
-        <div
-          className="categoryRow"
-          onClick={() =>
-            setExpandedCategory(isOpen ? null : cat)
-          }
-          style={{ cursor: "pointer" }}
-        >
-          <span>{CATEGORY_LABELS[cat]}</span>
-          <span>{categoryScores[cat] || 0}%</span>
-        </div>
-
-        <div
-          className={`categoryDetails ${isOpen ? "open" : ""}`}
-        >
-          {needsOptimization.length > 0 ? (
-            needsOptimization.map((id) => (
-              <div key={id} className="recommendationItem">
-                <strong>{QUESTIONS[id].label}</strong>
-                <p>{getRecommendation(id)}</p>
-              </div>
-            ))
-          ) : (
-            <p className="noIssues">Kein unmittelbarer Optimierungsbedarf.</p>
-          )}
-        </div>
-
-      </div>
-    );
-  })}
-</div>
 
 /* ================= UI COMPONENTS ================= */
 
