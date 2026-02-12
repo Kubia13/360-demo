@@ -250,13 +250,18 @@ export default function App() {
     }));
   }
 
-  /* ================= SCORE ================= */
+/* ================= SCORE ================= */
 
 function getScore(key) {
 
   const value = answers[key];
 
   if (!value) return 0;
+
+  // ---- Rentenlücke NICHT werten ----
+  if (key === "rentenluecke") {
+    return null; // wird komplett aus Score entfernt
+  }
 
   // ---- Rechtsschutz mit Unteroptionen ----
   if (key === "rechtsschutz") {
@@ -293,7 +298,6 @@ function getScore(key) {
   return 0;
 }
 
-
 const categoryScores = useMemo(() => {
 
   return Object.keys(CATEGORY_WEIGHTS).reduce((acc, cat) => {
@@ -312,11 +316,22 @@ const categoryScores = useMemo(() => {
     if (!relevantQuestions.length) {
       acc[cat] = 0;
     } else {
-      const sum = relevantQuestions.reduce(
-        (total, id) => total + getScore(id),
-        0
+
+      // Fragen ohne Bewertung (z. B. rentenluecke) entfernen
+      const scoredQuestions = relevantQuestions.filter(
+        (id) => getScore(id) !== null
       );
-      acc[cat] = Math.round(sum / relevantQuestions.length);
+
+      if (!scoredQuestions.length) {
+        acc[cat] = 0;
+      } else {
+        const sum = scoredQuestions.reduce(
+          (total, id) => total + getScore(id),
+          0
+        );
+
+        acc[cat] = Math.round(sum / scoredQuestions.length);
+      }
     }
 
     return acc;
@@ -325,10 +340,8 @@ const categoryScores = useMemo(() => {
 
 }, [answers, baseData]);
 
-
 const totalScore = useMemo(() => {
 
-  // Nur relevante Kategorien berücksichtigen
   const activeCategories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
 
     const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
@@ -343,7 +356,6 @@ const totalScore = useMemo(() => {
     return relevantQuestions.length > 0;
   });
 
-  // Summe der aktiven Gewichte berechnen
   const totalWeight = activeCategories.reduce(
     (sum, cat) => sum + CATEGORY_WEIGHTS[cat],
     0
@@ -351,12 +363,10 @@ const totalScore = useMemo(() => {
 
   if (totalWeight === 0) return 0;
 
-  // Score nur über aktive Kategorien berechnen
   const weightedScore = activeCategories.reduce((sum, cat) => {
     return sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat];
   }, 0);
 
-  // Normieren auf 100%
   return Math.round(weightedScore / totalWeight);
 
 }, [categoryScores, baseData]);
