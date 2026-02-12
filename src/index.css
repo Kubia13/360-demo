@@ -794,12 +794,15 @@ body::before {
 
 .legalFooter {
   margin-top: auto;
-  padding-bottom: 20px;
-  /* kleiner Abstand zum Balken */
+  padding-top: 30px;
+
   text-align: center;
   font-size: 12px;
-  opacity: 0.55;
+  opacity: 0.6;
+
+  margin-bottom: 90px; /* Abstand zum fixed Contact Bereich */
 }
+
 
 .legalFooter span {
   color: #8B7CF6;
@@ -932,6 +935,10 @@ body::before {
 
 @media (max-width: 480px) {
   .screen {
-    padding-bottom: 150px;
+    padding-bottom: 120px;
+  }
+
+  .legalFooter {
+    margin-bottom: 80px;
   }
 }
