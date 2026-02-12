@@ -742,165 +742,165 @@ export default function App() {
 
   /* ================= BASISDATEN ================= */
 
-if (step === "base") {
+  if (step === "base") {
 
-  return (
-    <div className="screen">
-      <Header reset={resetAll} back={() => setStep("welcome")} />
+    return (
+      <div className="screen">
+        <Header reset={resetAll} back={() => setStep("welcome")} />
 
-      <h2>Persönliche Angaben</h2>
+        <h2>Persönliche Angaben</h2>
 
-      <Select
-        label="Geschlecht"
-        options={["Herr", "Frau", "Divers"]}
-        value={baseData.geschlecht}
-        onChange={(v) => updateBaseData("geschlecht", v)}
-        selectRef={baseFormRefs.geschlecht}
-        onEnter={() => focusNext(baseFormRefs.geschlecht)}
-      />
-
-      <Input
-        label="Vorname"
-        value={baseData.vorname}
-        onChange={(v) => updateBaseData("vorname", v)}
-        inputRef={baseFormRefs.vorname}
-        onEnter={() => focusNext(baseFormRefs.vorname)}
-      />
-
-      <Input
-        label="Nachname"
-        value={baseData.nachname}
-        onChange={(v) => updateBaseData("nachname", v)}
-        inputRef={baseFormRefs.nachname}
-        onEnter={() => focusNext(baseFormRefs.nachname)}
-      />
-
-      <Input
-        label="Alter"
-        type="number"
-        value={baseData.alter}
-        onChange={(v) => updateBaseData("alter", v)}
-        inputRef={baseFormRefs.alter}
-        onEnter={() => focusNext(baseFormRefs.alter)}
-      />
-
-      <Input
-        label="Monatliches Netto-Gehalt (€)"
-        type="number"
-        value={baseData.gehalt}
-        onChange={(v) => updateBaseData("gehalt", v)}
-        inputRef={baseFormRefs.gehalt}
-        onEnter={() => focusNext(baseFormRefs.gehalt)}
-      />
-
-      <Select
-        label="Beziehungsstatus"
-        options={[
-          "Single",
-          "Partnerschaft",
-          "Verheiratet"
-        ]}
-        value={baseData.beziehungsstatus}
-        onChange={(v) => updateBaseData("beziehungsstatus", v)}
-        selectRef={baseFormRefs.beziehungsstatus}
-        onEnter={() => focusNext(baseFormRefs.beziehungsstatus)}
-      />
-
-      <Select
-        label="Berufliche Situation"
-        options={[
-          "Angestellt",
-          "Öffentlicher Dienst",
-          "Selbstständig",
-          "Nicht berufstätig",
-        ]}
-        value={baseData.beruf}
-        onChange={(v) => updateBaseData("beruf", v)}
-        selectRef={baseFormRefs.beruf}
-        onEnter={() => focusNext(baseFormRefs.beruf)}
-      />
-
-      <Select
-        label="Hast du Kinder?"
-        options={["Nein", "Ja"]}
-        value={baseData.kinder}
-        onChange={(v) => updateBaseData("kinder", v)}
-        selectRef={baseFormRefs.kinder}
-        onEnter={() => focusNext(baseFormRefs.kinder)}
-      />
-
-      {baseData.kinder === "Ja" && (
-        <Input
-          label="Anzahl Kinder"
-          type="number"
-          value={baseData.kinderAnzahl}
-          onChange={(v) => updateBaseData("kinderAnzahl", v)}
-          inputRef={baseFormRefs.kinderAnzahl}
-          onEnter={() => focusNext(baseFormRefs.kinderAnzahl)}
+        <Select
+          label="Geschlecht"
+          options={["Herr", "Frau", "Divers"]}
+          value={baseData.geschlecht}
+          onChange={(v) => updateBaseData("geschlecht", v)}
+          selectRef={baseFormRefs.geschlecht}
+          onEnter={() => focusNext(baseFormRefs.geschlecht)}
         />
-      )}
 
-      <Select
-        label="Haustiere"
-        options={[
-          "Keine Tiere",
-          "Katze",
-          "Hund",
-          "Hund und Katze",
-        ]}
-        value={baseData.tiere}
-        onChange={(v) => updateBaseData("tiere", v)}
-        selectRef={baseFormRefs.tiere}
-        onEnter={() => focusNext(baseFormRefs.tiere)}
-      />
-
-      <Select
-        label="Wie wohnst du?"
-        options={[
-          "Wohne bei Eltern",
-          "Miete Wohnung",
-          "Miete Haus",
-          "Eigentumswohnung",
-          "Eigentum Haus",
-        ]}
-        value={baseData.wohnen}
-        onChange={(v) => updateBaseData("wohnen", v)}
-        selectRef={baseFormRefs.wohnen}
-        onEnter={() => focusNext(baseFormRefs.wohnen)}
-      />
-
-      <Select
-        label="Besitzt du ein Fahrzeug? (z. B. Auto, Motorrad, Roller, Mofa)"
-        options={["Nein", "Ja"]}
-        value={baseData.kfz}
-        onChange={(v) => updateBaseData("kfz", v)}
-        selectRef={baseFormRefs.kfz}
-        onEnter={() => focusNext(baseFormRefs.kfz)}
-      />
-
-      {baseData.kfz === "Ja" && (
         <Input
-          label="Anzahl Fahrzeuge"
-          type="number"
-          value={baseData.kfzAnzahl}
-          onChange={(v) => updateBaseData("kfzAnzahl", v)}
-          inputRef={baseFormRefs.kfzAnzahl}
-          onEnter={() => focusNext(baseFormRefs.kfzAnzahl)}
+          label="Vorname"
+          value={baseData.vorname}
+          onChange={(v) => updateBaseData("vorname", v)}
+          inputRef={baseFormRefs.vorname}
+          onEnter={() => focusNext(baseFormRefs.vorname)}
         />
-      )}
 
-      <button
-        className="primaryBtn"
-        onClick={() => setStep("category")}
-      >
-        Weiter
-      </button>
+        <Input
+          label="Nachname"
+          value={baseData.nachname}
+          onChange={(v) => updateBaseData("nachname", v)}
+          inputRef={baseFormRefs.nachname}
+          onEnter={() => focusNext(baseFormRefs.nachname)}
+        />
 
-      <ContactButton onReset={() => setShowResetConfirm(true)} />
-      {ResetOverlay}
-    </div>
-  );
-}
+        <Input
+          label="Alter"
+          type="number"
+          value={baseData.alter}
+          onChange={(v) => updateBaseData("alter", v)}
+          inputRef={baseFormRefs.alter}
+          onEnter={() => focusNext(baseFormRefs.alter)}
+        />
+
+        <Input
+          label="Monatliches Netto-Gehalt (€)"
+          type="number"
+          value={baseData.gehalt}
+          onChange={(v) => updateBaseData("gehalt", v)}
+          inputRef={baseFormRefs.gehalt}
+          onEnter={() => focusNext(baseFormRefs.gehalt)}
+        />
+
+        <Select
+          label="Beziehungsstatus"
+          options={[
+            "Single",
+            "Partnerschaft",
+            "Verheiratet"
+          ]}
+          value={baseData.beziehungsstatus}
+          onChange={(v) => updateBaseData("beziehungsstatus", v)}
+          selectRef={baseFormRefs.beziehungsstatus}
+          onEnter={() => focusNext(baseFormRefs.beziehungsstatus)}
+        />
+
+        <Select
+          label="Berufliche Situation"
+          options={[
+            "Angestellt",
+            "Öffentlicher Dienst",
+            "Selbstständig",
+            "Nicht berufstätig",
+          ]}
+          value={baseData.beruf}
+          onChange={(v) => updateBaseData("beruf", v)}
+          selectRef={baseFormRefs.beruf}
+          onEnter={() => focusNext(baseFormRefs.beruf)}
+        />
+
+        <Select
+          label="Hast du Kinder?"
+          options={["Nein", "Ja"]}
+          value={baseData.kinder}
+          onChange={(v) => updateBaseData("kinder", v)}
+          selectRef={baseFormRefs.kinder}
+          onEnter={() => focusNext(baseFormRefs.kinder)}
+        />
+
+        {baseData.kinder === "Ja" && (
+          <Input
+            label="Anzahl Kinder"
+            type="number"
+            value={baseData.kinderAnzahl}
+            onChange={(v) => updateBaseData("kinderAnzahl", v)}
+            inputRef={baseFormRefs.kinderAnzahl}
+            onEnter={() => focusNext(baseFormRefs.kinderAnzahl)}
+          />
+        )}
+
+        <Select
+          label="Haustiere"
+          options={[
+            "Keine Tiere",
+            "Katze",
+            "Hund",
+            "Hund und Katze",
+          ]}
+          value={baseData.tiere}
+          onChange={(v) => updateBaseData("tiere", v)}
+          selectRef={baseFormRefs.tiere}
+          onEnter={() => focusNext(baseFormRefs.tiere)}
+        />
+
+        <Select
+          label="Wie wohnst du?"
+          options={[
+            "Wohne bei Eltern",
+            "Miete Wohnung",
+            "Miete Haus",
+            "Eigentumswohnung",
+            "Eigentum Haus",
+          ]}
+          value={baseData.wohnen}
+          onChange={(v) => updateBaseData("wohnen", v)}
+          selectRef={baseFormRefs.wohnen}
+          onEnter={() => focusNext(baseFormRefs.wohnen)}
+        />
+
+        <Select
+          label="Besitzt du ein Fahrzeug? (z. B. Auto, Motorrad, Roller, Mofa)"
+          options={["Nein", "Ja"]}
+          value={baseData.kfz}
+          onChange={(v) => updateBaseData("kfz", v)}
+          selectRef={baseFormRefs.kfz}
+          onEnter={() => focusNext(baseFormRefs.kfz)}
+        />
+
+        {baseData.kfz === "Ja" && (
+          <Input
+            label="Anzahl Fahrzeuge"
+            type="number"
+            value={baseData.kfzAnzahl}
+            onChange={(v) => updateBaseData("kfzAnzahl", v)}
+            inputRef={baseFormRefs.kfzAnzahl}
+            onEnter={() => focusNext(baseFormRefs.kfzAnzahl)}
+          />
+        )}
+
+        <button
+          className="primaryBtn"
+          onClick={() => setStep("category")}
+        >
+          Weiter
+        </button>
+
+        <ContactButton onReset={() => setShowResetConfirm(true)} />
+        {ResetOverlay}
+      </div>
+    );
+  }
 
   /* ================= KATEGORIEN ================= */
 
@@ -988,7 +988,23 @@ if (step === "base") {
                   className="calculatorIcon"
                   title={q.link.label}
                 >
-                  🧮
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="4" y="2" width="16" height="20" rx="3" />
+                    <line x1="8" y1="6" x2="16" y2="6" />
+                    <line x1="8" y1="10" x2="8" y2="14" />
+                    <line x1="12" y1="10" x2="12" y2="14" />
+                    <line x1="16" y1="10" x2="16" y2="14" />
+                    <line x1="8" y1="17" x2="16" y2="17" />
+                  </svg>
                 </a>
               )}
 
@@ -1202,6 +1218,7 @@ if (step === "base") {
             return (
               <div key={cat}>
                 <div
+
                   className="categoryRow"
                   onClick={() =>
                     setExpandedCategory(isOpen ? null : cat)
@@ -1209,7 +1226,30 @@ if (step === "base") {
                   style={{ cursor: "pointer" }}
                 >
                   <span>{CATEGORY_LABELS[cat]}</span>
-                  <span>{categoryScores[cat] || 0}%</span>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>{categoryScores[cat] || 0}%</span>
+
+                    <div
+                      className="categoryChevron"
+                      style={{
+                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      }}
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 {isOpen && (

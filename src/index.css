@@ -440,26 +440,40 @@ body {
   margin-top: 8px;
   margin-left: 8px;
 
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
 
-  border-radius: 8px;
-  background: #1a2a36;
-  border: 1px solid #8B7CF6;
+  border-radius: 12px;
 
-  font-size: 16px;
-  text-decoration: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 
-  transition: 0.2s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(139, 124, 246, 0.25);
+
+  color: #A99BFF;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+
+  transition: all 0.25s ease;
 }
 
 .calculatorIcon:hover {
-  background: #223445;
-  border-color: #A99BFF;
+  transform: translateY(-2px);
+
+  background: rgba(139, 124, 246, 0.15);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 20px rgba(139, 124, 246, 0.4),
+    0 0 12px rgba(139, 124, 246, 0.6);
 }
 
 .calculatorIcon:active {
   transform: scale(0.95);
+
 }
 
 .scoreLabel {
@@ -743,4 +757,29 @@ body::before {
 .dashboardTitle {
   text-align: center;
   margin-bottom: 20px;
+}
+
+.categoryChevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  border-radius: 10px;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(139, 124, 246, 0.2);
+
+  color: #A99BFF;
+
+  transition: transform 0.25s ease, background 0.2s ease;
+}
+
+.categoryRow:hover .categoryChevron {
+  background: rgba(139, 124, 246, 0.15);
 }
