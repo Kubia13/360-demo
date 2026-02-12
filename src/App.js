@@ -202,6 +202,7 @@ export default function App() {
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showInfo, setShowInfo] = useState(null);
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
   /* ================= DYNAMISCHE KATEGORIEN ================= */
 
@@ -917,90 +918,237 @@ if (step === "welcome") {
 
   /* ================= DASHBOARD ================= */
 
-  return (
-    <div className="screen">
-      <Header reset={resetAll} back={() => setStep("category")} />
+return (
+  <div className="screen">
+    <Header reset={resetAll} back={() => setStep("category")} />
 
-      <h2>
-        {baseData.vorname
-          ? `${baseData.vorname}, dein Status`
-          : "Dein Status"}
-      </h2>
+    <h2>
+      {baseData.vorname
+        ? `${baseData.vorname}, dein Status`
+        : "Dein Status"}
+    </h2>
 
-      {/* Score Ring */}
-      <div className="ringWrap">
-        <svg width="220" height="220">
-          {/* Hintergrund Ring */}
-          <circle
-            cx="110"
-            cy="110"
-            r="90"
-            stroke="#1a2a36"
-            strokeWidth="16"
-            fill="none"
-          />
+    {/* Score Ring */}
+    <div className="ringWrap">
+      <svg width="220" height="220">
+        <circle
+          cx="110"
+          cy="110"
+          r="90"
+          stroke="#1a2a36"
+          strokeWidth="16"
+          fill="none"
+        />
 
-          {/* Fortschritt Ring */}
-          <circle
-            cx="110"
-            cy="110"
-            r="90"
-            stroke="url(#grad)"
-            strokeWidth="16"
-            fill="none"
-            strokeDasharray="565"
-            strokeDashoffset={565 - (565 * animatedScore) / 100}
-            strokeLinecap="round"
-            transform="rotate(-90 110 110)"
-            style={{
-              filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
-              transition: "0.6s ease",
-            }}
-          />
+        <circle
+          cx="110"
+          cy="110"
+          r="90"
+          stroke="url(#grad)"
+          strokeWidth="16"
+          fill="none"
+          strokeDasharray="565"
+          strokeDashoffset={565 - (565 * animatedScore) / 100}
+          strokeLinecap="round"
+          transform="rotate(-90 110 110)"
+          style={{
+            filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
+            transition: "0.6s ease",
+          }}
+        />
 
-          <defs>
-            <linearGradient id="grad">
-              <stop offset="0%" stopColor="#8B7CF6" />
-              <stop offset="100%" stopColor="#5E4AE3" />
-            </linearGradient>
-          </defs>
-        </svg>
+        <defs>
+          <linearGradient id="grad">
+            <stop offset="0%" stopColor="#8B7CF6" />
+            <stop offset="100%" stopColor="#5E4AE3" />
+          </linearGradient>
+        </defs>
+      </svg>
 
-        <div className="ringCenter">{animatedScore}%</div>
-      </div>
+      <div className="ringCenter">{animatedScore}%</div>
+    </div>
 
-      {/* Score Bewertung + Dynamischer Hinweis */}
-<div className="scoreLabel">
+    {/* Bewertung + Hinweis */}
+    <div className="scoreLabel">
+      <p>
+        {animatedScore >= 80
+          ? "Sehr gut abgesichert"
+          : animatedScore >= 60
+          ? "Solide Basis"
+          : "Optimierung sinnvoll"}
+      </p>
 
-  <p>
-    {animatedScore >= 80
-      ? "Sehr gut abgesichert"
-      : animatedScore >= 60
-      ? "Solide Basis"
-      : "Optimierung sinnvoll"}
-  </p>
+      <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
+        {getDynamicHint()}
+      </p>
+    </div>
 
-  <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
-    {getDynamicHint()}
-  </p>
+    {/* Kategorien Übersicht */}
+    <div className="categoryList">
+      {categories.map((cat) => {
 
+        const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
+          const q = QUESTIONS[id];
+
+          if (q.category !== cat) return false;
+          if (q.condition && !q.condition(baseData)) return false;
+          if (!answers[id]) return false;
+
+          return true;
+        });
+
+        const needsOptimization = questionsInCat.filter(
+          (id) => getRecommendation(id)
+        );
+
+        const isOpen = expandedCategory === cat;
+
+        return (
+          <div key={cat}>
+
+            <div
+              className="categoryRow"
+              onClick={() =>
+                setExpandedCategory(isOpen ? null : cat)
+              }
+              style={{ cursor: "pointer" }}
+            >
+              <span>{CATEGORY_LABELS[cat]}</span>
+              <span>{categoryScores[cat] || 0}%</span>
+            </div>
+
+            {isOpen && (
+              <div className="categoryDetails open">
+                {needsOptimization.length > 0 ? (
+                  needsOptimization.map((id) => (
+                    <div key={id} className="recommendationItem">
+                      <strong>{QUESTIONS[id].label}</strong>
+                      <p>{getRecommendation(id)}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="noIssues">
+                    Kein unmittelbarer Optimierungsbedarf.
+                  </p>
+                )}
+              </div>
+            )}
+
+          </div>
+        );
+      })}
+    </div>
+
+    <ContactButton onReset={() => setShowResetConfirm(true)} />
+    {ResetOverlay}
+  </div>
+);
+
+/* ===== EMPFEHLUNGEN ===== */
+
+function getRecommendation(id) {
+
+  const value = answers[id];
+
+  if (!value || value === "ja") return null;
+
+  switch (id) {
+
+    case "bu":
+      return "Einkommensabsicherung prüfen – existenzielles Risiko.";
+
+    case "private_rente":
+      return "Private Altersvorsorge zur Schließung möglicher Rentenlücken prüfen.";
+
+    case "pflege":
+      return "Pflegezusatzversicherung prüfen – Beiträge steigen mit dem Alter.";
+
+    case "zahn":
+      return "Krankenzusatz kann hohe Eigenkosten im Leistungsfall reduzieren.";
+
+    case "hausrat":
+      return "Hausratversicherung prüfen oder Versicherungssumme anpassen.";
+
+    case "elementar":
+      return "Elementarschutz gegen Naturgefahren prüfen.";
+
+    case "gebaeude":
+      return "Wohngebäudeabsicherung überprüfen.";
+
+    case "haftpflicht":
+      return "Private Haftpflicht ist ein elementarer Basisschutz.";
+
+    case "rechtsschutz":
+      return "Rechtsschutz kann finanzielle Risiken bei Streitigkeiten reduzieren.";
+
+    case "kfz_haftpflicht":
+      return "Gesetzlich vorgeschriebene Haftpflicht prüfen.";
+
+    case "kasko":
+      return "Kaskoschutz prüfen – abhängig vom Fahrzeugwert.";
+
+    case "schutzbrief":
+      return "Schutzbrief kann Mobilitätskosten im Pannenfall reduzieren.";
+
+    default:
+      return "Optimierungsbedarf prüfen.";
+  }
+}
 </div>
 
       {/* Kategorien Übersicht */}
       <div className="categoryList">
-        {categories.map((cat) => (
-          <div key={cat} className="categoryRow">
-            <span>{CATEGORY_LABELS[cat]}</span>
-            <span>{categoryScores[cat] || 0}%</span>
-          </div>
-        ))}
-      </div>
+  {categories.map((cat) => {
 
-      <ContactButton onReset={() => setShowResetConfirm(true)} />
-      {ResetOverlay}
-    </div>
-  );
-}
+    const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
+
+      if (q.category !== cat) return false;
+      if (q.condition && !q.condition(baseData)) return false;
+      if (!answers[id]) return false;
+
+      return true;
+    });
+
+    const needsOptimization = questionsInCat.filter(
+      (id) => getRecommendation(id)
+    );
+
+    const isOpen = expandedCategory === cat;
+
+    return (
+      <div key={cat}>
+
+        <div
+          className="categoryRow"
+          onClick={() =>
+            setExpandedCategory(isOpen ? null : cat)
+          }
+          style={{ cursor: "pointer" }}
+        >
+          <span>{CATEGORY_LABELS[cat]}</span>
+          <span>{categoryScores[cat] || 0}%</span>
+        </div>
+
+        <div
+          className={`categoryDetails ${isOpen ? "open" : ""}`}
+        >
+          {needsOptimization.length > 0 ? (
+            needsOptimization.map((id) => (
+              <div key={id} className="recommendationItem">
+                <strong>{QUESTIONS[id].label}</strong>
+                <p>{getRecommendation(id)}</p>
+              </div>
+            ))
+          ) : (
+            <p className="noIssues">Kein unmittelbarer Optimierungsbedarf.</p>
+          )}
+        </div>
+
+      </div>
+    );
+  })}
+</div>
 
 /* ================= UI COMPONENTS ================= */
 
