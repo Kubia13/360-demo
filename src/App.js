@@ -23,6 +23,26 @@ const CATEGORY_LABELS = {
   kinder: "Kinder",
 };
 
+/* ================= PRIORITY MAP ================= */
+
+const PRIORITY_MAP = {
+  bu: 3,
+  haftpflicht: 3,
+  pflege: 3,
+
+  private_rente: 2,
+  gebaeude: 2,
+  rechtsschutz: 2,
+  hausrat: 2,
+  elementar: 2,
+
+  krankenzusatz: 1,
+  kinder_krankenzusatz: 1,
+  kasko: 1,
+  schutzbrief: 1,
+  kfz_haftpflicht: 2
+};
+
 /* ================= FRAGEN ================= */
 
 const QUESTIONS = {
@@ -753,6 +773,7 @@ export default function App() {
 
   }, [categoryScores, baseData]);
 
+
   /* ===== SCORE ANIMATION ===== */
 
   useEffect(() => {
@@ -773,6 +794,46 @@ export default function App() {
 
     return () => clearInterval(interval);
   }, [totalScore, step]);
+
+/* ================= TOP 3 HANDLUNGSFELDER ================= */
+
+const topRecommendations = useMemo(() => {
+
+  if (step !== "dashboard") return [];
+
+  const allRecommendations = [];
+
+  Object.keys(answers).forEach((id) => {
+
+    const score = getScore(id);
+    if (score === null) return;
+
+    const text = getStrategicRecommendation(id);
+    if (!text) return;
+
+    allRecommendations.push({
+      id,
+      text,
+      priority: PRIORITY_MAP[id] || 1,
+      score
+    });
+  });
+
+  // 1. Höchste Priorität zuerst
+  // 2. Niedrigster Score zuerst
+  allRecommendations.sort((a, b) => {
+
+    if (b.priority !== a.priority) {
+      return b.priority - a.priority;
+    }
+
+    return a.score - b.score;
+  });
+
+  return allRecommendations.slice(0, 3);
+
+}, [answers, baseData, step]);
+
 
   /* ================= PRODUKTSEITE ================= */
 
@@ -909,185 +970,185 @@ export default function App() {
 
   /* ===== STRATEGISCHE EMPFEHLUNGEN ===== */
 
-function getStrategicRecommendation(id) {
+  function getStrategicRecommendation(id) {
 
-  const value = answers[id];
-  const age = Number(baseData.alter);
-  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+    const value = answers[id];
+    const age = Number(baseData.alter);
+    const verheiratet = baseData.beziehungsstatus === "Verheiratet";
 
-  if (!value) return null;
+    if (!value) return null;
 
-  // NICHT RELEVANTE FÄLLE NICHT EMPFEHLEN
-  if (getScore(id) === null) return null;
+    // NICHT RELEVANTE FÄLLE NICHT EMPFEHLEN
+    if (getScore(id) === null) return null;
 
-  const unsicher = value === "unbekannt";
+    const unsicher = value === "unbekannt";
 
-  switch (id) {
+    switch (id) {
 
-    /* ================= BU ================= */
+      /* ================= BU ================= */
 
-    case "bu":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung deiner Einkommensabsicherung ist sinnvoll.";
-      if (verheiratet)
-        return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung.";
-      return "Die Absicherung der eigenen Arbeitskraft zählt zu den wichtigsten finanziellen Grundlagen.";
+      case "bu":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung deiner Einkommensabsicherung ist sinnvoll.";
+        if (verheiratet)
+          return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung.";
+        return "Die Absicherung der eigenen Arbeitskraft zählt zu den wichtigsten finanziellen Grundlagen.";
 
-    /* ================= PRIVATE RENTE ================= */
+      /* ================= PRIVATE RENTE ================= */
 
-    case "private_rente":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Eine strukturierte Ruhestandsplanung schafft Klarheit über Versorgungslücken.";
-      if (age >= 50)
-        return "Im fortgeschrittenen Erwerbsleben lassen sich Vorsorgelücken nur noch begrenzt aufholen.";
-      if (age >= 30)
-        return "Je früher private Altersvorsorge beginnt, desto geringer ist der monatliche Aufwand.";
-      return "Früher Vorsorgebeginn schafft langfristige finanzielle Flexibilität.";
+      case "private_rente":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine strukturierte Ruhestandsplanung schafft Klarheit über Versorgungslücken.";
+        if (age >= 50)
+          return "Im fortgeschrittenen Erwerbsleben lassen sich Vorsorgelücken nur noch begrenzt aufholen.";
+        if (age >= 30)
+          return "Je früher private Altersvorsorge beginnt, desto geringer ist der monatliche Aufwand.";
+        return "Früher Vorsorgebeginn schafft langfristige finanzielle Flexibilität.";
 
-    /* ================= PFLEGE ================= */
+      /* ================= PFLEGE ================= */
 
-    case "pflege":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung der Pflegeabsicherung kann finanzielle Risiken reduzieren.";
-      if (age >= 50)
-        return "Mit steigendem Alter erhöhen sich Eintrittswahrscheinlichkeit und Beitragshöhe.";
-      if (age >= 30)
-        return "Pflegekosten können erhebliche Eigenanteile verursachen.";
-      return "Frühe Gesundheitsabsicherung sichert langfristig günstige Beiträge.";
+      case "pflege":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung der Pflegeabsicherung kann finanzielle Risiken reduzieren.";
+        if (age >= 50)
+          return "Mit steigendem Alter erhöhen sich Eintrittswahrscheinlichkeit und Beitragshöhe.";
+        if (age >= 30)
+          return "Pflegekosten können erhebliche Eigenanteile verursachen.";
+        return "Frühe Gesundheitsabsicherung sichert langfristig günstige Beiträge.";
 
-    /* ================= KRANKENZUSATZ ================= */
+      /* ================= KRANKENZUSATZ ================= */
 
-    case "krankenzusatz":
+      case "krankenzusatz":
 
-      if (value !== "ja") return value === "nein"
-        ? "Eine Krankenzusatzversicherung kann Eigenkosten im Leistungsfall deutlich reduzieren."
-        : null;
-
-      const kzBereiche = [
-        "Ambulant",
-        "Stationär",
-        "Zähne",
-        "Brille",
-        "Krankenhaustagegeld"
-      ];
-
-      const fehlendKZ = kzBereiche.filter(
-        opt => !answers["krankenzusatz_" + opt]
-      );
-
-      if (fehlendKZ.length === 0) return null;
-
-      return "Eine umfassende Gesundheitsabsicherung sollte mehrere Leistungsbereiche abdecken. Eine Überprüfung des Umfangs kann sinnvoll sein.";
-
-    /* ================= KINDER KRANKENZUSATZ ================= */
-
-    case "kinder_krankenzusatz":
-
-      if (value !== "ja") return value === "nein"
-        ? "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein."
-        : null;
-
-      const kinderBereiche = [
-        "Ambulant",
-        "Stationär",
-        "Zähne",
-        "Brille",
-        "Krankenhaustagegeld"
-      ];
-
-      const fehlendKinder = kinderBereiche.filter(
-        opt => !answers["kinder_krankenzusatz_" + opt]
-      );
-
-      if (fehlendKinder.length === 0) return null;
-
-      return "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein. Eine Überprüfung des Leistungsumfangs schafft Transparenz.";
-
-    /* ================= HAUSRAT ================= */
-
-    case "hausrat":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Versicherungssumme schützt vor Unterversicherung.";
-      return "Der Schutz deines beweglichen Eigentums sollte regelmäßig am Neuwert ausgerichtet sein.";
-
-    /* ================= ELEMENTAR ================= */
-
-    case "elementar":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Elementarschäden sind häufig nicht automatisch eingeschlossen.";
-      return "Naturgefahren nehmen statistisch zu. Elementarschutz ergänzt die Wohnabsicherung sinnvoll.";
-
-    /* ================= GEBÄUDE ================= */
-
-    case "gebaeude":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Eine vollständige Gebäudeabsicherung ist essenziell.";
-      return "Als Eigentümer ist eine vollständige Gebäudeabsicherung essenziell.";
-
-    /* ================= HAFTPFLICHT ================= */
-
-    case "haftpflicht":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Deckungssumme ist sinnvoll.";
-      return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen.";
-
-    /* ================= RECHTSSCHUTZ ================= */
-
-    case "rechtsschutz":
-
-      if (value !== "ja")
-        return value === "nein"
-          ? "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen."
+        if (value !== "ja") return value === "nein"
+          ? "Eine Krankenzusatzversicherung kann Eigenkosten im Leistungsfall deutlich reduzieren."
           : null;
 
-      const rsBereiche = [
-        { key: "Privat", relevant: true },
-        { key: "Beruf", relevant: baseData.beruf && baseData.beruf !== "Nicht berufstätig" },
-        { key: "Verkehr", relevant: baseData.kfz === "Ja" },
-        { key: "Immobilie/Miete", relevant: baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern" }
-      ];
+        const kzBereiche = [
+          "Ambulant",
+          "Stationär",
+          "Zähne",
+          "Brille",
+          "Krankenhaustagegeld"
+        ];
 
-      const relevante = rsBereiche.filter(b => b.relevant);
+        const fehlendKZ = kzBereiche.filter(
+          opt => !answers["krankenzusatz_" + opt]
+        );
 
-      const fehlendRS = relevante.filter(
-        b => !answers["rechtsschutz_" + b.key]
-      );
+        if (fehlendKZ.length === 0) return null;
 
-      if (fehlendRS.length === 0) return null;
+        return "Eine umfassende Gesundheitsabsicherung sollte mehrere Leistungsbereiche abdecken. Eine Überprüfung des Umfangs kann sinnvoll sein.";
 
-      return "Eine vollständige Rechtsschutzabsicherung sollte alle relevanten Lebensbereiche abdecken.";
+      /* ================= KINDER KRANKENZUSATZ ================= */
 
-    /* ================= KFZ ================= */
+      case "kinder_krankenzusatz":
 
-    case "kfz_haftpflicht":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Die gesetzliche Haftpflicht sollte eindeutig geprüft werden.";
-      return "Die KFZ-Haftpflicht schützt vor existenzbedrohenden Schadenersatzforderungen.";
+        if (value !== "ja") return value === "nein"
+          ? "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein."
+          : null;
 
-    case "kasko":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Der passende Kaskoschutz hängt vom Fahrzeugwert ab.";
-      return "Der passende Kaskoschutz hängt vom Fahrzeugwert und deiner Risikobereitschaft ab.";
+        const kinderBereiche = [
+          "Ambulant",
+          "Stationär",
+          "Zähne",
+          "Brille",
+          "Krankenhaustagegeld"
+        ];
 
-    case "schutzbrief":
-      if (value === "ja") return null;
-      if (unsicher)
-        return "Hier besteht eventuell Optimierungsbedarf. Ein Schutzbrief kann im Notfall organisatorische Sicherheit bieten.";
-      return "Ein Schutzbrief reduziert organisatorische und finanzielle Belastungen im Notfall.";
+        const fehlendKinder = kinderBereiche.filter(
+          opt => !answers["kinder_krankenzusatz_" + opt]
+        );
 
-    default:
-      return null;
+        if (fehlendKinder.length === 0) return null;
+
+        return "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein. Eine Überprüfung des Leistungsumfangs schafft Transparenz.";
+
+      /* ================= HAUSRAT ================= */
+
+      case "hausrat":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Versicherungssumme schützt vor Unterversicherung.";
+        return "Der Schutz deines beweglichen Eigentums sollte regelmäßig am Neuwert ausgerichtet sein.";
+
+      /* ================= ELEMENTAR ================= */
+
+      case "elementar":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Elementarschäden sind häufig nicht automatisch eingeschlossen.";
+        return "Naturgefahren nehmen statistisch zu. Elementarschutz ergänzt die Wohnabsicherung sinnvoll.";
+
+      /* ================= GEBÄUDE ================= */
+
+      case "gebaeude":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine vollständige Gebäudeabsicherung ist essenziell.";
+        return "Als Eigentümer ist eine vollständige Gebäudeabsicherung essenziell.";
+
+      /* ================= HAFTPFLICHT ================= */
+
+      case "haftpflicht":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Deckungssumme ist sinnvoll.";
+        return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen.";
+
+      /* ================= RECHTSSCHUTZ ================= */
+
+      case "rechtsschutz":
+
+        if (value !== "ja")
+          return value === "nein"
+            ? "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen."
+            : null;
+
+        const rsBereiche = [
+          { key: "Privat", relevant: true },
+          { key: "Beruf", relevant: baseData.beruf && baseData.beruf !== "Nicht berufstätig" },
+          { key: "Verkehr", relevant: baseData.kfz === "Ja" },
+          { key: "Immobilie/Miete", relevant: baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern" }
+        ];
+
+        const relevante = rsBereiche.filter(b => b.relevant);
+
+        const fehlendRS = relevante.filter(
+          b => !answers["rechtsschutz_" + b.key]
+        );
+
+        if (fehlendRS.length === 0) return null;
+
+        return "Eine vollständige Rechtsschutzabsicherung sollte alle relevanten Lebensbereiche abdecken.";
+
+      /* ================= KFZ ================= */
+
+      case "kfz_haftpflicht":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Die gesetzliche Haftpflicht sollte eindeutig geprüft werden.";
+        return "Die KFZ-Haftpflicht schützt vor existenzbedrohenden Schadenersatzforderungen.";
+
+      case "kasko":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Der passende Kaskoschutz hängt vom Fahrzeugwert ab.";
+        return "Der passende Kaskoschutz hängt vom Fahrzeugwert und deiner Risikobereitschaft ab.";
+
+      case "schutzbrief":
+        if (value === "ja") return null;
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Ein Schutzbrief kann im Notfall organisatorische Sicherheit bieten.";
+        return "Ein Schutzbrief reduziert organisatorische und finanzielle Belastungen im Notfall.";
+
+      default:
+        return null;
+    }
   }
-}
 
   /* ================= LEGAL OVERLAY ================= */
 
@@ -1174,7 +1235,7 @@ function getStrategicRecommendation(id) {
       </div>
     );
   }
-
+ 
   /* ================= WELCOME ================= */
 
   if (step === "welcome") {
@@ -1695,178 +1756,193 @@ function getStrategicRecommendation(id) {
     );
   }
 
-  /* ================= DASHBOARD ================= */
+/* ================= DASHBOARD ================= */
 
-  if (step === "dashboard") {
+if (step === "dashboard") {
+  return (
+    <div className="screen">
+      <Header reset={resetAll} back={() => setStep("category")} />
 
-    return (
-      <div className="screen">
-        <Header reset={resetAll} back={() => setStep("category")} />
+      <h2 className="dashboardTitle">
+        {baseData.vorname
+          ? `${baseData.vorname}, dein Status`
+          : "Dein Status"}
+      </h2>
 
-        <h2 className="dashboardTitle">
-          {baseData.vorname
-            ? `${baseData.vorname}, dein Status`
-            : "Dein Status"}
-        </h2>
+      {/* Score Ring */}
+      <div className="ringWrap">
+        <svg width="220" height="220">
+          <circle
+            cx="110"
+            cy="110"
+            r="90"
+            stroke="#1a2a36"
+            strokeWidth="16"
+            fill="none"
+          />
 
-        {/* Score Ring */}
-        <div className="ringWrap">
-          <svg width="220" height="220">
-            <circle
-              cx="110"
-              cy="110"
-              r="90"
-              stroke="#1a2a36"
-              strokeWidth="16"
-              fill="none"
-            />
+          <circle
+            cx="110"
+            cy="110"
+            r="90"
+            stroke="url(#grad)"
+            strokeWidth="16"
+            fill="none"
+            strokeDasharray="565"
+            strokeDashoffset={565 - (565 * animatedScore) / 100}
+            strokeLinecap="round"
+            transform="rotate(-90 110 110)"
+            style={{
+              filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
+              transition: "0.6s ease",
+            }}
+          />
 
-            <circle
-              cx="110"
-              cy="110"
-              r="90"
-              stroke="url(#grad)"
-              strokeWidth="16"
-              fill="none"
-              strokeDasharray="565"
-              strokeDashoffset={565 - (565 * animatedScore) / 100}
-              strokeLinecap="round"
-              transform="rotate(-90 110 110)"
-              style={{
-                filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
-                transition: "0.6s ease",
-              }}
-            />
+          <defs>
+            <linearGradient id="grad">
+              <stop offset="0%" stopColor="#8B7CF6" />
+              <stop offset="100%" stopColor="#5E4AE3" />
+            </linearGradient>
+          </defs>
+        </svg>
 
-            <defs>
-              <linearGradient id="grad">
-                <stop offset="0%" stopColor="#8B7CF6" />
-                <stop offset="100%" stopColor="#5E4AE3" />
-              </linearGradient>
-            </defs>
-          </svg>
+        <div className="ringCenter">{animatedScore}%</div>
+      </div>
 
-          <div className="ringCenter">{animatedScore}%</div>
+      {/* Bewertung + Hinweis */}
+      <div className="scoreLabel">
+        <p>
+          {animatedScore >= 80
+            ? "Sehr gut abgesichert"
+            : animatedScore >= 60
+              ? "Solide Basis"
+              : "Optimierung sinnvoll"}
+        </p>
+
+        <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
+          {getDynamicHint()}
+        </p>
+      </div>
+
+      {/* ================= TOP 3 HANDLUNGSFELDER ================= */}
+      {topRecommendations.length > 0 && (
+        <div className="categoryList" style={{ marginTop: 20 }}>
+          <h3 style={{ marginBottom: 12 }}>
+            Deine wichtigsten Handlungsfelder
+          </h3>
+
+          {topRecommendations.map((item) => (
+            <div key={item.id} className="recommendationItem">
+              <strong>{QUESTIONS[item.id]?.label}</strong>
+              <p>{item.text}</p>
+            </div>
+          ))}
         </div>
+      )}
 
-        {/* Bewertung + Hinweis */}
-        <div className="scoreLabel">
-          <p>
-            {animatedScore >= 80
-              ? "Sehr gut abgesichert"
-              : animatedScore >= 60
-                ? "Solide Basis"
-                : "Optimierung sinnvoll"}
-          </p>
+      {/* Kategorien Übersicht */}
+      <div className="categoryList">
+        {categories.map((cat) => {
+          const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
+            const q = QUESTIONS[id];
 
-          <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
-            {getDynamicHint()}
-          </p>
-        </div>
+            if (q.category !== cat) return false;
+            if (q.condition && !q.condition(baseData)) return false;
+            if (answers[id] === undefined) return false;
 
-        {/* Kategorien Übersicht */}
-        <div className="categoryList">
-          {categories.map((cat) => {
-            const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
-              const q = QUESTIONS[id];
+            return true;
+          });
 
-              if (q.category !== cat) return false;
-              if (q.condition && !q.condition(baseData)) return false;
-              if (answers[id] === undefined) return false;
+          const needsOptimization = questionsInCat.filter((id) =>
+            getStrategicRecommendation(id)
+          );
 
-              return true;
-            });
+          const isOpen = expandedCategory === cat;
 
-            const needsOptimization = questionsInCat.filter((id) =>
-              getStrategicRecommendation(id)
-            );
+          return (
+            <div key={cat}>
+              <div
+                className="categoryRow"
+                onClick={() =>
+                  setExpandedCategory(isOpen ? null : cat)
+                }
+                style={{ cursor: "pointer" }}
+              >
+                <span>{CATEGORY_LABELS[cat]}</span>
 
-            const isOpen = expandedCategory === cat;
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span>{categoryScores[cat] || 0}%</span>
 
-            return (
-              <div key={cat}>
-                <div
-
-                  className="categoryRow"
-                  onClick={() =>
-                    setExpandedCategory(isOpen ? null : cat)
-                  }
-                  style={{ cursor: "pointer" }}
-                >
-                  <span>{CATEGORY_LABELS[cat]}</span>
-
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span>{categoryScores[cat] || 0}%</span>
-
-                    <div
-                      className="categoryChevron"
-                      style={{
-                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                      }}
+                  <div
+                    className="categoryChevron"
+                    style={{
+                      transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    }}
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </div>
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
                   </div>
                 </div>
-
-                {isOpen && (
-                  <div className="categoryDetails open">
-                    {needsOptimization.length > 0 ? (
-                      needsOptimization.map((id) => (
-                        <div key={id} className="recommendationItem">
-                          <strong>{QUESTIONS[id].label}</strong>
-                          <p>{getStrategicRecommendation(id)}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="noIssues">
-                        Kein unmittelbarer Optimierungsbedarf.
-                      </p>
-                    )}
-                  </div>
-                )}
               </div>
-            );
-          })}
-        </div>
 
-        <button
-          className="primaryBtn"
-          style={{ marginTop: 20 }}
-          onClick={() => setStep("products")}
-        >
-          Alle Abschlussmöglichkeiten anzeigen
-        </button>
-
-        <div className="legalFooter">
-          <span onClick={() => setLegalOverlay("impressum")}>
-            Impressum
-          </span>
-          {" | "}
-          <span onClick={() => setLegalOverlay("datenschutz")}>
-            Datenschutz
-          </span>
-        </div>
-
-        <ContactButton onReset={() => setShowResetConfirm(true)} />
-        <ResetOverlayComponent />
-        {LegalOverlay}
+              {isOpen && (
+                <div className="categoryDetails open">
+                  {needsOptimization.length > 0 ? (
+                    needsOptimization.map((id) => (
+                      <div key={id} className="recommendationItem">
+                        <strong>{QUESTIONS[id].label}</strong>
+                        <p>{getStrategicRecommendation(id)}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="noIssues">
+                      Kein unmittelbarer Optimierungsbedarf.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
-    );
-  }
+
+      <button
+        className="primaryBtn"
+        style={{ marginTop: 20 }}
+        onClick={() => setStep("products")}
+      >
+        Alle Abschlussmöglichkeiten anzeigen
+      </button>
+
+      <div className="legalFooter">
+        <span onClick={() => setLegalOverlay("impressum")}>
+          Impressum
+        </span>
+        {" | "}
+        <span onClick={() => setLegalOverlay("datenschutz")}>
+          Datenschutz
+        </span>
+      </div>
+
+      <ContactButton onReset={() => setShowResetConfirm(true)} />
+      <ResetOverlayComponent />
+      {LegalOverlay}
+    </div>
+  );
+}
 
 }
+
 
 /* ================= UI COMPONENTS ================= */
 
