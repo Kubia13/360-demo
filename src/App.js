@@ -194,6 +194,74 @@ const QUESTIONS = {
   },
 };
 
+/* ================= PRODUKTSTRUKTUR ================= */
+
+const PRODUCT_STRUCTURE = {
+  krankenzusatz: {
+    label: "Krankenzusatzversicherung",
+    products: [
+      { name: "Kombi (Mehr für Sie)", url: "#" },
+      { name: "Zahn (Mehr Zahn und Mehr Zahnvorsorge)", url: "#" },
+      { name: "Zahn (Mehr Zahn)", url: "#" },
+      { name: "Zahn (Mehr Zahnvorsorge)", url: "#" },
+      { name: "Zahn (DentPlus/ZIB)", url: "#" },
+      { name: "Ambulant (Mehr Gesundheit und Mehr Sehen)", url: "#" },
+      { name: "Ambulant (Mehr Gesundheit)", url: "#" },
+      { name: "Stationär (Mehr Komfort)", url: "#" },
+      { name: "Stationär (BKKST)", url: "#" },
+      { name: "Exclusiv+", url: "#" },
+    ]
+  },
+
+  reise: {
+    label: "Reiseversicherung",
+    products: [
+      { name: "Travel+ / Travel Day", url: "#" },
+      { name: "BKKR", url: "#" },
+    ]
+  },
+
+  tier: {
+    label: "Rund ums Tier",
+    products: [
+      { name: "Hund, Katze und Pferd", url: "#" },
+      { name: "Hunde-KV", url: "#" },
+      { name: "Hunde-OP", url: "#" },
+      { name: "Katzen-KV", url: "#" },
+      { name: "Katzen-OP", url: "#" },
+      { name: "Pferde-OP", url: "#" },
+      { name: "Tierhalterhaftpflicht", url: "#" },
+    ]
+  },
+
+  haftpflicht: {
+    label: "Haus und Haftpflicht",
+    products: [
+      { name: "Privathaftpflicht", url: "#" },
+      { name: "Hausrat", url: "#" },
+      { name: "Berufshaftpflicht (Heilberufe)", url: "#" },
+      { name: "Berufshaftpflicht (Psychologische Berufe)", url: "#" },
+    ]
+  },
+
+  mobilitaet: {
+    label: "Mobilität",
+    products: [
+      { name: "Fahrradversicherung", url: "#" },
+      { name: "Kfz-Versicherung", url: "#" },
+    ]
+  },
+
+  unfall: {
+    label: "Unfall und Invalidität",
+    products: [
+      { name: "UnfallhilfeSofort", url: "#" },
+      { name: "Unfallversicherung", url: "#" },
+      { name: "Kinder-Invaliditätsvorsorge (KISS)", url: "#" },
+    ]
+  }
+};
+
 export default function App() {
 
   /* ================= STEP & CORE STATE ================= */
@@ -234,7 +302,7 @@ export default function App() {
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [legalOverlay, setLegalOverlay] = useState(null);
   // "impressum" | "datenschutz" | null
-
+  const [expandedProductCategory, setExpandedProductCategory] = useState(null);
 
   /* ================= BASE FORM REFS ================= */
 
@@ -542,6 +610,103 @@ export default function App() {
     return () => clearInterval(interval);
   }, [totalScore, step]);
 
+  /* ================= PRODUKTSEITE ================= */
+
+  if (step === "products") {
+    return (
+      <div className="screen">
+        <Header reset={resetAll} back={() => setStep("dashboard")} />
+
+        <h2>Abschlussmöglichkeiten</h2>
+
+        <div className="categoryList">
+          {Object.keys(PRODUCT_STRUCTURE).map((key) => {
+            const category = PRODUCT_STRUCTURE[key];
+            const isOpen = expandedProductCategory === key;
+
+            return (
+              <div key={key}>
+
+                {/* Kategorie Kopf */}
+                <div
+                  className="categoryRow"
+                  onClick={() =>
+                    setExpandedProductCategory(isOpen ? null : key)
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  <span>{category.label}</span>
+
+                  <div
+                    className="categoryChevron"
+                    style={{
+                      transform: isOpen
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
+                    }}
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Produkte */}
+                {isOpen && (
+                  <div className="categoryDetails open">
+
+                    {category.products.map((product, index) => (
+                      <div key={index} className="productRow">
+
+                        <div className="productName">
+                          {product.name}
+                        </div>
+
+                        <button
+                          className="productButton"
+                          onClick={() =>
+                            window.open(product.url, "_blank", "noopener,noreferrer")
+                          }
+                        >
+                          Abschließen
+                        </button>
+
+                      </div>
+                    ))}
+
+                  </div>
+                )}
+
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Footer gehört UNTER die gesamte Liste */}
+        <div className="legalFooter">
+          <span onClick={() => setLegalOverlay("impressum")}>
+            Impressum
+          </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("datenschutz")}>
+            Datenschutz
+          </span>
+        </div>
+
+        <ContactButton onReset={() => setShowResetConfirm(true)} />
+        <ResetOverlayComponent />
+      </div>
+    );
+  }
 
   /* ===== DYNAMISCHER DASHBOARD-HINWEIS ===== */
 
@@ -686,40 +851,6 @@ export default function App() {
     }
   }
 
-  /* ================= RESET OVERLAY ================= */
-
-  const ResetOverlay = showResetConfirm && (
-    <div
-      className="infoOverlay"
-      onClick={() => setShowResetConfirm(false)}
-    >
-      <div
-        className="infoBox"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <p>Möchtest du von vorne beginnen?</p>
-
-        <div className="overlayButtons">
-          <button
-            className="overlayBtn primary"
-            onClick={() => {
-              setShowResetConfirm(false);
-              resetAll();
-            }}
-          >
-            Ja
-          </button>
-
-          <button
-            className="overlayBtn secondary"
-            onClick={() => setShowResetConfirm(false)}
-          >
-            Nein
-          </button>
-        </div>
-      </div>
-    </div>
-  );
   /* ================= LEGAL OVERLAY ================= */
 
   const LegalOverlay = legalOverlay && (
@@ -767,6 +898,44 @@ export default function App() {
       </div>
     </div>
   );
+  /* ================= RESET OVERLAY ================= */
+
+  function ResetOverlayComponent() {
+    if (!showResetConfirm) return null;
+
+    return (
+      <div
+        className="infoOverlay"
+        onClick={() => setShowResetConfirm(false)}
+      >
+        <div
+          className="infoBox"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p>Möchtest du von vorne beginnen?</p>
+
+          <div className="overlayButtons">
+            <button
+              className="overlayBtn primary"
+              onClick={() => {
+                setShowResetConfirm(false);
+                resetAll();
+              }}
+            >
+              Ja
+            </button>
+
+            <button
+              className="overlayBtn secondary"
+              onClick={() => setShowResetConfirm(false)}
+            >
+              Nein
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   /* ================= WELCOME ================= */
 
@@ -810,7 +979,7 @@ export default function App() {
         </div>
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
-        {ResetOverlay}
+        <ResetOverlayComponent />
         {LegalOverlay}
       </div>
     );
@@ -983,7 +1152,7 @@ export default function App() {
         </div>
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
-        {ResetOverlay}
+        <ResetOverlayComponent />
         {LegalOverlay}
       </div>
     );
@@ -1219,7 +1388,7 @@ export default function App() {
         </div>
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
-        {ResetOverlay}
+        <ResetOverlayComponent />
         {LegalOverlay}
       </div>
     );
@@ -1370,6 +1539,14 @@ export default function App() {
           })}
         </div>
 
+        <button
+          className="primaryBtn"
+          style={{ marginTop: 20 }}
+          onClick={() => setStep("products")}
+        >
+          Alle Abschlussmöglichkeiten anzeigen
+        </button>
+
         <div className="legalFooter">
           <span onClick={() => setLegalOverlay("impressum")}>
             Impressum
@@ -1381,7 +1558,7 @@ export default function App() {
         </div>
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
-        {ResetOverlay}
+        <ResetOverlayComponent />
         {LegalOverlay}
       </div>
     );
