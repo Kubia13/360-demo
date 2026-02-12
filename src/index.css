@@ -542,3 +542,145 @@ body {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.85; }
 }
+/* ================= UI UPGRADE 1 – DEPTH BACKGROUND ================= */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 20% 10%,
+      rgba(139,124,246,0.08),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 80% 90%,
+      rgba(94,74,227,0.06),
+      transparent 50%
+    );
+  z-index: 0;
+}
+
+.screen {
+  position: relative;
+  z-index: 1;
+}
+/* ================= UI UPGRADE 2 – PREMIUM CARDS ================= */
+
+.questionCard.dark {
+  background: rgba(15, 26, 35, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(139,124,246,0.12);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(139,124,246,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+
+  transition: all 0.25s ease;
+}
+
+.questionCard.dark:hover {
+  transform: translateY(-3px);
+
+  border-color: rgba(139,124,246,0.25);
+
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(139,124,246,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+/* ================= UI UPGRADE 3 – PREMIUM PROGRESS ================= */
+
+.screen > div[style*="height: 6"] {
+  position: relative;
+  background: rgba(26,42,54,0.6) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  border: 1px solid rgba(139,124,246,0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 4px 12px rgba(0,0,0,0.3);
+}
+
+.screen > div[style*="height: 6"] > div {
+  border-radius: 6px;
+  box-shadow:
+    0 0 12px rgba(139,124,246,0.6),
+    0 0 22px rgba(94,74,227,0.4);
+}
+/* ================= UI UPGRADE 4 – PREMIUM SCORE RING ================= */
+
+.ringWrap svg {
+  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.6));
+}
+
+.ringWrap svg circle:nth-child(2) {
+  filter:
+    drop-shadow(0 0 14px rgba(139,124,246,0.7))
+    drop-shadow(0 0 28px rgba(94,74,227,0.5));
+}
+
+.ringWrap::before {
+  content: "";
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(139,124,246,0.12),
+    transparent 65%
+  );
+  z-index: 0;
+}
+
+.ringCenter {
+  position: relative;
+  z-index: 2;
+  text-shadow:
+    0 0 10px rgba(139,124,246,0.6),
+    0 0 20px rgba(94,74,227,0.4);
+}
+/* ================= UI UPGRADE 5 – PREMIUM FOOTER ================= */
+
+.contactFixed {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-top: 1px solid rgba(139,124,246,0.15);
+
+  box-shadow:
+    0 -8px 30px rgba(0,0,0,0.6),
+    0 -1px 0 rgba(255,255,255,0.04);
+}
+
+.contactFixed::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139,124,246,0.4),
+    transparent
+  );
+}
+
+.contactBtn {
+  box-shadow:
+    0 6px 16px rgba(94,74,227,0.35);
+}
+
+.contactBtn.secondary {
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.5);
+}
