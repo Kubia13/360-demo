@@ -1052,237 +1052,230 @@ if (step === "category") {
   );
 }
 
-/* ================= DASHBOARD ================= */
+  /* ================= DASHBOARD ================= */
 
-return (
-  <div className="screen">
-    <Header reset={resetAll} back={() => setStep("category")} />
+  return (
+    <div className="screen">
+      <Header reset={resetAll} back={() => setStep("category")} />
 
-    <h2 className="dashboardTitle">
-      {baseData.vorname
-        ? `${baseData.vorname}, dein Status`
-        : "Dein Status"}
-    </h2>
+      <h2 className="dashboardTitle">
+        {baseData.vorname
+          ? `${baseData.vorname}, dein Status`
+          : "Dein Status"}
+      </h2>
 
+      {/* Score Ring */}
+      <div className="ringWrap">
+        <svg width="220" height="220">
+          <circle
+            cx="110"
+            cy="110"
+            r="90"
+            stroke="#1a2a36"
+            strokeWidth="16"
+            fill="none"
+          />
 
+          <circle
+            cx="110"
+            cy="110"
+            r="90"
+            stroke="url(#grad)"
+            strokeWidth="16"
+            fill="none"
+            strokeDasharray="565"
+            strokeDashoffset={565 - (565 * animatedScore) / 100}
+            strokeLinecap="round"
+            transform="rotate(-90 110 110)"
+            style={{
+              filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
+              transition: "0.6s ease",
+            }}
+          />
 
-    {/* Score Ring */}
-    <div className="ringWrap">
-      <svg width="220" height="220">
-        <circle
-          cx="110"
-          cy="110"
-          r="90"
-          stroke="#1a2a36"
-          strokeWidth="16"
-          fill="none"
-        />
+          <defs>
+            <linearGradient id="grad">
+              <stop offset="0%" stopColor="#8B7CF6" />
+              <stop offset="100%" stopColor="#5E4AE3" />
+            </linearGradient>
+          </defs>
+        </svg>
 
-        <circle
-          cx="110"
-          cy="110"
-          r="90"
-          stroke="url(#grad)"
-          strokeWidth="16"
-          fill="none"
-          strokeDasharray="565"
-          strokeDashoffset={565 - (565 * animatedScore) / 100}
-          strokeLinecap="round"
-          transform="rotate(-90 110 110)"
-          style={{
-            filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
-            transition: "0.6s ease",
-          }}
-        />
+        <div className="ringCenter">{animatedScore}%</div>
+      </div>
 
-        <defs>
-          <linearGradient id="grad">
-            <stop offset="0%" stopColor="#8B7CF6" />
-            <stop offset="100%" stopColor="#5E4AE3" />
-          </linearGradient>
-        </defs>
-      </svg>
-
-      <div className="ringCenter">{animatedScore}%</div>
-    </div>
-
-    {/* Bewertung + Hinweis */}
-    <div className="scoreLabel">
-      <p>
-        {animatedScore >= 80
-          ? "Sehr gut abgesichert"
-          : animatedScore >= 60
+      {/* Bewertung + Hinweis */}
+      <div className="scoreLabel">
+        <p>
+          {animatedScore >= 80
+            ? "Sehr gut abgesichert"
+            : animatedScore >= 60
             ? "Solide Basis"
             : "Optimierung sinnvoll"}
-      </p>
+        </p>
 
-      <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
-        {getDynamicHint()}
-      </p>
-    </div>
+        <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
+          {getDynamicHint()}
+        </p>
+      </div>
 
-    {/* Kategorien Übersicht */}
-    <div className="categoryList">
-      {categories.map((cat) => {
+      {/* Kategorien Übersicht */}
+      <div className="categoryList">
+        {categories.map((cat) => {
+          const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
+            const q = QUESTIONS[id];
 
-        const questionsInCat = Object.keys(QUESTIONS).filter((id) => {
-          const q = QUESTIONS[id]
+            if (q.category !== cat) return false;
+            if (q.condition && !q.condition(baseData)) return false;
+            if (answers[id] === undefined) return false;
 
-          if (q.category !== cat) return false
-          if (q.condition && !q.condition(baseData)) return false
-          if (answers[id] === undefined) return false
+            return true;
+          });
 
-          return true
-        })
+          const needsOptimization = questionsInCat.filter((id) =>
+            getStrategicRecommendation(id)
+          );
 
-        const needsOptimization = questionsInCat.filter(
-          (id) => getStrategicRecommendation(id)
-        )
+          const isOpen = expandedCategory === cat;
 
-        const isOpen = expandedCategory === cat
-
-        return (
-          <div key={cat}>
-
-            <div
-              className="categoryRow"
-              onClick={() =>
-                setExpandedCategory(isOpen ? null : cat)
-              }
-              style={{ cursor: "pointer" }}
-            >
-              <span>{CATEGORY_LABELS[cat]}</span>
-              <span>{categoryScores[cat] || 0}%</span>
-            </div>
-
-            {isOpen && (
-              <div className="categoryDetails open">
-                {needsOptimization.length > 0 ? (
-                  needsOptimization.map((id) => (
-                    <div key={id} className="recommendationItem">
-                      <strong>{QUESTIONS[id].label}</strong>
-                      <p>{getStrategicRecommendation(id)}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="noIssues">
-                    Kein unmittelbarer Optimierungsbedarf.
-                  </p>
-                )}
+          return (
+            <div key={cat}>
+              <div
+                className="categoryRow"
+                onClick={() =>
+                  setExpandedCategory(isOpen ? null : cat)
+                }
+                style={{ cursor: "pointer" }}
+              >
+                <span>{CATEGORY_LABELS[cat]}</span>
+                <span>{categoryScores[cat] || 0}%</span>
               </div>
-            )}
 
-          </div>
-        )
-      })}
-    </div>
+              {isOpen && (
+                <div className="categoryDetails open">
+                  {needsOptimization.length > 0 ? (
+                    needsOptimization.map((id) => (
+                      <div key={id} className="recommendationItem">
+                        <strong>{QUESTIONS[id].label}</strong>
+                        <p>{getStrategicRecommendation(id)}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="noIssues">
+                      Kein unmittelbarer Optimierungsbedarf.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
-    <ContactButton onReset={() => setShowResetConfirm(true)} />
-    {ResetOverlay}
-  </div>
-)
-
-/* ================= UI COMPONENTS ================= */
-
-function Header({ reset, back }) {
-  return (
-    <div className="header">
-      <img
-        src="/logo.jpg"
-        className="logo small"
-        onClick={reset}
-        alt="Logo"
-      />
-      <button className="backBtn" onClick={back}>
-        <span className="arrowIcon"></span>
-      </button>
+      <ContactButton onReset={() => setShowResetConfirm(true)} />
+      {ResetOverlay}
     </div>
   );
-}
 
-function Input({
-  label,
-  type = "text",
-  value,
-  onChange,
-  onEnter,
-  inputRef,
-}) {
-  return (
-    <div className="field">
-      {label && <label>{label}</label>}
-      <input
-        ref={inputRef}
-        type={type}
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && onEnter) {
-            e.preventDefault();
-            onEnter();
+  /* ================= UI COMPONENTS ================= */
+
+  function Header({ reset, back }) {
+    return (
+      <div className="header">
+        <img
+          src="/logo.jpg"
+          className="logo small"
+          onClick={reset}
+          alt="Logo"
+        />
+        <button className="backBtn" onClick={back}>
+          <span className="arrowIcon"></span>
+        </button>
+      </div>
+    );
+  }
+
+  function Input({
+    label,
+    type = "text",
+    value,
+    onChange,
+    onEnter,
+    inputRef,
+  }) {
+    return (
+      <div className="field">
+        {label && <label>{label}</label>}
+        <input
+          ref={inputRef}
+          type={type}
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && onEnter) {
+              e.preventDefault();
+              onEnter();
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
+  function Select({ label, options, onChange, value }) {
+    return (
+      <div className="field">
+        {label && <label>{label}</label>}
+        <select
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          <option value="">Bitte wählen</option>
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  function Checkbox({ label, checked, onChange }) {
+    return (
+      <label className="checkbox">
+        <input
+          type="checkbox"
+          checked={!!checked}
+          onChange={onChange}
+        />
+        {label}
+      </label>
+    );
+  }
+
+  function ContactButton({ onReset }) {
+    return (
+      <div className="contactFixed">
+        <button
+          className="contactBtn"
+          onClick={() =>
+            window.open(
+              "https://agentur.barmenia.de/florian_loeffler",
+              "_blank"
+            )
           }
-        }}
-      />
-    </div>
-  );
-}
+        >
+          Kontakt aufnehmen
+        </button>
 
-function Select({ label, options, onChange, value }) {
-  return (
-    <div className="field">
-      {label && <label>{label}</label>}
-      <select
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">Bitte wählen</option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function Checkbox({ label, checked, onChange }) {
-  return (
-    <label className="checkbox">
-      <input
-        type="checkbox"
-        checked={!!checked}
-        onChange={onChange}
-      />
-      {label}
-    </label>
-  );
-}
-
-function ContactButton({ onReset }) {
-  return (
-    <div className="contactFixed">
-      <button
-        className="contactBtn"
-        onClick={() =>
-          window.open(
-            "https://agentur.barmenia.de/florian_loeffler",
-            "_blank"
-          )
-        }
-      >
-        Kontakt aufnehmen
-      </button>
-
-      <button
-        className="contactBtn secondary"
-        onClick={onReset}
-      >
-        Neustart
-      </button>
-    </div>
-  );
-}
-
-
+        <button
+          className="contactBtn secondary"
+          onClick={onReset}
+        >
+          Neustart
+        </button>
+      </div>
+    );
+  }
 }
