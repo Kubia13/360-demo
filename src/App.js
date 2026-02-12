@@ -87,13 +87,14 @@ const QUESTIONS = {
   /* ===== WOHNEN ===== */
 
   hausrat: {
-    label: "Hausrat ausreichend versichert?",
-    category: "wohnen",
-    type: "yesno",
-    condition: (baseData) =>
-      baseData.wohnen &&
-      baseData.wohnen !== "Wohne bei Eltern",
-  },
+  label: "Hausrat ausreichend versichert?",
+  category: "wohnen",
+  type: "yesno",
+  condition: (baseData) =>
+    baseData.wohnen &&
+    baseData.wohnen !== "Wohne bei Eltern",
+  info: "Die Hausratversicherung schützt dein gesamtes bewegliches Eigentum (Möbel, Kleidung, Technik usw.).\n\nEntscheidend ist der Neuwert – also der Betrag, den du heute für eine Neuanschaffung zahlen müsstest.\n\nAls Orientierung gelten ca. 650 € pro m² Wohnfläche.\nBeispiel: 80 m² × 650 € = 52.000 € Versicherungssumme.\n\nIst die Summe zu niedrig, droht im Schadenfall eine Kürzung wegen Unterversicherung."
+},
 
   elementar: {
     label: "Elementarversicherung vorhanden?",
@@ -404,7 +405,10 @@ const totalScore = useMemo(() => {
         />
 
         <h1>360° Absicherungscheck</h1>
-        <p>Beantworte ein paar Fragen zu deiner Situation.</p>
+        <p>
+          In wenigen Minuten erhältst du eine strukturierte Einschätzung,
+          wie gut deine aktuelle Absicherung wirklich aufgestellt ist.
+          </p>
 
         <button
           className="primaryBtn big"
