@@ -116,11 +116,12 @@ const QUESTIONS = {
   /* ===== MOBILITÄT ===== */
 
   kfz_haftpflicht: {
-    label: "KFZ-Haftpflicht vorhanden?",
-    category: "mobilitaet",
-    type: "yesno",
-    condition: (baseData) => baseData.kfz === "Ja",
+   label: "Haftpflichtversicherung für dein Fahrzeug vorhanden? (z. B. Auto, Motorrad, Roller, Mofa)",
+   category: "mobilitaet",
+   type: "yesno",
+   condition: (baseData) => baseData.kfz === "Ja",
   },
+
 
   kasko: {
     label: "Welche KFZ-Kasko besteht?",
@@ -327,13 +328,38 @@ const categoryScores = useMemo(() => {
 
 const totalScore = useMemo(() => {
 
-  return Math.round(
-    Object.keys(CATEGORY_WEIGHTS).reduce((sum, cat) => {
-      return sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat];
-    }, 0)
+  // Nur relevante Kategorien berücksichtigen
+  const activeCategories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
+
+    const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
+
+      if (q.category !== cat) return false;
+      if (q.condition && !q.condition(baseData)) return false;
+
+      return true;
+    });
+
+    return relevantQuestions.length > 0;
+  });
+
+  // Summe der aktiven Gewichte berechnen
+  const totalWeight = activeCategories.reduce(
+    (sum, cat) => sum + CATEGORY_WEIGHTS[cat],
+    0
   );
 
-}, [categoryScores]);
+  if (totalWeight === 0) return 0;
+
+  // Score nur über aktive Kategorien berechnen
+  const weightedScore = activeCategories.reduce((sum, cat) => {
+    return sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat];
+  }, 0);
+
+  // Normieren auf 100%
+  return Math.round(weightedScore / totalWeight);
+
+}, [categoryScores, baseData]);
 
   /* ===== SCORE ANIMATION ===== */
 
@@ -394,35 +420,42 @@ const totalScore = useMemo(() => {
 
   /* ================= WELCOME ================= */
 
-  if (step === "welcome") {
-    return (
-      <div className="screen center">
-        <img
-          src="/logo.jpg"
-          className="logo large"
-          onClick={resetAll}
-          alt="Logo"
-        />
+if (step === "welcome") {
+  return (
+    <div className="screen center">
+      <img
+        src="/logo.jpg"
+        className="logo large"
+        onClick={resetAll}
+        alt="Logo"
+      />
 
-        <h1>360° Absicherungscheck</h1>
-        <p>
-          In wenigen Minuten erhältst du eine strukturierte Einschätzung,
-          wie gut deine aktuelle Absicherung wirklich aufgestellt ist.
-          </p>
+      <h1>360° Absicherungscheck</h1>
 
-        <button
-          className="primaryBtn big"
-          onClick={() => setStep("base")}
-        >
-          Jetzt starten
-        </button>
+      <p style={{ opacity: 0.85, lineHeight: 1.5 }}>
+        In wenigen Minuten erhältst du eine strukturierte Übersicht
+        deiner aktuellen Absicherung – klar, verständlich und
+        kategorisiert nach Risiko­bereichen.
+      </p>
 
-        <ContactButton onReset={() => setShowResetConfirm(true)} />
-        {ResetOverlay}
-      </div>
-    );
-  }
+      <p style={{ opacity: 0.65, fontSize: 14, marginTop: 6 }}>
+        Keine Anmeldung. Keine Datenspeicherung. Nur Transparenz.
+      </p>
 
+      <button
+        className="primaryBtn big"
+        onClick={() => setStep("base")}
+      >
+        Jetzt Check starten
+      </button>
+
+      <ContactButton onReset={() => setShowResetConfirm(true)} />
+      {ResetOverlay}
+    </div>
+  );
+}
+
+ 
   /* ================= BASISDATEN ================= */
 
   if (step === "base") {
@@ -550,7 +583,7 @@ const totalScore = useMemo(() => {
       />
 
       <Select
-        label="Besitzt du ein KFZ?"
+        label="Besitzt du ein Fahrzeug? (z. B. Auto, Motorrad, Roller, Mofa)"
         options={["Nein", "Ja"]}
         value={baseData.kfz}
         onChange={(v) =>
@@ -585,204 +618,212 @@ const totalScore = useMemo(() => {
 }
   /* ================= KATEGORIEN ================= */
 
-   if (step === "category") {
+  if (step === "category") {
 
-  const questionsOfCategory = Object.keys(QUESTIONS).filter((id) => {
-    const q = QUESTIONS[id];
+    const questionsOfCategory = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
 
-    if (q.category !== currentCategory) return false;
-    if (q.condition && !q.condition(baseData)) return false;
+      if (q.category !== currentCategory) return false;
+      if (q.condition && !q.condition(baseData)) return false;
 
-    return true;
-  });
+      return true;
+    });
 
-  return (
-    <div className="screen">
-      <Header
-        reset={resetAll}
-        back={() => {
-          if (currentCategoryIndex > 0) {
-            setCurrentCategoryIndex((prev) => prev - 1);
-          } else {
-            setStep("base");
-          }
-        }}
-      />
-
-      {/* Progress */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 14, opacity: 0.7 }}>
-          Kategorie {currentCategoryIndex + 1} von {categories.length}
-        </div>
-
-        <div style={{ fontSize: 20, fontWeight: "bold" }}>
-          {CATEGORY_LABELS[currentCategory]}
-        </div>
-
-        <div
-          style={{
-            height: 6,
-            background: "#1a2a36",
-            borderRadius: 6,
-            marginTop: 8,
-            overflow: "hidden",
+    return (
+      <div className="screen">
+        <Header
+          reset={resetAll}
+          back={() => {
+            if (currentCategoryIndex > 0) {
+              setCurrentCategoryIndex((prev) => prev - 1);
+            } else {
+              setStep("base");
+            }
           }}
-        >
+        />
+
+        {/* Progress */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 14, opacity: 0.7 }}>
+            Kategorie {currentCategoryIndex + 1} von {categories.length}
+          </div>
+
+          <div style={{ fontSize: 20, fontWeight: "bold" }}>
+            {CATEGORY_LABELS[currentCategory]}
+          </div>
+
           <div
             style={{
-              width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`,
-              height: "100%",
-              background: "linear-gradient(135deg, #8B7CF6, #5E4AE3)",
-              transition: "0.3s ease",
+              height: 6,
+              background: "#1a2a36",
+              borderRadius: 6,
+              marginTop: 8,
+              overflow: "hidden",
             }}
-          />
+          >
+            <div
+              style={{
+                width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`,
+                height: "100%",
+                background: "linear-gradient(135deg, #8B7CF6, #5E4AE3)",
+                transition: "0.3s ease",
+              }}
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Fragen */}
-      {questionsOfCategory.map((id) => {
-        const q = QUESTIONS[id];
+        {/* Fragen */}
+        {questionsOfCategory.map((id) => {
+          const q = QUESTIONS[id];
 
-        return (
-          <div key={id + (answers[id] || "")} className="questionCard dark">
-            <div className="questionText">
-              {q.label}
+          return (
+            <div key={id} className="questionCard dark">
+              <div className="questionText">
+                {q.label}
 
-              {q.info && (
-                <span
-                  className="infoIcon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowInfo(q.info);
-                  }}
+                {q.info && (
+                  <span
+                    className="infoIcon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowInfo(q.info);
+                    }}
+                  >
+                    i
+                  </span>
+                )}
+              </div>
+
+              {q.link && (
+                <a
+                  href={q.link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="calculatorIcon"
+                  title={q.link.label}
                 >
-                  i
-                </span>
+                  🧮
+                </a>
+              )}
+
+              {/* SELECT */}
+              {q.type === "select" && (
+                <Select
+                  label=""
+                  options={q.options}
+                  value={
+                    id === "kasko"
+                      ? answers[id] === "haftpflicht"
+                        ? "Haftpflicht"
+                        : answers[id] === "teilkasko"
+                        ? "Teilkasko"
+                        : answers[id] === "vollkasko"
+                        ? "Vollkasko"
+                        : answers[id] === "unbekannt"
+                        ? "Weiß nicht"
+                        : ""
+                      : answers[id] || ""
+                  }
+                  onChange={(v) => {
+                    if (id === "kasko") {
+                      if (v === "Haftpflicht") answer(id, "haftpflicht");
+                      else if (v === "Teilkasko") answer(id, "teilkasko");
+                      else if (v === "Vollkasko") answer(id, "vollkasko");
+                      else answer(id, "unbekannt");
+                    } else {
+                      answer(id, v === "Weiß nicht" ? "unbekannt" : v);
+                    }
+                  }}
+                />
+              )}
+
+              {/* YES / NO */}
+              {q.type === "yesno" && (
+                <>
+                  <div className="buttonRow">
+                    {["ja", "nein", "unbekannt"].map((v) => {
+                      const isActive = answers[id] === v;
+
+                      return (
+                        <button
+                          key={v}
+                          className={`answerBtn ${isActive ? "active" : ""}`}
+                          onClick={() => answer(id, v)}
+                          style={{
+                            transform: isActive ? "scale(1.02)" : "scale(1)",
+                            boxShadow: isActive
+                              ? "0 0 14px rgba(139,124,246,0.6)"
+                              : "none",
+                            transition: "all 0.18s ease",
+                          }}
+                        >
+                          {v === "ja"
+                            ? "Ja"
+                            : v === "nein"
+                            ? "Nein"
+                            : "Weiß ich nicht"}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* RECHTSSCHUTZ SUBOPTIONEN */}
+                  {id === "rechtsschutz" && answers[id] === "ja" && (
+                    <div className="subOptions">
+                      {["Privat", "Beruf", "Verkehr", "Immobilie/Miete"].map((opt) => (
+                        <Checkbox
+                          key={opt}
+                          label={opt}
+                          checked={answers["rechtsschutz_" + opt]}
+                          onChange={(e) =>
+                            answer("rechtsschutz_" + opt, e.target.checked)
+                          }
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
+          );
+        })}
 
-            {q.link && (
-              <a
-                href={q.link.url}
-                target="_blank"
-                rel="noreferrer"
-                className="calculatorIcon"
-                title={q.link.label}
-              >
-                🧮
-              </a>
-            )}
-
-            {/* SELECT */}
-            {q.type === "select" && (
-              <Select
-                label=""
-                options={q.options}
-                value={
-                  id === "kasko"
-                    ? answers[id] === "haftpflicht"
-                      ? "Haftpflicht"
-                      : answers[id] === "teilkasko"
-                      ? "Teilkasko"
-                      : answers[id] === "vollkasko"
-                      ? "Vollkasko"
-                      : answers[id] === "unbekannt"
-                      ? "Weiß nicht"
-                      : ""
-                    : answers[id] || ""
-                }
-                onChange={(v) => {
-                  if (id === "kasko") {
-                    if (v === "Haftpflicht") answer(id, "haftpflicht");
-                    else if (v === "Teilkasko") answer(id, "teilkasko");
-                    else if (v === "Vollkasko") answer(id, "vollkasko");
-                    else answer(id, "unbekannt");
-                  } else {
-                    answer(id, v === "Weiß nicht" ? "unbekannt" : v);
-                  }
-                }}
-              />
-            )}
-
-            {/* YES / NO */}
-            {q.type === "yesno" && (
-              <>
-                <div className="buttonRow">
-                  {["ja", "nein", "unbekannt"].map((v) => (
-                    <button
-                      key={v}
-                      className={`answerBtn ${
-                        answers[id] === v ? "active" : ""
-                      }`}
-                      onClick={() => answer(id, v)}
-                    >
-                      {v === "ja"
-                        ? "Ja"
-                        : v === "nein"
-                        ? "Nein"
-                        : "Weiß ich nicht"}
-                    </button>
-                  ))}
-                </div>
-
-                {/* RECHTSSCHUTZ SUBOPTIONEN */}
-                {id === "rechtsschutz" && answers[id] === "ja" && (
-                  <div className="subOptions">
-                    {["Privat", "Beruf", "Verkehr", "Immobilie/Miete"].map((opt) => (
-                      <Checkbox
-                        key={opt}
-                        label={opt}
-                        checked={answers["rechtsschutz_" + opt]}
-                        onChange={(e) =>
-                          answer("rechtsschutz_" + opt, e.target.checked)
-                        }
-                      />
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        );
-      })}
-
-      <button
-        className="primaryBtn"
-        onClick={() => {
-          if (currentCategoryIndex < categories.length - 1) {
-            setCurrentCategoryIndex((prev) => prev + 1);
-          } else {
-            setStep("dashboard");
-          }
-        }}
-      >
-        {currentCategoryIndex < categories.length - 1
-          ? "Weiter"
-          : "Auswertung"}
-      </button>
-
-      {/* Info Overlay */}
-      {showInfo && (
-        <div
-          className="infoOverlay"
-          onClick={() => setShowInfo(null)}
+        <button
+          className="primaryBtn"
+          onClick={() => {
+            if (currentCategoryIndex < categories.length - 1) {
+              setCurrentCategoryIndex((prev) => prev + 1);
+            } else {
+              setStep("dashboard");
+            }
+          }}
         >
-          <div
-            className="infoBox"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {showInfo.split("\n").map((line, i) => (
-              <p key={i}>{line}</p>
-            ))}
-          </div>
-        </div>
-      )}
+          {currentCategoryIndex < categories.length - 1
+            ? "Weiter"
+            : "Auswertung"}
+        </button>
 
-      <ContactButton onReset={() => setShowResetConfirm(true)} />
-      {ResetOverlay}
-    </div>
-  );
-}
+        {showInfo && (
+          <div
+            className="infoOverlay"
+            onClick={() => setShowInfo(null)}
+          >
+            <div
+              className="infoBox"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {showInfo.split("\n").map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <ContactButton onReset={() => setShowResetConfirm(true)} />
+        {ResetOverlay}
+      </div>
+    );
+  }
 
   /* ================= DASHBOARD ================= */
 
