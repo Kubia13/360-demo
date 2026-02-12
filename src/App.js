@@ -1054,6 +1054,8 @@ if (step === "category") {
 
   /* ================= DASHBOARD ================= */
 
+  if (step === "dashboard") {
+
   return (
     <div className="screen">
       <Header reset={resetAll} back={() => setStep("category")} />
@@ -1176,7 +1178,8 @@ if (step === "category") {
       {ResetOverlay}
     </div>
   );
-
+  }
+  
   /* ================= UI COMPONENTS ================= */
 
   function Header({ reset, back }) {
