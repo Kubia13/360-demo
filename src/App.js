@@ -147,7 +147,7 @@ const QUESTIONS = {
     label: "Welche KFZ-Kasko besteht?",
     category: "mobilitaet",
     type: "select",
-    options: ["Haftpflicht", "Teilkasko", "Vollkasko", "Weiß nicht"],
+    options: ["Keine", "Teilkasko", "Vollkasko", "Weiß nicht"],
     condition: (baseData) => baseData.kfz === "Ja",
   },
 
@@ -463,28 +463,23 @@ export default function App() {
 
   /* ================= DYNAMISCHE KATEGORIEN ================= */
 
-  const categories = useMemo(() => {
-    return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
+const categories = useMemo(() => {
+  return Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
 
-      const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
-        const q = QUESTIONS[id];
+    const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
 
-        if (q.category !== cat) return false;
-        if (q.condition && !q.condition(baseData)) return false;
+      if (q.category !== cat) return false;
+      if (q.condition && !q.condition(baseData)) return false;
 
-        return true;
-      });
-
-      return relevantQuestions.length > 0;
+      return true;
     });
-  }, [
-    baseData.kinder,
-    baseData.alter,
-    baseData.beziehungsstatus
-  ]);
 
+    return relevantQuestions.length > 0;
+  });
+}, [baseData]);
 
-  const currentCategory = categories[currentCategoryIndex];
+const currentCategory = categories[currentCategoryIndex];
 
   /* ===== FLOW-SCHUTZ ===== */
 
@@ -1570,8 +1565,8 @@ const topRecommendations = useMemo(() => {
                   options={q.options}
                   value={
                     id === "kasko"
-                      ? answers[id] === "haftpflicht"
-                        ? "Haftpflicht"
+                      ? answers[id] === "keine"
+                        ? "Keine"
                         : answers[id] === "teilkasko"
                           ? "Teilkasko"
                           : answers[id] === "vollkasko"
@@ -1583,7 +1578,7 @@ const topRecommendations = useMemo(() => {
                   }
                   onChange={(v) => {
                     if (id === "kasko") {
-                      if (v === "Haftpflicht") answer(id, "haftpflicht");
+                      if (v === "Keine") answer(id, "keine");
                       else if (v === "Teilkasko") answer(id, "teilkasko");
                       else if (v === "Vollkasko") answer(id, "vollkasko");
                       else answer(id, "unbekannt");
