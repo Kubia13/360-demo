@@ -1269,80 +1269,80 @@ export default function App() {
 
   /* ================= LEGAL OVERLAY ================= */
 
-function LegalOverlayComponent() {
-  if (!legalOverlay) return null;
+  function LegalOverlayComponent() {
+    if (!legalOverlay) return null;
 
-  return (
-    <div
-      className="infoOverlay"
-      onClick={() => setLegalOverlay(null)}
-    >
+    return (
       <div
-        className="infoBox legalBox"
-        onClick={(e) => e.stopPropagation()}
+        className="infoOverlay"
+        onClick={() => setLegalOverlay(null)}
       >
-        <h3 style={{ marginBottom: 12 }}>
-          {legalOverlay === "impressum" ? "Impressum" : "Datenschutz"}
-        </h3>
+        <div
+          className="infoBox legalBox"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 style={{ marginBottom: 12 }}>
+            {legalOverlay === "impressum" ? "Impressum" : "Datenschutz"}
+          </h3>
 
-        {legalOverlay === "impressum" && (
-          <>
-            <p><strong>Florian Löffler</strong></p>
+          {legalOverlay === "impressum" && (
+            <>
+              <p><strong>Florian Löffler</strong></p>
 
-            <p>
-              Breisacher Str. 145b<br />
-              79110 Freiburg
-            </p>
+              <p>
+                Breisacher Str. 145b<br />
+                79110 Freiburg
+              </p>
 
-            <p>
-              Telefon:{" "}
-              <a href="tel:+497612027423">
-                0761-2027423
-              </a>
-              <br />
-              E-Mail:{" "}
-              <a href="mailto:florian.loeffler@barmenia.de?subject=Anfrage%20360%C2%B0%20Absicherungscheck">
-                florian.loeffler@barmenia.de
-              </a>
-            </p>
+              <p>
+                Telefon:{" "}
+                <a href="tel:+497612027423">
+                  0761-2027423
+                </a>
+                <br />
+                E-Mail:{" "}
+                <a href="mailto:florian.loeffler@barmenia.de?subject=Anfrage%20360%C2%B0%20Absicherungscheck">
+                  florian.loeffler@barmenia.de
+                </a>
+              </p>
 
-            <p>
-              Vermittlerregisternummer: D-3ED0-I0NGJ-87
-            </p>
+              <p>
+                Vermittlerregisternummer: D-3ED0-I0NGJ-87
+              </p>
 
-            <p>
-              Registrierungsstelle:<br />
-              DIHK | Deutscher Industrie- und Handelskammertag e. V.<br />
-              <a
-                href="https://www.vermittlerregister.info"
-                target="_blank"
-                rel="noreferrer"
-              >
-                www.vermittlerregister.info
-              </a>
-            </p>
-          </>
-        )}
+              <p>
+                Registrierungsstelle:<br />
+                DIHK | Deutscher Industrie- und Handelskammertag e. V.<br />
+                <a
+                  href="https://www.vermittlerregister.info"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  www.vermittlerregister.info
+                </a>
+              </p>
+            </>
+          )}
 
-        {legalOverlay === "datenschutz" && (
-          <>
-            <p>
-              Diese Anwendung speichert keine personenbezogenen Daten.
-            </p>
-            <p>
-              Alle Eingaben erfolgen ausschließlich lokal im Browser
-              und werden nicht an Server übertragen.
-            </p>
-            <p>
-              Beim Klick auf externe Links gelten die Datenschutz-
-              bestimmungen der jeweiligen Anbieter.
-            </p>
-          </>
-        )}
+          {legalOverlay === "datenschutz" && (
+            <>
+              <p>
+                Diese Anwendung speichert keine personenbezogenen Daten.
+              </p>
+              <p>
+                Alle Eingaben erfolgen ausschließlich lokal im Browser
+                und werden nicht an Server übertragen.
+              </p>
+              <p>
+                Beim Klick auf externe Links gelten die Datenschutz-
+                bestimmungen der jeweiligen Anbieter.
+              </p>
+            </>
+          )}
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   /* ================= RESET OVERLAY ================= */
 
@@ -1479,7 +1479,7 @@ function LegalOverlayComponent() {
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         <ResetOverlayComponent />
-       <LegalOverlayComponent />
+        <LegalOverlayComponent />
       </div>
     );
   }
@@ -1722,17 +1722,6 @@ function LegalOverlayComponent() {
               <div className="questionText">
                 {q.label}
 
-                {q.info && (
-                  <span
-                    className="infoIcon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowInfo(q.info);
-                    }}
-                  >
-                    i
-                  </span>
-                )}
               </div>
 
               {q.link && (
@@ -1816,6 +1805,18 @@ function LegalOverlayComponent() {
                         </button>
                       );
                     })}
+                    {/* FLOATING INFO ICON */}
+                    {q.info && (
+                      <span
+                        className="floatingInfoSquare"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowInfo(q.info);
+                        }}
+                      >
+                        i
+                      </span>
+                    )}
                   </div>
 
 
