@@ -1044,6 +1044,8 @@ export default function App() {
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         <ResetOverlayComponent />
+        <ActionOverlayComponent />
+        <LegalOverlayComponent />
       </div>
     );
   }
@@ -1267,7 +1269,10 @@ export default function App() {
 
   /* ================= LEGAL OVERLAY ================= */
 
-  const LegalOverlay = legalOverlay && (
+function LegalOverlayComponent() {
+  if (!legalOverlay) return null;
+
+  return (
     <div
       className="infoOverlay"
       onClick={() => setLegalOverlay(null)}
@@ -1329,14 +1334,16 @@ export default function App() {
               und werden nicht an Server übertragen.
             </p>
             <p>
-              Beim Klick auf externe Links (z. B. Rechner oder Kontakt)
-              gelten die Datenschutzbestimmungen der jeweiligen Anbieter.
+              Beim Klick auf externe Links gelten die Datenschutz-
+              bestimmungen der jeweiligen Anbieter.
             </p>
           </>
         )}
       </div>
     </div>
   );
+}
+
   /* ================= RESET OVERLAY ================= */
 
   function ResetOverlayComponent() {
@@ -1377,7 +1384,7 @@ export default function App() {
   }
   /* ================= ACTION OVERLAY ================= */
 
-  const ActionOverlayComponent = () => {
+  function ActionOverlayComponent() {
     if (!actionOverlay) return null;
 
     const action = ACTION_MAP[actionOverlay];
@@ -1427,7 +1434,7 @@ export default function App() {
         </div>
       </div>
     );
-  };
+  }
 
   /* ================= WELCOME ================= */
 
@@ -1472,7 +1479,7 @@ export default function App() {
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         <ResetOverlayComponent />
-        {LegalOverlay}
+       <LegalOverlayComponent />
       </div>
     );
   }
@@ -1645,7 +1652,7 @@ export default function App() {
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         <ResetOverlayComponent />
-        {LegalOverlay}
+        <LegalOverlayComponent />
       </div>
     );
   }
@@ -1939,7 +1946,7 @@ export default function App() {
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         <ResetOverlayComponent />
-        {LegalOverlay}
+        <LegalOverlayComponent />
       </div>
     );
   }
@@ -2155,7 +2162,7 @@ export default function App() {
         <ContactButton onReset={() => setShowResetConfirm(true)} />
         <ResetOverlayComponent />
         <ActionOverlayComponent />
-        {LegalOverlay}
+        <LegalOverlayComponent />
       </div>
     );
   }
