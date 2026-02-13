@@ -177,9 +177,19 @@ const QUESTIONS = {
     label: "Krankentagegeld vorhanden?",
     category: "existenz",
     type: "yesno",
-    link: {
-      label: "Krankentagegeld-Rechner",
-      url: "https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner"
+    info: {
+      text: [
+        "Nach 6 Wochen endet die Lohnfortzahlung.",
+        "",
+        "Gesetzlich Versicherte erhalten danach Krankengeld (ca. 70% vom Brutto, max. 90% vom Netto).",
+        "Privatversicherte erhalten ohne Vereinbarung kein Krankengeld.",
+        "",
+        "Ohne Krankentagegeld entsteht eine Einkommenslücke."
+      ],
+      link: {
+        label: "Prüfe, wie hoch dein finanzieller Bedarf ab der 7. Woche wirklich ist:",
+        url: "https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner"
+      }
     }
   },
 
@@ -303,9 +313,18 @@ const QUESTIONS = {
     label: "Kennst du deine Rentenlücke?",
     category: "vorsorge",
     type: "yesno",
-    link: {
-      label: "Rentenlückenrechner",
-      url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke"
+    info: {
+      text: [
+        "Die gesetzliche Rente deckt meist nur einen Teil deines letzten Einkommens.",
+        "",
+        "Die Rentenlücke ist die Differenz zwischen Wunsch-Rente und tatsächlicher gesetzlicher Rente.",
+        "",
+        "Ohne zusätzliche Vorsorge ensteht eine Versorgungslücke"
+      ],
+      link: {
+        label: "Berechne hier deine persönliche Rentenlücke:",
+        url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke"
+      }
     }
   },
 
@@ -1928,12 +1947,48 @@ export default function App() {
               className="infoBox"
               onClick={(e) => e.stopPropagation()}
             >
-              {showInfo.split("\n").map((line, i) => (
+              {showInfo.text.map((line, i) => (
                 <p key={i}>{line}</p>
               ))}
+
+              {showInfo.link && (
+                <>
+                  <p style={{ marginTop: 14, fontWeight: 500 }}>
+                    ➜ {showInfo.link.label}
+                  </p>
+
+                  <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
+                    <a
+                      href={showInfo.link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="calculatorIcon"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect x="4" y="2" width="16" height="20" rx="3" />
+                        <line x1="8" y1="6" x2="16" y2="6" />
+                        <line x1="8" y1="10" x2="8" y2="14" />
+                        <line x1="12" y1="10" x2="12" y2="14" />
+                        <line x1="16" y1="10" x2="16" y2="14" />
+                        <line x1="8" y1="17" x2="16" y2="17" />
+                      </svg>
+                    </a>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
+
 
         <div className="legalFooter">
           <span onClick={() => setLegalOverlay("impressum")}>

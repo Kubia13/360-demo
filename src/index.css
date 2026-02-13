@@ -487,44 +487,43 @@ body {
   align-items: center;
   justify-content: center;
 
-  margin-top: 8px;
+  margin-top: 10px;   /* minimal mehr Luft */
   margin-left: 8px;
 
-  width: 34px;
-  height: 34px;
+  width: 40px;        /* vorher 34px */
+  height: 40px;       /* vorher 34px */
 
-  border-radius: 12px;
+  border-radius: 14px; /* proportional größer */
 
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(139, 124, 246, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(139, 124, 246, 0.35);
 
   color: #A99BFF;
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 4px 12px rgba(0, 0, 0, 0.4);
+    0 6px 16px rgba(0, 0, 0, 0.45);
 
   transition: all 0.25s ease;
 }
 
-.calculatorIcon:hover {
+
+/* SVG im Icon etwas größer */
+.calculatorIcon svg {
+  width: 20px;
+  height: 20px;
+}
+latorIcon:hover {
   transform: translateY(-2px);
-
-  background: rgba(139, 124, 246, 0.15);
-
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 8px 20px rgba(139, 124, 246, 0.4),
-    0 0 12px rgba(139, 124, 246, 0.6);
 }
 
 .calculatorIcon:active {
-  transform: scale(0.95);
-
+  transform: translateY(0) scale(0.97);
 }
+
 
 .scoreLabel {
   text-align: center;
