@@ -487,13 +487,13 @@ body {
   align-items: center;
   justify-content: center;
 
-  margin-top: 10px;   /* minimal mehr Luft */
+  margin-top: 10px;
   margin-left: 8px;
 
-  width: 40px;        /* vorher 34px */
-  height: 40px;       /* vorher 34px */
+  width: 40px;
+  height: 40px;
 
-  border-radius: 14px; /* proportional größer */
+  border-radius: 14px;
 
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -508,20 +508,31 @@ body {
     0 6px 16px rgba(0, 0, 0, 0.45);
 
   transition: all 0.25s ease;
+  cursor: pointer;
 }
-
 
 /* SVG im Icon etwas größer */
 .calculatorIcon svg {
   width: 20px;
   height: 20px;
 }
-latorIcon:hover {
-  transform: translateY(-2px);
+
+/* HOVER */
+.calculatorIcon:hover {
+  transform: translateY(-2px) scale(1.08);
+
+  background: rgba(139, 124, 246, 0.22);
+  border: 1px solid rgba(139, 124, 246, 0.6);
+
+  box-shadow:
+    0 0 14px rgba(139,124,246,0.8),
+    0 0 28px rgba(94,74,227,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.12);
 }
 
+/* ACTIVE */
 .calculatorIcon:active {
-  transform: translateY(0) scale(0.97);
+  transform: translateY(0) scale(0.96);
 }
 
 
