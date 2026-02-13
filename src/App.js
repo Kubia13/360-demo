@@ -1283,13 +1283,38 @@ export default function App() {
         {legalOverlay === "impressum" && (
           <>
             <p><strong>Florian Löffler</strong></p>
-            <p>Breisacher Str. 145b<br />79110 Freiburg</p>
-            <p>Telefon: 0761-2027423<br />E-Mail: florian.loeffler@barmenia.de</p>
-            <p>Vermittlerregisternummer: D-3ED0-I0NGJ-87</p>
+
+            <p>
+              Breisacher Str. 145b<br />
+              79110 Freiburg
+            </p>
+
+            <p>
+              Telefon:{" "}
+              <a href="tel:+497612027423">
+                0761-2027423
+              </a>
+              <br />
+              E-Mail:{" "}
+              <a href="mailto:florian.loeffler@barmenia.de?subject=Anfrage%20360%C2%B0%20Absicherungscheck">
+                florian.loeffler@barmenia.de
+              </a>
+            </p>
+
+            <p>
+              Vermittlerregisternummer: D-3ED0-I0NGJ-87
+            </p>
+
             <p>
               Registrierungsstelle:<br />
               DIHK | Deutscher Industrie- und Handelskammertag e. V.<br />
-              www.vermittlerregister.info
+              <a
+                href="https://www.vermittlerregister.info"
+                target="_blank"
+                rel="noreferrer"
+              >
+                www.vermittlerregister.info
+              </a>
             </p>
           </>
         )}
@@ -1350,59 +1375,59 @@ export default function App() {
       </div>
     );
   }
-/* ================= ACTION OVERLAY ================= */
+  /* ================= ACTION OVERLAY ================= */
 
-const ActionOverlayComponent = () => {
-  if (!actionOverlay) return null;
+  const ActionOverlayComponent = () => {
+    if (!actionOverlay) return null;
 
-  const action = ACTION_MAP[actionOverlay];
-  if (!action) return null;
+    const action = ACTION_MAP[actionOverlay];
+    if (!action) return null;
 
-  return (
-    <div
-      className="infoOverlay"
-      onClick={() => setActionOverlay(null)}
-    >
+    return (
       <div
-        className="infoBox"
-        onClick={(e) => e.stopPropagation()}
+        className="infoOverlay"
+        onClick={() => setActionOverlay(null)}
       >
-        <h3 style={{ marginBottom: 12 }}>
-          {QUESTIONS[actionOverlay]?.label}
-        </h3>
+        <div
+          className="infoBox"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 style={{ marginBottom: 12 }}>
+            {QUESTIONS[actionOverlay]?.label}
+          </h3>
 
-        <div className="overlayButtons">
+          <div className="overlayButtons">
 
-          {/* Beratungstermin */}
-          <button
-            className="overlayBtn primary"
-            onClick={() =>
-              window.open(
-                action.calendar,
-                "_blank",
-                "noopener,noreferrer"
-              )
-            }
-          >
-            Termin vereinbaren
-          </button>
+            {/* Beratungstermin */}
+            <button
+              className="overlayBtn primary"
+              onClick={() =>
+                window.open(
+                  action.calendar,
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
+            >
+              Termin vereinbaren
+            </button>
 
-          {/* Kontakt anzeigen */}
-          <button
-            className="overlayBtn secondary"
-            onClick={() => {
-              setActionOverlay(null);
-              setLegalOverlay("impressum");
-            }}
-          >
-            Kontakt anzeigen
-          </button>
+            {/* Kontakt anzeigen */}
+            <button
+              className="overlayBtn secondary"
+              onClick={() => {
+                setActionOverlay(null);
+                setLegalOverlay("impressum");
+              }}
+            >
+              Kontakt anzeigen
+            </button>
 
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   /* ================= WELCOME ================= */
 
@@ -1767,20 +1792,14 @@ const ActionOverlayComponent = () => {
                 <>
                   <div className="buttonRow">
                     {["ja", "nein", "unbekannt"].map((v) => {
-                      const isActive = answers[id] === v;
+                      const isActive = answers?.[id] === v;
 
                       return (
                         <button
                           key={v}
+                          type="button"
                           className={`answerBtn ${isActive ? "active" : ""}`}
                           onClick={() => answer(id, v)}
-                          style={{
-                            transform: isActive ? "scale(1.02)" : "scale(1)",
-                            boxShadow: isActive
-                              ? "0 0 14px rgba(139,124,246,0.6)"
-                              : "none",
-                            transition: "all 0.18s ease",
-                          }}
                         >
                           {v === "ja"
                             ? "Ja"
@@ -1791,6 +1810,7 @@ const ActionOverlayComponent = () => {
                       );
                     })}
                   </div>
+
 
                   {/* RECHTSSCHUTZ SUBOPTIONEN */}
 
