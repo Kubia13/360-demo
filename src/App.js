@@ -29,10 +29,12 @@ const PRIORITY_MAP = {
   bu: 3,
   du: 3,
   anwartschaft: 3,
-
   haftpflicht: 3,
   pflege: 3,
+  risiko_lv: 3,
+  ruecklagen: 3,
 
+  bav: 2,
   private_rente: 2,
   gebaeude: 2,
   rechtsschutz: 2,
@@ -51,7 +53,7 @@ const CORE_PRODUCTS = [
   "du",
   "ktg",
   "haftpflicht",
-   "anwartschaft",
+  "anwartschaft",
   "hausrat",
   "private_rente",
   "rentenluecke",
@@ -63,7 +65,10 @@ const CORE_PRODUCTS = [
   "kinder_unfall",
   "kinder_vorsorge",
   "kfz_haftpflicht",
-  "kasko"
+  "kasko",
+  "risiko_lv",
+  "ruecklagen",
+  "bav",
 ];
 
 
@@ -75,6 +80,11 @@ const ACTION_MAP = {
   bu: {
     type: "beratung",
     calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  risiko_lv: {
+    type: "beratung",
+   calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
   },
 
   du: {
@@ -93,9 +103,9 @@ const ACTION_MAP = {
   },
 
   anwartschaft: {
-  type: "beratung",
-  calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
-},
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
 
 
   /* ===== HAFTUNG ===== */
@@ -140,6 +150,11 @@ const ACTION_MAP = {
   },
 
   rentenluecke: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  bav: {
     type: "beratung",
     calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
   },
@@ -279,6 +294,30 @@ const QUESTIONS = {
     type: "yesno",
   },
 
+  risiko_lv: {
+    label: "Risikolebensversicherung vorhanden?",
+    category: "existenz",
+    type: "yesno",
+    condition: (baseData) =>
+      baseData.beziehungsstatus === "Verheiratet" ||
+      baseData.kinder === "Ja" ||
+      baseData.wohnen === "Eigentum Haus",
+    info:
+      "Eine Risikolebensversicherung sichert Hinterbliebene oder laufende Verpflichtungen im Todesfall ab.\n\n" +
+      "Besonders relevant bei Familie oder Immobilienbesitz."
+  },
+
+  ruecklagen: {
+    label: "Hast du finanzielle Rücklagen für mindestens 3 Monate Lebenshaltungskosten?",
+    category: "existenz",
+    type: "yesno",
+    condition: () => true,
+    info:
+      "Eine Liquiditätsreserve schützt vor finanziellen Engpässen bei Jobverlust, Krankheit oder unerwarteten Ausgaben.\n\n" +
+      "Empfehlung: mindestens 3 Netto-Monatsgehälter als Rücklage."
+  },
+
+
   /* ===== HAFTUNG ===== */
 
   haftpflicht: {
@@ -408,6 +447,18 @@ const QUESTIONS = {
         url: "https://rentenrechner.dieversicherer.de/app/gdv.html#luecke"
       }
     }
+  },
+
+  bav: {
+    label: "Nutzt du eine betriebliche Altersvorsorge (bAV)?",
+    category: "vorsorge",
+    type: "yesno",
+    condition: (baseData) =>
+      baseData.beruf === "Angestellt" ||
+      baseData.beruf === "Öffentlicher Dienst",
+    info:
+      "Die betriebliche Altersvorsorge ermöglicht eine zusätzliche Altersabsicherung über den Arbeitgeber.\n\n" +
+      "Oft besteht Anspruch auf einen Arbeitgeberzuschuss."
   },
 
   /* ===== KINDER ===== */
@@ -1337,36 +1388,36 @@ export default function App() {
 
         return "Eine umfassende Gesundheitsabsicherung sollte mehrere Leistungsbereiche abdecken. Eine Überprüfung des Umfangs kann sinnvoll sein.";
 
-/* ================= KINDER KRANKENZUSATZ ================= */
+      /* ================= KINDER KRANKENZUSATZ ================= */
 
-case "kinder_krankenzusatz":
+      case "kinder_krankenzusatz":
 
-  // Wenn Kinder-KV unklar ist → erst System klären
-  if (baseData.kinderKrankenversicherung === "Weiß nicht")
-    return "Die Krankenversicherung deiner Kinder sollte geklärt werden, um mögliche Versorgungslücken einschätzen zu können.";
+        // Wenn Kinder-KV unklar ist → erst System klären
+        if (baseData.kinderKrankenversicherung === "Weiß nicht")
+          return "Die Krankenversicherung deiner Kinder sollte geklärt werden, um mögliche Versorgungslücken einschätzen zu können.";
 
-  // Wenn keine Zusatz vorhanden
-  if (value === "nein")
-    return "Für gesetzlich versicherte Kinder kann eine ergänzende Gesundheitsabsicherung sinnvoll sein.";
+        // Wenn keine Zusatz vorhanden
+        if (value === "nein")
+          return "Für gesetzlich versicherte Kinder kann eine ergänzende Gesundheitsabsicherung sinnvoll sein.";
 
-  // Wenn nicht beantwortet
-  if (value !== "ja") return null;
+        // Wenn nicht beantwortet
+        if (value !== "ja") return null;
 
-  const kinderBereiche = [
-    "Ambulant",
-    "Stationär",
-    "Zähne",
-    "Brille",
-    "Krankenhaustagegeld"
-  ];
+        const kinderBereiche = [
+          "Ambulant",
+          "Stationär",
+          "Zähne",
+          "Brille",
+          "Krankenhaustagegeld"
+        ];
 
-  const fehlendKinder = kinderBereiche.filter(
-    opt => !answers["kinder_krankenzusatz_" + opt]
-  );
+        const fehlendKinder = kinderBereiche.filter(
+          opt => !answers["kinder_krankenzusatz_" + opt]
+        );
 
-  if (fehlendKinder.length === 0) return null;
+        if (fehlendKinder.length === 0) return null;
 
-  return "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein. Eine Überprüfung des Leistungsumfangs schafft Transparenz.";
+        return "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein. Eine Überprüfung des Leistungsumfangs schafft Transparenz.";
 
       /* ================= HAUSRAT ================= */
 
@@ -1439,6 +1490,39 @@ case "kinder_krankenzusatz":
           return "Bei Heilfürsorge ist eine Anwartschaft entscheidend, um später ohne erneute Gesundheitsprüfung in die private Krankenversicherung wechseln zu können.";
 
         return "Ohne Anwartschaft kann bei späterem Wechsel in die private Krankenversicherung eine erneute Gesundheitsprüfung erforderlich sein.";
+
+        /* ================= RISIKO-LEBENSVERSICHERUNG ================= */
+
+case "risiko_lv":
+
+  if (value === "ja") return null;
+
+  if (value === "unbekannt")
+    return "Hier besteht möglicher Klärungsbedarf. Eine Risikolebensversicherung sichert Hinterbliebene oder finanzielle Verpflichtungen im Todesfall ab.";
+
+  return "Eine Risikolebensversicherung schützt Familie, Partner oder laufende Darlehen im Todesfall und verhindert finanzielle Engpässe.";
+
+  /* ================= RÜCKLAGEN ================= */
+
+case "ruecklagen":
+
+  if (value === "ja") return null;
+
+  if (value === "unbekannt")
+    return "Eine Überprüfung deiner Liquiditätsreserve kann sinnvoll sein.";
+
+  return "Eine Notfallreserve von 3–6 Monatsnettoeinkommen schützt vor finanziellen Engpässen bei unerwarteten Ereignissen wie Jobverlust oder Reparaturen.";
+
+  /* ================= BETRIEBLICHE ALTERSVORSORGE ================= */
+
+case "betriebliche_altersvorsorge":
+
+  if (value === "ja") return null;
+
+  if (value === "unbekannt")
+    return "Hier besteht möglicher Klärungsbedarf. Eine betriebliche Altersvorsorge kann staatliche Förderung und Arbeitgeberzuschüsse nutzen.";
+
+  return "Die betriebliche Altersvorsorge ermöglicht staatlich geförderten Vermögensaufbau und sollte bei Angestellten geprüft werden.";
 
 
       /* ================= KFZ ================= */
