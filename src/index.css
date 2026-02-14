@@ -863,7 +863,7 @@ body::before {
 .recommendationItem {
   background: #0f1a23;
   border-left: 3px solid #8B7CF6;
-  padding: 10px 12px;
+  padding: 14px 16px;
   margin-top: 8px;
   border-radius: 10px;
 }
@@ -881,9 +881,11 @@ body::before {
 }
 
 .dashboardTitle {
-  text-align: center;
-  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
+
 
 .categoryChevron {
   display: flex;
@@ -1134,14 +1136,18 @@ svg {
   position: relative;
 }
 
-/* Text bekommt Platz rechts */
+/* ================= QUESTION TEXT CLEAN ================= */
+
 .questionText {
-  padding-right: 60px;
-  line-height: 1.4;
-  font-size: 17px;
-  font-weight: 500;
+  margin-bottom: 14px;
+  padding-right: 60px;      /* Platz für Info-Icon */
+  
+  font-size: 16px;          /* statt 17 */
+  font-weight: 600;         /* etwas stärker */
+  line-height: 1.5;         /* ruhiger */
   letter-spacing: 0.2px;
 }
+
 
 /* Mehr visuelle Ruhe */
 .questionCard.dark {
@@ -1549,4 +1555,28 @@ svg {
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
+}
+.recommendationItem p {
+  font-size: 14px;
+  line-height: 1.6;   /* vorher ~1.4 */
+  letter-spacing: 0.2px;
+  max-width: 95%;
+}
+@media (max-width: 480px) {
+
+  .recommendationItem p {
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  .questionText {
+    font-size: 15.5px;
+  }
+
+}
+@media (max-width: 480px) {
+  .questionText {
+    font-size: 15.5px;
+    line-height: 1.55;
+  }
 }
