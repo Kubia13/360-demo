@@ -39,11 +39,11 @@ const PRIORITY_MAP = {
   gebaeude: 2,
   rechtsschutz: 2,
   hausrat: 2,
+  kfz_haftpflicht: 2,
 
   krankenzusatz: 1,
   kinder_krankenzusatz: 1,
   kasko: 1,
-  kfz_haftpflicht: 2
 };
 
 /* ================= CORE PRODUKTE ================= */
@@ -190,7 +190,7 @@ const ACTION_MAP = {
 
   schutzbrief: {
     type: "abschluss",
-    url: "https://ssl.barmenia.de/online-versichern/#/kfzversicherung/Fahrzeug?adm=00840513"
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
   },
 
   /* ===== KINDER ===== */
@@ -817,263 +817,299 @@ export default function App() {
     }));
   }
 
-  /* ================= SCORE ================= */
+/* ================= SCORE ================= */
 
-  function getScore(key) {
+function getScore(key) {
 
-    const value = answers[key];
-    const age = Number(baseData.alter);
-    const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+  const value = answers[key];
+  const age = Number(baseData.alter);
+  const income = Number(baseData.gehalt);
+  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+  const hatKinder = baseData.kinder === "Ja";
+  const hatHaus = baseData.wohnen === "Eigentum Haus";
 
-    if (!value) return 0;
+  if (value === undefined) return null;
 
-    /* ========================================================= */
-    /* ===== NICHT RELEVANTE FÄLLE NICHT WERTEN ================= */
-    /* ========================================================= */
+  /* ========================================================= */
+  /* ===== NICHT RELEVANTE FÄLLE NICHT WERTEN ================= */
+  /* ========================================================= */
 
-    if (key === "rentenluecke") return null;
+  if (key === "kinder_krankenzusatz" && !hatKinder) return null;
+  if ((key === "kasko" || key === "kfz_haftpflicht" || key === "schutzbrief") && baseData.kfz !== "Ja") return null;
+  if ((key === "tierhaft" || key === "tier_op") && (!baseData.tiere || baseData.tiere === "Keine Tiere")) return null;
+  if ((key === "hausrat" || key === "elementar") && baseData.wohnen === "Wohne bei Eltern") return null;
+  if (key === "gebaeude" && !hatHaus) return null;
+  if (key === "ktg" && baseData.beruf === "Beamter") return null;
+  if (key === "bu" && (baseData.beruf === "Beamter" || baseData.beruf === "Nicht berufstätig")) return null;
+  if (key === "du" && baseData.beruf !== "Beamter") return null;
 
-    if (key === "kinder_krankenzusatz" && baseData.kinder !== "Ja") return null;
+  /* ========================================================= */
+  /* ===== RÜCKLAGEN ========================================= */
+  /* ========================================================= */
 
-    if (key === "kfz_haftpflicht" && baseData.kfz !== "Ja") return null;
-    if (key === "kasko" && baseData.kfz !== "Ja") return null;
-    if (key === "schutzbrief" && baseData.kfz !== "Ja") return null;
+  if (key === "ruecklagen") {
+    if (value === "ja") return 100;
 
-    if (key === "tierhaft" && (!baseData.tiere || baseData.tiere === "Keine Tiere")) return null;
-    if (key === "tier_op" && (!baseData.tiere || baseData.tiere === "Keine Tiere")) return null;
+    // höheres Einkommen → höheres Risiko ohne Reserve
+    if (income > 4000) return 0;
+    if (income > 2500) return 20;
 
-    if ((key === "hausrat" || key === "elementar") &&
-      (!baseData.wohnen || baseData.wohnen === "Wohne bei Eltern")) return null;
+    return 30;
+  }
 
-    if (key === "gebaeude" && baseData.wohnen !== "Eigentum Haus") return null;
+  /* ========================================================= */
+  /* ===== RISIKO LEBENSVERSICHERUNG ========================== */
+  /* ========================================================= */
 
-    if (key === "ktg" && baseData.beruf === "Beamter") return null;
-
-    /* ========================================================= */
-    /* ===== PRIVATE ALTERSVORSORGE (DEINE LOGIK) =============== */
-    /* ========================================================= */
-
-    if (key === "private_rente") {
-
-      if (value === "ja") return 100;
-
-      if (age < 30) return 0;
-      if (age < 50) return 0;
-
-      return 20;
-    }
-
-
-    /* ========================================================= */
-    /* ===== PFLEGE (DEINE LOGIK) =============================== */
-    /* ========================================================= */
-
-    if (key === "pflege") {
-
-      if (value === "ja") return 100;
-
-      if (age < 30) return 40;
-      if (age < 50) return 20;
-
-      return 0;
-    }
-
-
-    /* ========================================================= */
-    /* ===== KRANKENZUSATZ (ANTEILIG) =========================== */
-    /* ========================================================= */
-
-    if (key === "krankenzusatz") {
-
-      if (value !== "ja") return 0;
-
-      const bereiche = [
-        "Ambulant",
-        "Stationär",
-        "Zähne",
-        "Brille",
-        "Krankenhaustagegeld"
-      ];
-
-      const abgedeckt = bereiche.filter(
-        opt => answers["krankenzusatz_" + opt]
-      );
-
-      return Math.round((abgedeckt.length / bereiche.length) * 100);
-    }
-
-
-    /* ========================================================= */
-    /* ===== KINDER KRANKENZUSATZ (ANTEILIG) ==================== */
-    /* ========================================================= */
-
-    if (key === "kinder_krankenzusatz") {
-
-      if (value !== "ja") return 0;
-
-      const bereiche = [
-        "Ambulant",
-        "Stationär",
-        "Zähne",
-        "Brille",
-        "Krankenhaustagegeld"
-      ];
-
-      const abgedeckt = bereiche.filter(
-        opt => answers["kinder_krankenzusatz_" + opt]
-      );
-
-      return Math.round((abgedeckt.length / bereiche.length) * 100);
-    }
-
-
-    /* ========================================================= */
-    /* ===== RECHTSSCHUTZ (NUR RELEVANTE BEREICHE) ============== */
-    /* ========================================================= */
-
-    if (key === "rechtsschutz") {
-
-      if (value !== "ja") return 0;
-
-      const rsBereiche = [
-        { key: "Privat", relevant: true },
-        { key: "Beruf", relevant: baseData.beruf && baseData.beruf !== "Nicht berufstätig" },
-        { key: "Verkehr", relevant: baseData.kfz === "Ja" },
-        { key: "Immobilie/Miete", relevant: baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern" }
-      ];
-
-      const relevante = rsBereiche.filter(b => b.relevant);
-
-      if (relevante.length === 0) return 100;
-
-      const abgedeckt = relevante.filter(
-        b => answers["rechtsschutz_" + b.key]
-      );
-
-      return Math.round((abgedeckt.length / relevante.length) * 100);
-    }
-
-
-    /* ========================================================= */
-    /* ===== BU (DEINE LOGIK) ================================== */
-    /* ========================================================= */
-
-    if (key === "bu") {
-
-      if (value === "ja") return 100;
-
-      if (verheiratet) return 0;
-
-      return 0;
-    }
-
-    /* ========================================================= */
-    /* ===== DIENSTUNFÄHIGKEIT (DU) ============================ */
-    /* ========================================================= */
-
-    if (key === "bu") {
-
-      // Nur für Nicht-Beamte relevant
-      if (baseData.beruf === "Beamter") return null;
-      if (baseData.beruf === "Nicht berufstätig") return null;
-
-      if (value === "ja") return 100;
-
-      return 0;
-    }
-
-
-
-    /* ========================================================= */
-    /* ===== KASKO (DEINE ORIGINALE LOGIK – UNVERÄNDERT) ======= */
-    /* ========================================================= */
-
-    if (key === "kasko") {
-      if (value === "vollkasko") return 100;
-      if (value === "teilkasko") return 50;
-      return 0;
-    }
-
-
-    /* ========================================================= */
-    /* ===== STANDARD YES / NO ================================= */
-    /* ========================================================= */
+  if (key === "risiko_lv") {
 
     if (value === "ja") return 100;
-    if (value === "nein" || value === "unbekannt") return 0;
+
+    // Relevanz steigt bei Familie oder Immobilie
+    if (verheiratet || hatKinder || hatHaus) return 0;
+
+    // ohne Verpflichtungen weniger kritisch
+    return 40;
+  }
+
+  /* ========================================================= */
+  /* ===== PRIVATE RENTE ===================================== */
+  /* ========================================================= */
+
+  if (key === "private_rente") {
+
+    if (value === "ja") return 100;
+
+    if (age < 30) return 40;
+    if (age < 45) return 20;
 
     return 0;
   }
 
-  /* ================= CATEGORY SCORES ================= */
+  /* ========================================================= */
+  /* ===== BETRIEBLICHE ALTERSVORSORGE ======================= */
+  /* ========================================================= */
 
-  const categoryScores = useMemo(() => {
+  if (key === "betriebliche_altersvorsorge") {
 
-    return categories.reduce((acc, cat) => {
+    if (baseData.beruf !== "Angestellter") return null;
 
-      const relevanteFragen = Object.keys(QUESTIONS).filter((id) => {
+    if (value === "ja") return 100;
+
+    return 0;
+  }
+
+  /* ========================================================= */
+  /* ===== PFLEGE ============================================ */
+  /* ========================================================= */
+
+  if (key === "pflege") {
+
+    if (value === "ja") return 100;
+
+    if (age < 30) return 50;
+    if (age < 50) return 25;
+
+    return 0;
+  }
+
+/* ========================================================= */
+/* ===== KRANKENZUSATZ (GEWICHTET) ========================= */
+/* ========================================================= */
+
+if (key === "krankenzusatz") {
+
+  const gewichtung = {
+    "Stationär": 30,
+    "Zähne": 25,
+    "Ambulant": 20,
+    "Krankenhaustagegeld": 15,
+    "Brille": 10
+  };
+
+  let score = 0;
+
+  Object.keys(gewichtung).forEach((bereich) => {
+    if (answers["krankenzusatz_" + bereich]) {
+      score += gewichtung[bereich];
+    }
+  });
+
+  return score; // maximal 100
+}
+
+
+/* ========================================================= */
+/* ===== KINDER KRANKENZUSATZ (GEWICHTET) ================== */
+/* ========================================================= */
+
+if (key === "kinder_krankenzusatz") {
+
+  const gewichtung = {
+    "Stationär": 30,
+    "Zähne": 25,
+    "Ambulant": 20,
+    "Krankenhaustagegeld": 15,
+    "Brille": 10
+  };
+
+  let score = 0;
+
+  Object.keys(gewichtung).forEach((bereich) => {
+    if (answers["kinder_krankenzusatz_" + bereich]) {
+      score += gewichtung[bereich];
+    }
+  });
+
+  return score; // maximal 100
+}
+
+/* ========================================================= */
+/* ===== RECHTSSCHUTZ (GEWICHTET & RELEVANT) ================ */
+/* ========================================================= */
+
+if (key === "rechtsschutz") {
+
+  const gewichtung = {
+    "Privat": 30,
+    "Beruf": 25,
+    "Verkehr": 25,
+    "Immobilie/Miete": 20
+  };
+
+  const relevant = {
+    "Privat": true,
+    "Beruf": baseData.beruf !== "Nicht berufstätig",
+    "Verkehr": baseData.kfz === "Ja",
+    "Immobilie/Miete": baseData.wohnen !== "Wohne bei Eltern"
+  };
+
+  let maxScore = 0;
+  let score = 0;
+
+  Object.keys(gewichtung).forEach((bereich) => {
+
+    if (!relevant[bereich]) return;
+
+    maxScore += gewichtung[bereich];
+
+    if (answers["rechtsschutz_" + bereich]) {
+      score += gewichtung[bereich];
+    }
+
+  });
+
+  if (maxScore === 0) return 100;
+
+  return Math.round((score / maxScore) * 100);
+}
+
+  /* ========================================================= */
+  /* ===== BU ================================================= */
+  /* ========================================================= */
+
+  if (key === "bu") {
+    if (value === "ja") return 100;
+
+    // höheres Einkommen = höherer Absicherungsbedarf
+    if (income > 4000) return 0;
+    if (income > 2500) return 10;
+
+    return 20;
+  }
+
+  /* ========================================================= */
+  /* ===== DU ================================================= */
+  /* ========================================================= */
+
+  if (key === "du") {
+    if (value === "ja") return 100;
+    return 0;
+  }
+
+  /* ========================================================= */
+  /* ===== KASKO ============================================= */
+  /* ========================================================= */
+
+  if (key === "kasko") {
+    if (value === "vollkasko") return 100;
+    if (value === "teilkasko") return 50;
+    return 0;
+  }
+
+  /* ========================================================= */
+  /* ===== STANDARD JA / NEIN ================================ */
+  /* ========================================================= */
+
+  if (value === "ja") return 100;
+  return 0;
+}
+
+/* ================= CATEGORY SCORES ================= */
+
+const categoryScores = useMemo(() => {
+
+  return categories.reduce((acc, cat) => {
+
+    const scores = Object.keys(QUESTIONS)
+      .filter((id) => {
         const q = QUESTIONS[id];
-
         if (q.category !== cat) return false;
         if (q.condition && !q.condition(baseData)) return false;
-        if (answers[id] === undefined) return false;
-
-        const score = getScore(id);
-        if (score === null) return false; // NICHT WERTEN
-
         return true;
-      });
+      })
+      .map((id) => getScore(id))
+      .filter((score) => score !== null);
 
-      if (relevanteFragen.length === 0) {
-        acc[cat] = 0;
-        return acc;
-      }
-
-      const sum = relevanteFragen.reduce(
-        (total, id) => total + getScore(id),
-        0
-      );
-
-      acc[cat] = Math.round(sum / relevanteFragen.length);
-
+    if (scores.length === 0) {
+      acc[cat] = 0;
       return acc;
+    }
 
-    }, {});
+    const sum = scores.reduce((total, s) => total + s, 0);
 
-  }, [answers, baseData, categories]);
+    acc[cat] = Math.round(sum / scores.length);
+
+    return acc;
+
+  }, {});
+
+}, [answers, baseData, categories]);
 
 
+/* ================= TOTAL SCORE ================= */
 
-  const totalScore = useMemo(() => {
+const totalScore = useMemo(() => {
 
-    const activeCategories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
+  const activeCategories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
 
-      const relevantQuestions = Object.keys(QUESTIONS).filter((id) => {
-        const q = QUESTIONS[id];
+    const hasRelevant = Object.keys(QUESTIONS).some((id) => {
+      const q = QUESTIONS[id];
+      if (q.category !== cat) return false;
+      if (q.condition && !q.condition(baseData)) return false;
 
-        if (q.category !== cat) return false;
-        if (q.condition && !q.condition(baseData)) return false;
-
-        return true;
-      });
-
-      return relevantQuestions.length > 0;
+      const score = getScore(id);
+      return score !== null;
     });
 
-    const totalWeight = activeCategories.reduce(
-      (sum, cat) => sum + CATEGORY_WEIGHTS[cat],
-      0
-    );
+    return hasRelevant;
 
-    if (totalWeight === 0) return 0;
+  });
 
-    const weightedScore = activeCategories.reduce((sum, cat) => {
-      return sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat];
-    }, 0);
+  const totalWeight = activeCategories.reduce(
+    (sum, cat) => sum + CATEGORY_WEIGHTS[cat],
+    0
+  );
 
-    return Math.round(weightedScore / totalWeight);
+  if (totalWeight === 0) return 0;
 
-  }, [categoryScores, baseData]);
+  const weightedScore = activeCategories.reduce((sum, cat) => {
+    return sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat];
+  }, 0);
+
+  return Math.round(weightedScore / totalWeight);
+
+}, [categoryScores, baseData]);
 
 
   /* ===== SCORE ANIMATION ===== */
@@ -1097,63 +1133,62 @@ export default function App() {
     return () => clearInterval(interval);
   }, [totalScore, step]);
 
-  /* ================= TOP 3 HANDLUNGSFELDER ================= */
+ /* ================= TOP 3 HANDLUNGSFELDER ================= */
 
-  const topRecommendations = useMemo(() => {
+const topRecommendations = useMemo(() => {
 
-    if (step !== "dashboard") return [];
+  if (step !== "dashboard") return [];
 
-    const EXCLUDED_FROM_TOP3 = ["elementar", "schutzbrief"];
+  const EXCLUDED_FROM_TOP3 = [
+    "elementar",
+    "schutzbrief"
+  ];
 
-    const allRecommendations = [];
+  const allRecommendations = Object.keys(QUESTIONS)
+    .filter((id) => {
 
-    Object.keys(answers).forEach((id) => {
+      if (!CORE_PRODUCTS.includes(id)) return false;
+      if (EXCLUDED_FROM_TOP3.includes(id)) return false;
 
-      if (EXCLUDED_FROM_TOP3.includes(id)) return;
-
-      // BU nur für Nicht-Beamte & nicht Nicht-berufstätig
-      if (id === "bu") {
-        if (baseData.beruf === "Beamter") return;
-        if (baseData.beruf === "Nicht berufstätig") return;
-      }
-
-      // DU nur für Beamte
-      if (id === "du") {
-        if (baseData.beruf !== "Beamter") return;
-      }
+      const q = QUESTIONS[id];
+      if (q.condition && !q.condition(baseData)) return false;
 
       const score = getScore(id);
-      if (score === null) return;
-      if (score >= 100) return;
+      if (score === null) return false;
+      if (score >= 100) return false;
+
+      // Vollkasko nie empfehlen
+      if (id === "kasko" && answers[id] === "vollkasko") return false;
 
       const text = getStrategicRecommendation(id);
-      if (!text) return;
+      if (!text) return false;
 
-      if (id === "kasko" && answers[id] === "vollkasko") return;
+      return true;
 
-      if (!CORE_PRODUCTS.includes(id)) return;
+    })
+    .map((id) => ({
+      id,
+      text: getStrategicRecommendation(id),
+      priority: PRIORITY_MAP[id] || 1,
+      score: getScore(id)
+    }));
 
-      allRecommendations.push({
-        id,
-        text,
-        priority: PRIORITY_MAP[id] || 1,
-        score
-      });
 
-    });
+  allRecommendations.sort((a, b) => {
 
-    allRecommendations.sort((a, b) => {
+    // 1️⃣ Höhere Priorität zuerst
+    if (b.priority !== a.priority) {
+      return b.priority - a.priority;
+    }
 
-      if (b.priority !== a.priority) {
-        return b.priority - a.priority;
-      }
+    // 2️⃣ Schlechterer Score zuerst
+    return a.score - b.score;
+  });
 
-      return a.score - b.score;
-    });
+  return allRecommendations.slice(0, 3);
 
-    return allRecommendations.slice(0, 3);
+}, [answers, baseData, step]);
 
-  }, [answers, baseData, step]);
 
   /* ================= PRODUKTSEITE ================= */
 
