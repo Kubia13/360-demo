@@ -1081,60 +1081,70 @@ svg {
   display: inline-block;
 }
 
-/* ================= INFO ICON PREMIUM ================= */
+/* ================= INFO ICON CLEAN ================= */
 
 .questionCard {
   position: relative;
 }
 
+/* Text bekommt Platz rechts */
+.questionText {
+  padding-right: 52px;
+  line-height: 1.45;
+}
+
+/* Icon */
 .floatingInfoSquare {
   position: absolute;
+  top: 14px;
+  right: 16px;
 
-  top: 16px;       /* sauber im Card-Kopf */
-  right: 18px;     /* bündig mit Innenpadding */
-
-  width: 32px;     /* größer */
-  height: 32px;
+  width: 30px;
+  height: 30px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 17px; /* proportional größer */
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
 
-  border-radius: 10px;
+  border-radius: 8px;
 
   cursor: pointer;
 
-  background: rgba(139, 124, 246, 0.22);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* dezente Glasoptik */
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
-  border: 1px solid rgba(139, 124, 246, 0.5);
+  border: 1px solid rgba(139, 124, 246, 0.6);
   color: #8B7CF6;
 
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.08),
-    0 6px 16px rgba(0,0,0,0.45);
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 4px 12px rgba(0,0,0,0.4);
 
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
+/* Hover wie Zurück-Pfeil – nicht übertrieben */
 .floatingInfoSquare:hover {
-  background: rgba(139, 124, 246, 0.35);
-
-  box-shadow:
-    0 0 18px rgba(139, 124, 246, 0.6),
-    0 0 28px rgba(94, 74, 227, 0.4);
-
-  transform: scale(1.1);
+  background: rgba(139, 124, 246, 0.12);
+  transform: translateY(-1px);
 }
 
+/* Active sauber */
 .floatingInfoSquare:active {
-  transform: scale(0.95);
+  transform: translateY(0) scale(0.95);
 }
 
+/* Mobile minimal mehr Luft */
+@media (max-width: 480px) {
+  .questionText {
+    padding-right: 56px;
+  }
+}
 
 /* ================= DISCLAIMER PREMIUM ================= */
 
