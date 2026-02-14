@@ -376,7 +376,7 @@ body {
 }
 
 
-/* ================= RESET OVERLAY ================= */
+/* ================= OVERLAY BASE ================= */
 
 .infoOverlay {
   position: fixed;
@@ -393,6 +393,9 @@ body {
   z-index: 1000;
 }
 
+/* ================= OVERLAY BOX ================= */
+
+.infoBox,
 .legalBox {
   width: 100%;
   max-width: 600px;
@@ -409,6 +412,34 @@ body {
   box-shadow: 0 25px 60px rgba(0,0,0,0.6);
 }
 
+/* Scrollbar dezenter */
+.infoBox::-webkit-scrollbar,
+.legalBox::-webkit-scrollbar {
+  width: 6px;
+}
+
+.infoBox::-webkit-scrollbar-thumb,
+.legalBox::-webkit-scrollbar-thumb {
+  background: rgba(139,124,246,0.4);
+  border-radius: 6px;
+}
+
+/* ================= LINKS IM IMPRESSUM ================= */
+
+.legalBox a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: underline;
+  text-decoration-color: rgba(139,124,246,0.6);
+  text-underline-offset: 3px;
+  transition: all 0.2s ease;
+}
+
+.legalBox a:hover {
+  color: #ffffff;
+  text-decoration-color: #8B7CF6;
+}
+
+/* ================= BUTTON CONTAINER ================= */
 
 .overlayButtons {
   display: flex;
@@ -417,34 +448,53 @@ body {
   margin-top: 20px;
 }
 
+/* ================= OVERLAY BUTTON ================= */
+
 .overlayBtn {
   flex: 1;
 
   height: 56px;
   min-height: 56px;
 
-  padding: 0;
-  margin: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
 
   font-size: 15px;
-  font-weight: bold;
-  line-height: 1;
+  font-weight: 600;
 
   border-radius: 18px;
-
-  box-sizing: border-box;
-  appearance: none;
-  -webkit-appearance: none;
-
   border: 1px solid transparent;
 
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: all 0.2s ease;
 }
+
+/* Primär (lila Verlauf) */
+
+.overlayBtn.primary {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+}
+
+.overlayBtn.primary:hover {
+  box-shadow: 0 0 18px rgba(139,124,246,0.6);
+  transform: translateY(-2px);
+}
+
+/* Sekundär (Glas Look) */
+
+.overlayBtn.secondary {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(139,124,246,0.4);
+  color: rgba(255,255,255,0.85);
+}
+
+.overlayBtn.secondary:hover {
+  background: rgba(139,124,246,0.15);
+  transform: translateY(-2px);
+}
+
 
 /* Ja */
 .overlayBtn.primary {
@@ -1025,23 +1075,6 @@ body::before {
   .productButton {
     width: 100%;
   }
-}
-
-.legalBox a {
-  color: rgba(255,255,255,0.85);
-  text-decoration: underline;
-  text-decoration-color: rgba(139,124,246,0.6);
-  text-underline-offset: 3px;
-  transition: all 0.2s ease;
-}
-
-.legalBox a:hover {
-  color: #ffffff;
-  text-decoration-color: #8B7CF6;
-}
-.answerBtn.active {
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
 }
 
 .recommendationBtn,
