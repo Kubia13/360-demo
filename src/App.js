@@ -1129,7 +1129,7 @@ export default function App() {
                             window.open(product.url, "_blank", "noopener,noreferrer")
                           }
                         >
-                          Abschließen
+                          jetzt Online absichern
                         </button>
 
                       </div>
