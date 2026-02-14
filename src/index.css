@@ -480,7 +480,7 @@ body {
   transform: scale(0.97);
 }
 
-/* ================= CALCULATOR ICON ================= */
+/* ================= CALCULATOR ICON – PREMIUM CLEAN ================= */
 
 .calculatorIcon {
   display: inline-flex;
@@ -490,10 +490,10 @@ body {
   margin-top: 12px;
   margin-left: 8px;
 
-  width: 46px;          /* vorher 40px */
-  height: 46px;         /* vorher 40px */
+  width: 46px;
+  height: 46px;
 
-  border-radius: 16px;  /* proportional größer */
+  border-radius: 16px;
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -508,33 +508,35 @@ body {
     0 8px 20px rgba(0, 0, 0, 0.5);
 
   transition: all 0.25s ease;
+
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 /* SVG proportional größer */
 .calculatorIcon svg {
-  width: 24px;   /* vorher 20px */
+  width: 24px;
   height: 24px;
 }
 
-.calculatorIcon:hover {
-  transform: translateY(-2px);
-
-  background: rgba(139, 124, 246, 0.18);
-
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 10px 24px rgba(139, 124, 246, 0.4),
-    0 0 18px rgba(139, 124, 246, 0.6);
+/* Hover nur bei echten Maus-Geräten */
+@media (hover: hover) and (pointer: fine) {
+  .calculatorIcon:hover {
+    transform: translateY(-2px);
+    background: rgba(139, 124, 246, 0.18);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 10px 24px rgba(139, 124, 246, 0.4),
+      0 0 18px rgba(139, 124, 246, 0.6);
+  }
 }
 
-.calculatorIcon:active {
-  transform: translateY(0) scale(0.97);
-}
-
-
-/* ACTIVE */
+/* Active – sauberes Touch Feedback */
 .calculatorIcon:active {
   transform: translateY(0) scale(0.96);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 
@@ -1278,21 +1280,14 @@ svg {
   transition: all 0.18s ease;
 }
 
-/* ===== CLEAN TOUCH BEHAVIOR ===== */
-
-.numberStepper button {
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
+/* Hover – subtiler Glow */
+.numberStepper button:hover {
+  background: rgba(139,124,246,0.15);
+  box-shadow: 0 0 10px rgba(139,124,246,0.4);
+  transform: scale(1.05);
 }
 
-/* Hover nur auf Geräten mit echter Maus */
-@media (hover: hover) and (pointer: fine) {
-  .numberStepper button:hover {
-    background: rgba(139,124,246,0.12);
-  }
-}
-
-/* Active Zustand dezenter */
+/* Active */
 .numberStepper button:active {
-  transform: scale(0.95);
+  transform: scale(0.92);
 }
