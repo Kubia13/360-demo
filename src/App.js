@@ -28,6 +28,7 @@ const CATEGORY_LABELS = {
 const PRIORITY_MAP = {
   bu: 3,
   du: 3,
+  anwartschaft: 3,
 
   haftpflicht: 3,
   pflege: 3,
@@ -50,6 +51,7 @@ const CORE_PRODUCTS = [
   "du",
   "ktg",
   "haftpflicht",
+   "anwartschaft",
   "hausrat",
   "private_rente",
   "rentenluecke",
@@ -89,6 +91,12 @@ const ACTION_MAP = {
     type: "abschluss",
     url: "https://ssl.barmenia.de/online-versichern/#/unfallversicherung/Beitrag?adm=00840513"
   },
+
+  anwartschaft: {
+  type: "beratung",
+  calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+},
+
 
   /* ===== HAFTUNG ===== */
 
@@ -220,6 +228,26 @@ const QUESTIONS = {
       "Besonders wichtig ist eine echte DU-Klausel."
   },
 
+  anwartschaft: {
+    label: "Besteht eine Anwartschaft auf eine private Krankenversicherung?",
+    category: "existenz",
+    type: "select",
+    options: [
+      "Große Anwartschaft",
+      "Kleine Anwartschaft",
+      "Keine",
+      "Weiß nicht"
+    ],
+    condition: (baseData) =>
+      baseData.krankenversicherung === "Heilfürsorge",
+    info:
+      "Heilfürsorge ist keine eigene Krankenversicherung, sondern eine Absicherung über den Dienstherrn.\n\n" +
+      "Endet das Dienstverhältnis, wird in der Regel eine private Krankenversicherung benötigt.\n\n" +
+      "Eine Anwartschaft sichert den späteren Zugang zur PKV ohne erneute Gesundheitsprüfung.\n\n" +
+      "Große Anwartschaft: Gesundheitszustand und Eintrittsalter werden gesichert.\n" +
+      "Kleine Anwartschaft: Nur der Gesundheitszustand wird gesichert."
+  },
+
 
   ktg: {
     label: "Krankentagegeld vorhanden?",
@@ -344,7 +372,9 @@ const QUESTIONS = {
     label: "Krankenzusatzversicherung vorhanden?",
     category: "gesundheit",
     type: "yesno",
-    hasSubOptions: true
+    hasSubOptions: true,
+    condition: (baseData) =>
+      baseData.krankenversicherung === "Gesetzlich versichert (GKV)"
   },
 
   pflege: {
@@ -393,7 +423,12 @@ const QUESTIONS = {
     label: "Krankenzusatz für dein Kind vorhanden?",
     category: "kinder",
     type: "yesno",
-    condition: (baseData) => baseData.kinder === "Ja",
+    condition: (baseData) =>
+      baseData.kinder === "Ja" &&
+      (
+        baseData.kinderKrankenversicherung === "Gesetzlich versichert (GKV)" ||
+        baseData.kinderKrankenversicherung === "Weiß nicht"
+      ),
     hasSubOptions: true
   },
 
@@ -570,10 +605,12 @@ export default function App() {
     vorname: "",
     nachname: "",
     alter: "",
-    gehalt: "",
     beziehungsstatus: "",
     beruf: "",
+    krankenversicherung: "",
+    gehalt: "",
     kinder: "",
+    kinderKrankenversicherung: "",
     kinderAnzahl: "",
     tiere: "",
     wohnen: "",
@@ -611,10 +648,12 @@ export default function App() {
     vorname: React.createRef(),
     nachname: React.createRef(),
     alter: React.createRef(),
-    gehalt: React.createRef(),
     beziehungsstatus: React.createRef(),
     beruf: React.createRef(),
+    krankenversicherung: React.createRef(),
+    gehalt: React.createRef(),
     kinder: React.createRef(),
+    kinderKrankenversicherung: React.createRef(),
     kinderAnzahl: React.createRef(),
     tiere: React.createRef(),
     wohnen: React.createRef(),
@@ -630,17 +669,18 @@ export default function App() {
     baseFormRefs.vorname,
     baseFormRefs.nachname,
     baseFormRefs.alter,
-    baseFormRefs.gehalt,
     baseFormRefs.beziehungsstatus,
     baseFormRefs.beruf,
+    baseFormRefs.krankenversicherung,
+    baseFormRefs.gehalt,
     baseFormRefs.kinder,
+    baseFormRefs.kinderKrankenversicherung,
     baseFormRefs.kinderAnzahl,
     baseFormRefs.tiere,
     baseFormRefs.wohnen,
     baseFormRefs.kfz,
     baseFormRefs.kfzAnzahl,
   ], [baseFormRefs]);
-
 
   /* ================= FOCUS LOGIC ================= */
 
@@ -695,10 +735,12 @@ export default function App() {
       vorname: "",
       nachname: "",
       alter: "",
-      gehalt: "",
       beziehungsstatus: "",
       beruf: "",
+      krankenversicherung: "",
+      gehalt: "",
       kinder: "",
+      kinderKrankenversicherung: "",
       kinderAnzahl: "",
       tiere: "",
       wohnen: "",
@@ -1295,29 +1337,36 @@ export default function App() {
 
         return "Eine umfassende Gesundheitsabsicherung sollte mehrere Leistungsbereiche abdecken. Eine Überprüfung des Umfangs kann sinnvoll sein.";
 
-      /* ================= KINDER KRANKENZUSATZ ================= */
+/* ================= KINDER KRANKENZUSATZ ================= */
 
-      case "kinder_krankenzusatz":
+case "kinder_krankenzusatz":
 
-        if (value !== "ja") return value === "nein"
-          ? "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein."
-          : null;
+  // Wenn Kinder-KV unklar ist → erst System klären
+  if (baseData.kinderKrankenversicherung === "Weiß nicht")
+    return "Die Krankenversicherung deiner Kinder sollte geklärt werden, um mögliche Versorgungslücken einschätzen zu können.";
 
-        const kinderBereiche = [
-          "Ambulant",
-          "Stationär",
-          "Zähne",
-          "Brille",
-          "Krankenhaustagegeld"
-        ];
+  // Wenn keine Zusatz vorhanden
+  if (value === "nein")
+    return "Für gesetzlich versicherte Kinder kann eine ergänzende Gesundheitsabsicherung sinnvoll sein.";
 
-        const fehlendKinder = kinderBereiche.filter(
-          opt => !answers["kinder_krankenzusatz_" + opt]
-        );
+  // Wenn nicht beantwortet
+  if (value !== "ja") return null;
 
-        if (fehlendKinder.length === 0) return null;
+  const kinderBereiche = [
+    "Ambulant",
+    "Stationär",
+    "Zähne",
+    "Brille",
+    "Krankenhaustagegeld"
+  ];
 
-        return "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein. Eine Überprüfung des Leistungsumfangs schafft Transparenz.";
+  const fehlendKinder = kinderBereiche.filter(
+    opt => !answers["kinder_krankenzusatz_" + opt]
+  );
+
+  if (fehlendKinder.length === 0) return null;
+
+  return "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein. Eine Überprüfung des Leistungsumfangs schafft Transparenz.";
 
       /* ================= HAUSRAT ================= */
 
@@ -1376,6 +1425,21 @@ export default function App() {
         if (fehlendRS.length === 0) return null;
 
         return "Eine vollständige Rechtsschutzabsicherung sollte alle relevanten Lebensbereiche abdecken.";
+
+      /* ================= ANWARTSCHAFT ================= */
+
+      case "anwartschaft":
+
+        if (value === "Große Anwartschaft") return null;
+
+        if (value === "Kleine Anwartschaft")
+          return "Eine große Anwartschaft sichert zusätzlich das Eintrittsalter und kann langfristig Beitragssicherheit bieten.";
+
+        if (value === "Weiß nicht")
+          return "Bei Heilfürsorge ist eine Anwartschaft entscheidend, um später ohne erneute Gesundheitsprüfung in die private Krankenversicherung wechseln zu können.";
+
+        return "Ohne Anwartschaft kann bei späterem Wechsel in die private Krankenversicherung eine erneute Gesundheitsprüfung erforderlich sein.";
+
 
       /* ================= KFZ ================= */
 
@@ -1464,63 +1528,63 @@ export default function App() {
                 <strong>Hinweis zur Nutzung dieser Anwendung</strong>
               </p>
 
-<p style={{ fontSize: 13, opacity: 0.75 }}>
-  Der 360° Absicherungscheck stellt ein unverbindliches digitales
-  Informations- und Analyseangebot dar. Er ersetzt keine individuelle
-  Versicherungsberatung oder Bedarfsanalyse im Sinne des
-  Versicherungsvertragsgesetzes (VVG).
-</p>
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Der 360° Absicherungscheck stellt ein unverbindliches digitales
+                Informations- und Analyseangebot dar. Er ersetzt keine individuelle
+                Versicherungsberatung oder Bedarfsanalyse im Sinne des
+                Versicherungsvertragsgesetzes (VVG).
+              </p>
 
-<p style={{ fontSize: 13, opacity: 0.75 }}>
-  Die dargestellten Ergebnisse basieren ausschließlich auf den vom Nutzer
-  gemachten Angaben sowie auf einer algorithmischen Auswertung.
-  Angezeigte Handlungsfelder oder Abschlussmöglichkeiten stellen
-  keine individuelle Empfehlung dar.
-</p>
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Die dargestellten Ergebnisse basieren ausschließlich auf den vom Nutzer
+                gemachten Angaben sowie auf einer algorithmischen Auswertung.
+                Angezeigte Handlungsfelder oder Abschlussmöglichkeiten stellen
+                keine individuelle Empfehlung dar.
+              </p>
 
-<p style={{ fontSize: 13, opacity: 0.75 }}>
-  Ein Beratungsverhältnis entsteht erst im Rahmen eines persönlichen
-  Gesprächs. Die Nutzung von Abschluss- oder Terminlinks erfolgt
-  eigenverantwortlich.
-</p>
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Ein Beratungsverhältnis entsteht erst im Rahmen eines persönlichen
+                Gesprächs. Die Nutzung von Abschluss- oder Terminlinks erfolgt
+                eigenverantwortlich.
+              </p>
 
-<p style={{ fontSize: 13, opacity: 0.75 }}>
-  Florian Löffler ist als gebundener Versicherungsvertreter gemäß
-  § 34d Abs. 7 GewO tätig und vermittelt ausschließlich die Produkte
-  folgender Gesellschaften:
-</p>
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Florian Löffler ist als gebundener Versicherungsvertreter gemäß
+                § 34d Abs. 7 GewO tätig und vermittelt ausschließlich die Produkte
+                folgender Gesellschaften:
+              </p>
 
-<p style={{ fontSize: 13, opacity: 0.75 }}>
-  Barmenia Versicherungen a. G.<br />
-  Barmenia Krankenversicherung AG<br />
-  Barmenia Allgemeine Versicherungs-AG<br />
-  Gothaer Krankenversicherung AG<br />
-  Gothaer Lebensversicherung AG<br />
-  Roland Rechtsschutz-Versicherungs-AG<br />
-  Roland Schutzbrief-Versicherung AG
-</p>
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Barmenia Versicherungen a. G.<br />
+                Barmenia Krankenversicherung AG<br />
+                Barmenia Allgemeine Versicherungs-AG<br />
+                Gothaer Krankenversicherung AG<br />
+                Gothaer Lebensversicherung AG<br />
+                Roland Rechtsschutz-Versicherungs-AG<br />
+                Roland Schutzbrief-Versicherung AG
+              </p>
 
-<p style={{ fontSize: 13, opacity: 0.75 }}>
-  Für die Vermittlung erhält Florian Löffler eine Provision sowie
-  gegebenenfalls weitere Vergütungen, die in der jeweiligen
-  Versicherungsprämie enthalten sind.
-</p>
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Für die Vermittlung erhält Florian Löffler eine Provision sowie
+                gegebenenfalls weitere Vergütungen, die in der jeweiligen
+                Versicherungsprämie enthalten sind.
+              </p>
 
-<p style={{ fontSize: 13, opacity: 0.75 }}>
-  Zuständige Schlichtungsstellen:
-</p>
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Zuständige Schlichtungsstellen:
+              </p>
 
-<p style={{ fontSize: 13, opacity: 0.75 }}>
-  Versicherungsombudsmann e. V.<br />
-  Postfach 080632<br />
-  10006 Berlin
-</p>
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Versicherungsombudsmann e. V.<br />
+                Postfach 080632<br />
+                10006 Berlin
+              </p>
 
-<p style={{ fontSize: 13, opacity: 0.75 }}>
-  Ombudsmann für private Kranken- und Pflegeversicherung<br />
-  Postfach 06 02 22<br />
-  10052 Berlin
-</p>
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Ombudsmann für private Kranken- und Pflegeversicherung<br />
+                Postfach 06 02 22<br />
+                10052 Berlin
+              </p>
 
             </>
           )}
@@ -1910,15 +1974,6 @@ export default function App() {
           onEnter={() => focusNext(baseFormRefs.alter)}
         />
 
-        <Input
-          label="Monatliches Netto-Gehalt (€)"
-          type="number"
-          value={baseData.gehalt}
-          onChange={(v) => updateBaseData("gehalt", v)}
-          inputRef={baseFormRefs.gehalt}
-          onEnter={() => focusNext(baseFormRefs.gehalt)}
-        />
-
         <Select
           label="Familienstand"
           options={[
@@ -1950,6 +2005,28 @@ export default function App() {
         />
 
         <Select
+          label="Krankenversicherung"
+          options={[
+            "Gesetzlich versichert (GKV)",
+            "Privat versichert (PKV)",
+            "Heilfürsorge"
+          ]}
+          value={baseData.krankenversicherung}
+          onChange={(v) => updateBaseData("krankenversicherung", v)}
+          selectRef={baseFormRefs.krankenversicherung}
+          onEnter={() => focusNext(baseFormRefs.krankenversicherung)}
+        />
+
+        <Input
+          label="Monatliches Netto-Gehalt (€)"
+          type="number"
+          value={baseData.gehalt}
+          onChange={(v) => updateBaseData("gehalt", v)}
+          inputRef={baseFormRefs.gehalt}
+          onEnter={() => focusNext(baseFormRefs.gehalt)}
+        />
+
+        <Select
           label="Hast du Kinder?"
           options={["Nein", "Ja"]}
           value={baseData.kinder}
@@ -1959,14 +2036,30 @@ export default function App() {
         />
 
         {baseData.kinder === "Ja" && (
-          <Input
-            label="Anzahl Kinder"
-            type="number"
-            value={baseData.kinderAnzahl}
-            onChange={(v) => updateBaseData("kinderAnzahl", v)}
-            inputRef={baseFormRefs.kinderAnzahl}
-            onEnter={() => focusNext(baseFormRefs.kinderAnzahl)}
-          />
+          <>
+            <Select
+              label="Wie sind deine Kinder krankenversichert?"
+              options={[
+                "Gesetzlich versichert (GKV)",
+                "Privat versichert (PKV)",
+                "Beihilfe + PKV",
+                "Weiß nicht"
+              ]}
+              value={baseData.kinderKrankenversicherung}
+              onChange={(v) => updateBaseData("kinderKrankenversicherung", v)}
+              selectRef={baseFormRefs.kinderKrankenversicherung}
+              onEnter={() => focusNext(baseFormRefs.kinderKrankenversicherung)}
+            />
+
+            <Input
+              label="Anzahl Kinder"
+              type="number"
+              value={baseData.kinderAnzahl}
+              onChange={(v) => updateBaseData("kinderAnzahl", v)}
+              inputRef={baseFormRefs.kinderAnzahl}
+              onEnter={() => focusNext(baseFormRefs.kinderAnzahl)}
+            />
+          </>
         )}
 
         <Select
