@@ -514,7 +514,7 @@ const [answers, setAnswers] = useState({});
 const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
 const [baseData, setBaseData] = useState({
-  geschlecht: "",
+  anrede: "",
   vorname: "",
   nachname: "",
   alter: "",
@@ -554,7 +554,7 @@ const [baseData, setBaseData] = useState({
   /* ================= BASE FORM REFS ================= */
 
   const baseFormRefs = useMemo(() => ({
-    geschlecht: React.createRef(),
+    anrede: React.createRef(),
     vorname: React.createRef(),
     nachname: React.createRef(),
     alter: React.createRef(),
@@ -573,7 +573,7 @@ const [baseData, setBaseData] = useState({
   /* ================= BASE INPUT ORDER ================= */
 
   const baseInputOrder = useMemo(() => [
-    baseFormRefs.geschlecht,
+    baseFormRefs. anrede,
     baseFormRefs.vorname,
     baseFormRefs.nachname,
     baseFormRefs.alter,
@@ -634,29 +634,32 @@ const [baseData, setBaseData] = useState({
 
   /* ================= RESET ================= */
 
-  function resetAll() {
-    setStep("welcome");
-    setAnswers({});
-    setBaseData({
-      geschlecht: "",
-      vorname: "",
-      nachname: "",
-      alter: "",
-      gehalt: "",
-      beziehungsstatus: "",
-      beruf: "",
-      kinder: "",
-      kinderAnzahl: "",
-      tiere: "",
-      wohnen: "",
-      kfz: "",
-      kfzAnzahl: ""
-    });
-    setCurrentCategoryIndex(0);
-    setAnimatedScore(0);
-    setExpandedCategory(null);
-    setLegalOverlay(null);
-  }
+function resetAll() {
+  setStep("welcome");
+  setAnswers({});
+  setBaseData({
+    anrede: "",
+    vorname: "",
+    nachname: "",
+    alter: "",
+    gehalt: "",
+    beziehungsstatus: "",
+    beruf: "",
+    kinder: "",
+    kinderAnzahl: "",
+    tiere: "",
+    wohnen: "",
+    kfz: "",
+    kfzAnzahl: ""
+  });
+
+  setCurrentCategoryIndex(0);
+  setAnimatedScore(0);
+  setExpandedCategory(null);
+  setLegalOverlay(null);
+
+  setDisclaimerAccepted(false); // <-- DAS HIER HINZUFÜGEN
+}
 
 
   /* ================= ANSWER ================= */
@@ -1667,14 +1670,14 @@ if (step === "disclaimer") {
 
         <h2>Persönliche Angaben</h2>
 
-        <Select
-          label="Geschlecht"
-          options={["Herr", "Frau", "Divers"]}
-          value={baseData.geschlecht}
-          onChange={(v) => updateBaseData("geschlecht", v)}
-          selectRef={baseFormRefs.geschlecht}
-          onEnter={() => focusNext(baseFormRefs.geschlecht)}
-        />
+<Select
+  label="Anrede"
+  options={["Herr", "Frau", "Divers", "Keine Angabe"]}
+  value={baseData.anrede}
+  onChange={(v) => updateBaseData("anrede", v)}
+  selectRef={baseFormRefs.anrede}
+  onEnter={() => focusNext(baseFormRefs.anrede)}
+/>
 
         <Input
           label="Vorname"
@@ -2425,21 +2428,45 @@ function Input({
     }
   };
 
+  const isNumber = type === "number";
+
+  const increase = () => {
+    const current = parseInt(value) || 0;
+    onChange(current + 1);
+  };
+
+  const decrease = () => {
+    const current = parseInt(value) || 0;
+    onChange(Math.max(0, current - 1));
+  };
+
   return (
     <div className="field">
       {label && <label>{label}</label>}
 
-      <input
-        ref={inputRef}
-        type={type}
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
+      <div className={isNumber ? "numberField" : ""}>
+        <input
+          ref={inputRef}
+          type={type}
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+
+        {isNumber && (
+          <div className="numberStepper">
+            <button type="button" onClick={increase}>
+              +
+            </button>
+            <button type="button" onClick={decrease}>
+              −
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-
 function Select({
   label,
   options,

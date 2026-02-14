@@ -1168,8 +1168,12 @@ svg {
 
 .disclaimerCard h2 {
   background: linear-gradient(135deg, #8B7CF6, #A99BFF);
-  -webkit-background-clip: text;
+
+  background-clip: text;            /* Standard */
+  -webkit-background-clip: text;    /* Safari / Chrome */
+
   color: transparent;
+  -webkit-text-fill-color: transparent; /* wichtig für Safari */
 }
 
 .disclaimerCard p {
@@ -1208,4 +1212,80 @@ svg {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ===== PREMIUM NUMBER INPUT – MINI GLASS MODULE ===== */
+
+.field input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.field input[type="number"]::-webkit-outer-spin-button,
+.field input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numberField {
+  position: relative;
+}
+
+.numberField input {
+  padding-right: 56px;
+}
+/* ===== MINI GLASS NUMBER STEPPER – CLEAN ===== */
+
+.numberStepper {
+  position: absolute;
+  right: 1px;                 /* etwas näher am Rand */
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;                    /* enger */
+
+  padding: 6px 6px;
+
+  border-radius: 16px;         /* weniger extrem rund */
+  background: rgba(139,124,246,0.08);  /* deutlich dezenter */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(139,124,246,0.22);
+
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* Buttons */
+.numberStepper button {
+  width: 22px;                 /* kleiner */
+  height: 15px;
+
+  border-radius: 8px;          /* weniger rund */
+  border: none;
+
+  background: transparent;     /* KEINE fette Fläche */
+  color: #A99BFF;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+/* Hover – subtiler Glow */
+.numberStepper button:hover {
+  background: rgba(139,124,246,0.15);
+  box-shadow: 0 0 10px rgba(139,124,246,0.4);
+  transform: scale(1.05);
+}
+
+/* Active */
+.numberStepper button:active {
+  transform: scale(0.92);
 }
