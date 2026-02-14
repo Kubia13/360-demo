@@ -1413,34 +1413,56 @@ svg {
   box-shadow: 0 8px 22px rgba(139,124,246,0.4);
 }
 
-.checkbox input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #8B7CF6;
-  border-radius: 4px; /* wenn du komplett eckig willst: 0 */
-  background: transparent;
-  cursor: pointer;
-  position: relative;
-  display: inline-block;
-}
+/* ================= SYMMETRISCHE CHECKBOX ================= */
 
-/* Haken */
 .checkbox input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
+
   width: 20px;
   height: 20px;
-  border: 2px solid #8B7CF6;
-  border-radius: 4px; /* oder 0 wenn komplett eckig */
-  background: transparent;
-  cursor: pointer;
-  position: relative;
+
+  min-width: 20px;
+  min-height: 20px;
+
+  aspect-ratio: 1 / 1;   /* garantiert quadratisch */
+
+  border-radius: 6px;
+  border: 2px solid rgba(139,124,246,0.6);
+
+  background: rgba(255,255,255,0.03);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: 0.2s ease;
+
+  cursor: pointer;
+  position: relative;
+
+  transition: all 0.2s ease;
+}
+
+/* Haken */
+.checkbox input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+
+  width: 10px;
+  height: 6px;
+
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+
+  transform: rotate(-45deg);
+  top: 50%;
+  left: 50%;
+  translate: -50% -60%;
+
+  opacity: 0;
+}
+
+.checkbox input[type="checkbox"]:checked::after {
+  opacity: 1;
 }
 
 /* Checked Background */
