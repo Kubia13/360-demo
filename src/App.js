@@ -1003,90 +1003,73 @@ export default function App() {
     return () => clearInterval(interval);
   }, [totalScore, step]);
 
-  /* ================= TOP 3 HANDLUNGSFELDER ================= */
+ /* ================= TOP 3 HANDLUNGSFELDER ================= */
 
-  const topRecommendations = useMemo(() => {
+const topRecommendations = useMemo(() => {
 
-    if (step !== "dashboard") return [];
+  if (step !== "dashboard") return [];
 
-    const EXCLUDED_FROM_TOP3 = ["elementar", "schutzbrief"];
+  const EXCLUDED_FROM_TOP3 = ["elementar", "schutzbrief"];
 
-    const allRecommendations = [];
+  const allRecommendations = [];
 
-    Object.keys(answers).forEach((id) => {
+  Object.keys(answers).forEach((id) => {
 
-      // 🔒 1️⃣ Add-on Produkte komplett ausschließen
-      if (EXCLUDED_FROM_TOP3.includes(id)) return;
+    // 1️⃣ Add-on Produkte komplett ausschließen
+    if (EXCLUDED_FROM_TOP3.includes(id)) return;
 
-      // 🔒 2️⃣ Berufslogik sauber trennen
+    // 2️⃣ Berufslogik sauber trennen
 
-      /* ========================================================= */
-      /* ===== BU (NUR FÜR ERWERBSTÄTIGE NICHT-BEAMTE) =========== */
-      /* ========================================================= */
+    // BU nur für Erwerbstätige (nicht Beamte, nicht Nicht berufstätig)
+    if (id === "bu") {
+      if (baseData.beruf === "Beamter") return;
+      if (baseData.beruf === "Nicht berufstätig") return;
+    }
 
-      if (key === "bu") {
+    // DU nur für Beamte
+    if (id === "du") {
+      if (baseData.beruf !== "Beamter") return;
+    }
 
-        if (baseData.beruf === "Beamter") return null;
-        if (baseData.beruf === "Nicht berufstätig") return null;
+    const score = getScore(id);
+    if (score === null) return;
 
-        if (value === "ja") return 100;
+    // 3️⃣ Produkte mit 100% Score nicht anzeigen
+    if (score >= 100) return;
 
-        return 0;
-      }
+    const text = getStrategicRecommendation(id);
+    if (!text) return;
 
+    // 4️⃣ KASKO LOGIK
+    if (id === "kasko" && answers[id] === "vollkasko") return;
 
-      /* ========================================================= */
-      /* ===== DIENSTUNFÄHIGKEIT (NUR FÜR BEAMTE) ================= */
-      /* ========================================================= */
+    // 5️⃣ Nur Core-Produkte berücksichtigen
+    if (!CORE_PRODUCTS.includes(id)) return;
 
-      if (key === "du") {
-
-        if (baseData.beruf !== "Beamter") return null;
-
-        if (value === "ja") return 100;
-
-        return 0;
-      }
-
-      const score = getScore(id);
-      if (score === null) return;
-
-      // 🔒 3️⃣ Produkte mit 100% Score nicht anzeigen
-      if (score >= 100) return;
-
-      const text = getStrategicRecommendation(id);
-      if (!text) return;
-
-      // 🔒 4️⃣ KASKO LOGIK
-      if (id === "kasko" && answers[id] === "vollkasko") return;
-
-      // 🔒 5️⃣ Optional: Nur Core-Produkte berücksichtigen
-      if (typeof CORE_PRODUCTS !== "undefined" && !CORE_PRODUCTS.includes(id)) return;
-
-      allRecommendations.push({
-        id,
-        text,
-        priority: PRIORITY_MAP[id] || 1,
-        score
-      });
-
+    allRecommendations.push({
+      id,
+      text,
+      priority: PRIORITY_MAP[id] || 1,
+      score
     });
 
-    // 🔎 Sortierung:
-    // 1️⃣ Höchste Priorität zuerst
-    // 2️⃣ Niedrigster Score zuerst
-    allRecommendations.sort((a, b) => {
+  });
 
-      if (b.priority !== a.priority) {
-        return b.priority - a.priority;
-      }
+  // Sortierung:
+  // Höchste Priorität zuerst
+  // Niedrigster Score zuerst
+  allRecommendations.sort((a, b) => {
 
-      return a.score - b.score;
-    });
+    if (b.priority !== a.priority) {
+      return b.priority - a.priority;
+    }
 
-    return allRecommendations.slice(0, 3);
+    return a.score - b.score;
+  });
 
-  }, [answers, baseData, step]);
+  return allRecommendations.slice(0, 3);
+
+}, [answers, baseData, step]);
 
 
   /* ================= PRODUKTSEITE ================= */
