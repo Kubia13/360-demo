@@ -1329,3 +1329,32 @@ svg {
 .infoBox a:hover {
   opacity: 1;
 }
+
+.recommendationBtn,
+.recommendationMiniBtn {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  border: none;
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.recommendationBtn:hover,
+.recommendationMiniBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(139,124,246,0.4);
+}
+
+.questionCard {
+  position: relative;
+}
+
+.floatingInfoSquare {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+}

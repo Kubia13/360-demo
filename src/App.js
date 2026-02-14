@@ -2461,8 +2461,8 @@ export default function App() {
                       }}
                     >
                       {action.type === "abschluss"
-                        ? "Online abschließen"
-                        : "Beratung vereinbaren"}
+                        ? "jetzt Online absichertn"
+                        : "jetzt Beratung vereinbaren"}
                     </button>
                   )}
                 </div>
@@ -2559,8 +2559,8 @@ export default function App() {
                                 }}
                               >
                                 {action.type === "abschluss"
-                                  ? "Online abschließen"
-                                  : "Beratung vereinbaren"}
+                                  ? "jetzt Online absichern"
+                                  : "jetzt Beratung vereinbaren"}
                               </button>
                             )}
 
