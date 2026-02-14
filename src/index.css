@@ -1349,12 +1349,71 @@ svg {
   box-shadow: 0 8px 22px rgba(139,124,246,0.4);
 }
 
-.questionCard {
+.checkbox input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #8B7CF6;
+  border-radius: 4px; /* wenn du komplett eckig willst: 0 */
+  background: transparent;
+  cursor: pointer;
   position: relative;
+  display: inline-block;
 }
 
-.floatingInfoSquare {
-  position: absolute;
-  right: 16px;
-  top: 16px;
+/* Haken */
+.checkbox input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #8B7CF6;
+  border-radius: 4px; /* oder 0 wenn komplett eckig */
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+}
+
+/* Checked Background */
+.checkbox input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #8B7CF6;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  display: grid;
+  place-items: center;
+  transition: 0.2s ease;
+}
+
+/* Hintergrund bei aktiv */
+.checkbox input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  border: none;
+  box-shadow: 0 0 8px rgba(139,124,246,0.6);
+}
+
+/* WICHTIG: Erst alles resetten */
+.checkbox input[type="checkbox"]::before,
+.checkbox input[type="checkbox"]::after {
+  content: none;
+}
+
+/* Neuer sauberer Haken */
+.checkbox input[type="checkbox"]:checked::before {
+  content: "";
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }

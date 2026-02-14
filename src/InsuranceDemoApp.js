@@ -72,7 +72,7 @@ export default function InsuranceDemoApp() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div style={cardStyle}>
               <h2>Kurz-Check</h2>
-              <p>Lebenssituation: Single / Familie / Kinder?</p>
+              <p>Lebenssituation: Ledig / Familie / Kinder?</p>
               <button
                 style={buttonStyle}
                 onClick={() => setScreen("recommendation")}
