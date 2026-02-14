@@ -1156,3 +1156,48 @@ svg {
 .questionCard {
   position: relative;
 }
+/* ================= DISCLAIMER PREMIUM ================= */
+
+.disclaimerScreen {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.disclaimerCard {
+  max-width: 380px;
+  padding: 28px;
+
+  border-radius: 22px;
+
+  background: rgba(15, 26, 35, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border: 1px solid rgba(139, 124, 246, 0.2);
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(139, 124, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  animation: fadeIn 0.5s ease;
+}
+
+.disclaimerCard p {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+  margin-bottom: 14px;
+}
+
+.disclaimerCheckbox {
+  margin-top: 16px;
+}
+
+/* Disabled Button Optik */
+.primaryBtn:disabled {
+  transform: none !important;
+  filter: none !important;
+}

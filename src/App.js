@@ -509,24 +509,26 @@ export default function App() {
 
   /* ================= STEP & CORE STATE ================= */
 
-  const [step, setStep] = useState("welcome");
-  const [answers, setAnswers] = useState({});
+const [step, setStep] = useState("welcome");
+const [answers, setAnswers] = useState({});
+const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
-  const [baseData, setBaseData] = useState({
-    geschlecht: "",
-    vorname: "",
-    nachname: "",
-    alter: "",
-    gehalt: "",
-    beziehungsstatus: "",
-    beruf: "",
-    kinder: "",
-    kinderAnzahl: "",
-    tiere: "",
-    wohnen: "",
-    kfz: "",
-    kfzAnzahl: ""
-  });
+const [baseData, setBaseData] = useState({
+  geschlecht: "",
+  vorname: "",
+  nachname: "",
+  alter: "",
+  gehalt: "",
+  beziehungsstatus: "",
+  beruf: "",
+  kinder: "",
+  kinderAnzahl: "",
+  tiere: "",
+  wohnen: "",
+  kfz: "",
+  kfzAnzahl: ""
+});
+
 
   const updateBaseData = React.useCallback((field, value) => {
     setBaseData(prev => {
@@ -544,7 +546,7 @@ export default function App() {
   const [showInfo, setShowInfo] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [legalOverlay, setLegalOverlay] = useState(null);
-  // "impressum" | "datenschutz" | null
+  // "impressum" | "datenschutz" | "hinweis" | null
   const [expandedProductCategory, setExpandedProductCategory] = useState(null);
   const [actionOverlay, setActionOverlay] = useState(null);
 
@@ -1059,6 +1061,10 @@ export default function App() {
           <span onClick={() => setLegalOverlay("datenschutz")}>
             Datenschutz
           </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("hinweis")}>
+            Hinweis
+          </span>
         </div>
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
@@ -1340,21 +1346,88 @@ export default function App() {
                   www.vermittlerregister.info
                 </a>
               </p>
+
+              <hr style={{ margin: "20px 0", opacity: 0.2 }} />
+
+              <p style={{ fontSize: 13, opacity: 0.85 }}>
+                <strong>Hinweis zur Nutzung dieser Anwendung</strong>
+              </p>
+
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Der 360° Absicherungscheck stellt ein unverbindliches
+                digitales Informationsangebot dar und ersetzt keine
+                individuelle Versicherungsberatung im Sinne des
+                Versicherungsvertragsgesetzes (VVG).
+              </p>
+
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Die dargestellten Ergebnisse beruhen ausschließlich
+                auf den vom Nutzer gemachten Angaben. Eine Haftung
+                für Entscheidungen, die auf Grundlage dieser
+                Auswertung getroffen werden, ist ausgeschlossen,
+                sofern kein vorsätzliches oder grob fahrlässiges
+                Verhalten vorliegt.
+              </p>
+
+              <p style={{ fontSize: 13, opacity: 0.75 }}>
+                Florian Löffler ist als gebundener Versicherungsvertreter
+                gemäß § 34d GewO tätig und berät ausschließlich zu den
+                Produkten der im Impressum aufgeführten Gesellschaften.
+              </p>
             </>
           )}
 
           {legalOverlay === "datenschutz" && (
             <>
-              <p>
-                Diese Anwendung speichert keine personenbezogenen Daten.
+              <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 10 }}>
+                Datenschutzhinweis
               </p>
-              <p>
-                Alle Eingaben erfolgen ausschließlich lokal im Browser
-                und werden nicht an Server übertragen.
+
+              <p style={{ fontSize: 13, opacity: 0.8 }}>
+                Diese Anwendung speichert keine personenbezogenen Daten auf Servern.
+                Alle Eingaben erfolgen ausschließlich lokal in deinem Browser.
               </p>
-              <p>
-                Beim Klick auf externe Links gelten die Datenschutz-
-                bestimmungen der jeweiligen Anbieter.
+
+              <p style={{ fontSize: 13, opacity: 0.8 }}>
+                Es findet keine automatische Übertragung deiner eingegebenen Daten
+                an Dritte statt.
+              </p>
+
+              <p style={{ fontSize: 13, opacity: 0.8 }}>
+                Beim Klick auf externe Links (z. B. Online-Abschluss,
+                Terminvereinbarung oder externe Rechner) verlässt du diese Anwendung.
+                Für die Datenverarbeitung der jeweiligen Anbieter gelten deren
+                eigene Datenschutzbestimmungen.
+              </p>
+
+              <p style={{ fontSize: 13, opacity: 0.8 }}>
+                Sofern eine PDF-Auswertung erzeugt wird, erfolgt diese ausschließlich
+                lokal in deinem Browser ohne Speicherung auf externen Servern.
+              </p>
+            </>
+          )}
+
+          {legalOverlay === "hinweis" && (
+            <>
+              <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 10 }}>
+                Hinweis zur Nutzung
+              </p>
+
+              <p style={{ fontSize: 13, opacity: 0.8 }}>
+                Der 360° Absicherungscheck ist ein digitales Analyse-Tool zur
+                strukturierten Selbsteinschätzung deiner aktuellen Absicherung.
+              </p>
+
+              <p style={{ fontSize: 13, opacity: 0.8 }}>
+                Die Auswertung basiert ausschließlich auf deinen eigenen Angaben
+                und stellt keine individuelle Versicherungsberatung im Sinne des
+                Versicherungsvertragsgesetzes (VVG) dar.
+              </p>
+
+              <p style={{ fontSize: 13, opacity: 0.8 }}>
+                Es erfolgt keine verbindliche Bedarfsanalyse oder konkrete
+                Produktempfehlung. Eine rechtlich verbindliche Beratung erfolgt
+                ausschließlich im Rahmen eines persönlichen Gesprächs.
               </p>
             </>
           )}
@@ -1481,7 +1554,7 @@ export default function App() {
 
         <button
           className="primaryBtn big"
-          onClick={() => setStep("base")}
+          onClick={() => setStep("disclaimer")}
         >
           Jetzt Check starten
         </button>
@@ -1494,6 +1567,10 @@ export default function App() {
           <span onClick={() => setLegalOverlay("datenschutz")}>
             Datenschutz
           </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("hinweis")}>
+            Hinweis
+          </span>
         </div>
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
@@ -1502,6 +1579,79 @@ export default function App() {
       </div>
     );
   }
+
+  /* ================= DISCLAIMER ================= */
+
+  if (step === "disclaimer") {
+    return (
+      <div className="screen center disclaimerScreen">
+
+        <div className="disclaimerCard">
+
+          <h2 style={{ marginBottom: 20 }}>
+            Hinweis zur Nutzung
+          </h2>
+          <p>
+            Der 360° Absicherungscheck ist ein digitales Analyse-Tool
+            zur strukturierten Selbsteinschätzung deiner aktuellen Absicherung.
+          </p>
+
+          <p>
+            Die Ergebnisse basieren ausschließlich auf deinen eigenen
+            Angaben und stellen keine individuelle Versicherungsberatung
+            im Sinne des Versicherungsvertragsgesetzes (VVG) dar.
+          </p>
+
+          <p>
+            Es erfolgt keine automatische Produktempfehlung und
+            keine rechtlich verbindliche Bedarfsanalyse gemäß § 6 VVG.
+          </p>
+
+          <p>
+            Eine verbindliche Beratung sowie eine konkrete Produktempfehlung
+            erfolgen ausschließlich im Rahmen eines persönlichen Gesprächs.
+          </p>
+
+          <p>
+            Florian Löffler ist als gebundener Versicherungsvertreter
+            gemäß § 34d GewO tätig und berät ausschließlich zu den
+            Produkten der im Impressum genannten Gesellschaften.
+          </p>
+
+          <p>
+            Für seine Tätigkeit erhält er eine Provision,
+            die in der jeweiligen Versicherungsprämie enthalten ist.
+          </p>
+
+          <div className="disclaimerCheckbox">
+            <label className="checkbox">
+              <input
+                type="checkbox"
+                checked={disclaimerAccepted}
+                onChange={(e) => setDisclaimerAccepted(e.target.checked)}
+              />
+              Ich habe den Hinweis gelesen und akzeptiere ihn.
+            </label>
+          </div>
+
+          <button
+            className="primaryBtn big"
+            disabled={!disclaimerAccepted}
+            style={{
+              marginTop: 20,
+              opacity: disclaimerAccepted ? 1 : 0.5,
+              cursor: disclaimerAccepted ? "pointer" : "not-allowed"
+            }}
+            onClick={() => setStep("base")}
+          >
+            Weiter zu den persönlichen Angaben
+          </button>
+
+        </div>
+      </div>
+    );
+  }
+
 
   /* ================= BASISDATEN ================= */
 
@@ -1666,6 +1816,10 @@ export default function App() {
           {" | "}
           <span onClick={() => setLegalOverlay("datenschutz")}>
             Datenschutz
+          </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("hinweis")}>
+            Hinweis
           </span>
         </div>
 
@@ -1998,6 +2152,10 @@ export default function App() {
           <span onClick={() => setLegalOverlay("datenschutz")}>
             Datenschutz
           </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("hinweis")}>
+            Hinweis
+          </span>
         </div>
 
         <ContactButton onReset={() => setShowResetConfirm(true)} />
@@ -2212,6 +2370,10 @@ export default function App() {
           {" | "}
           <span onClick={() => setLegalOverlay("datenschutz")}>
             Datenschutz
+          </span>
+          {" | "}
+          <span onClick={() => setLegalOverlay("hinweis")}>
+            Hinweis
           </span>
         </div>
 
