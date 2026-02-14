@@ -1020,15 +1020,32 @@ export default function App() {
 
       // 🔒 2️⃣ Berufslogik sauber trennen
 
-      // BU nur für Erwerbstätige (nicht Beamte, nicht Nicht berufstätig)
-      if (id === "bu") {
-        if (baseData.beruf === "Beamter") return;
-        if (baseData.beruf === "Nicht berufstätig") return;
+      /* ========================================================= */
+      /* ===== BU (NUR FÜR ERWERBSTÄTIGE NICHT-BEAMTE) =========== */
+      /* ========================================================= */
+
+      if (key === "bu") {
+
+        if (baseData.beruf === "Beamter") return null;
+        if (baseData.beruf === "Nicht berufstätig") return null;
+
+        if (value === "ja") return 100;
+
+        return 0;
       }
 
-      // DU nur für Beamte
-      if (id === "du") {
-        if (baseData.beruf !== "Beamter") return;
+
+      /* ========================================================= */
+      /* ===== DIENSTUNFÄHIGKEIT (NUR FÜR BEAMTE) ================= */
+      /* ========================================================= */
+
+      if (key === "du") {
+
+        if (baseData.beruf !== "Beamter") return null;
+
+        if (value === "ja") return 100;
+
+        return 0;
       }
 
       const score = getScore(id);
@@ -2205,67 +2222,67 @@ export default function App() {
             : "Auswertung"}
         </button>
 
-{showInfo && (
-  <div
-    className="infoOverlay"
-    onClick={() => setShowInfo(null)}
-  >
-    <div
-      className="infoBox"
-      onClick={(e) => e.stopPropagation()}
-    >
-
-      {/* TEXT HANDLING – STRING ODER OBJEKT */}
-      {(typeof showInfo === "string"
-        ? showInfo.split("\n")
-        : showInfo.text || []
-      ).map((line, i) => (
-        <p key={i}>{line}</p>
-      ))}
-
-      {/* OPTIONALER RECHNER LINK */}
-      {typeof showInfo === "object" && showInfo.link && (
-        <>
-          <p style={{ marginTop: 14, fontWeight: 500 }}>
-            ➜ {showInfo.link.label}
-          </p>
-
+        {showInfo && (
           <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: 12
-            }}
+            className="infoOverlay"
+            onClick={() => setShowInfo(null)}
           >
-            <a
-              href={showInfo.link.url}
-              target="_blank"
-              rel="noreferrer"
-              className="calculatorIcon"
+            <div
+              className="infoBox"
+              onClick={(e) => e.stopPropagation()}
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="4" y="2" width="16" height="20" rx="3" />
-                <line x1="8" y1="6" x2="16" y2="6" />
-                <line x1="8" y1="10" x2="8" y2="14" />
-                <line x1="12" y1="10" x2="12" y2="14" />
-                <line x1="16" y1="10" x2="16" y2="14" />
-                <line x1="8" y1="17" x2="16" y2="17" />
-              </svg>
-            </a>
-          </div>
-        </>
-      )}
 
-    </div>
-  </div>
-)}
+              {/* TEXT HANDLING – STRING ODER OBJEKT */}
+              {(typeof showInfo === "string"
+                ? showInfo.split("\n")
+                : showInfo.text || []
+              ).map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+
+              {/* OPTIONALER RECHNER LINK */}
+              {typeof showInfo === "object" && showInfo.link && (
+                <>
+                  <p style={{ marginTop: 14, fontWeight: 500 }}>
+                    ➜ {showInfo.link.label}
+                  </p>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginTop: 12
+                    }}
+                  >
+                    <a
+                      href={showInfo.link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="calculatorIcon"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect x="4" y="2" width="16" height="20" rx="3" />
+                        <line x1="8" y1="6" x2="16" y2="6" />
+                        <line x1="8" y1="10" x2="8" y2="14" />
+                        <line x1="12" y1="10" x2="12" y2="14" />
+                        <line x1="16" y1="10" x2="16" y2="14" />
+                        <line x1="8" y1="17" x2="16" y2="17" />
+                      </svg>
+                    </a>
+                  </div>
+                </>
+              )}
+
+            </div>
+          </div>
+        )}
 
         <div className="legalFooter">
           <span onClick={() => setLegalOverlay("impressum")}>
