@@ -34,14 +34,35 @@ const PRIORITY_MAP = {
   gebaeude: 2,
   rechtsschutz: 2,
   hausrat: 2,
-  elementar: 2,
+  elementar: 1,
 
-  krankenzusatz: 1,
-  kinder_krankenzusatz: 1,
+  krankenzusatz: 2,
+  kinder_krankenzusatz: 2,
   kasko: 1,
   schutzbrief: 1,
   kfz_haftpflicht: 2
 };
+
+/* ================= CORE PRODUKTE ================= */
+
+const CORE_PRODUCTS = [
+  "bu",
+  "ktg",
+  "haftpflicht",
+  "hausrat",
+  "private_rente",
+  "rentenluecke",
+  "pflege",
+  "gebaeude",
+  "rechtsschutz",
+  "krankenzusatz",
+  "kinder_krankenzusatz",
+  "kinder_unfall",
+  "kinder_vorsorge",
+  "kfz_haftpflicht",
+  "kasko"
+];
+
 
 /* ================= ACTION MAP ================= */
 
@@ -934,45 +955,58 @@ function resetAll() {
     return () => clearInterval(interval);
   }, [totalScore, step]);
 
-  /* ================= TOP 3 HANDLUNGSFELDER ================= */
+/* ================= TOP 3 HANDLUNGSFELDER ================= */
 
-  const topRecommendations = useMemo(() => {
+const topRecommendations = useMemo(() => {
 
-    if (step !== "dashboard") return [];
+  if (step !== "dashboard") return [];
 
-    const allRecommendations = [];
+  const EXCLUDED_FROM_TOP3 = ["elementar", "schutzbrief"];
 
-    Object.keys(answers).forEach((id) => {
+  const allRecommendations = [];
 
-      const score = getScore(id);
-      if (score === null) return;
+  Object.keys(answers).forEach((id) => {
 
-      const text = getStrategicRecommendation(id);
-      if (!text) return;
+    // 🔒 1️⃣ Add-on Produkte komplett ausschließen
+    if (EXCLUDED_FROM_TOP3.includes(id)) return;
 
-      allRecommendations.push({
-        id,
-        text,
-        priority: PRIORITY_MAP[id] || 1,
-        score
-      });
+    const score = getScore(id);
+    if (score === null) return;
+
+    // 🔒 2️⃣ Produkte mit 100% Score nicht anzeigen
+    if (score >= 100) return;
+
+    const text = getStrategicRecommendation(id);
+    if (!text) return;
+
+    // 🔒 3️⃣ KASKO LOGIK
+    // Wenn Vollkasko vorhanden → keine Empfehlung
+    if (id === "kasko" && answers[id] === "vollkasko") return;
+
+    allRecommendations.push({
+      id,
+      text,
+      priority: PRIORITY_MAP[id] || 1,
+      score
     });
 
-    // 1. Höchste Priorität zuerst
-    // 2. Niedrigster Score zuerst
-    allRecommendations.sort((a, b) => {
+  });
 
-      if (b.priority !== a.priority) {
-        return b.priority - a.priority;
-      }
+  // 🔎 Sortierung:
+  // 1️⃣ Höchste Priorität zuerst
+  // 2️⃣ Niedrigster Score zuerst
+  allRecommendations.sort((a, b) => {
 
-      return a.score - b.score;
-    });
+    if (b.priority !== a.priority) {
+      return b.priority - a.priority;
+    }
 
-    return allRecommendations.slice(0, 3);
+    return a.score - b.score;
+  });
 
-  }, [answers, baseData, step]);
+  return allRecommendations.slice(0, 3);
 
+}, [answers, baseData, step]);
 
   /* ================= PRODUKTSEITE ================= */
 

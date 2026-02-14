@@ -1263,7 +1263,7 @@ svg {
 /* Buttons */
 .numberStepper button {
   width: 22px;                 /* kleiner */
-  height: 1px;
+  height: 15px;
 
   border-radius: 8px;          /* weniger rund */
   border: none;
