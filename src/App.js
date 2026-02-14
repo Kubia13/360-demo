@@ -592,6 +592,7 @@ export default function App() {
 
   /* ================= UI STATE ================= */
 
+  const [contactOverlay, setContactOverlay] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -1003,74 +1004,63 @@ export default function App() {
     return () => clearInterval(interval);
   }, [totalScore, step]);
 
- /* ================= TOP 3 HANDLUNGSFELDER ================= */
+  /* ================= TOP 3 HANDLUNGSFELDER ================= */
 
-const topRecommendations = useMemo(() => {
+  const topRecommendations = useMemo(() => {
 
-  if (step !== "dashboard") return [];
+    if (step !== "dashboard") return [];
 
-  const EXCLUDED_FROM_TOP3 = ["elementar", "schutzbrief"];
+    const EXCLUDED_FROM_TOP3 = ["elementar", "schutzbrief"];
 
-  const allRecommendations = [];
+    const allRecommendations = [];
 
-  Object.keys(answers).forEach((id) => {
+    Object.keys(answers).forEach((id) => {
 
-    // 1️⃣ Add-on Produkte komplett ausschließen
-    if (EXCLUDED_FROM_TOP3.includes(id)) return;
+      if (EXCLUDED_FROM_TOP3.includes(id)) return;
 
-    // 2️⃣ Berufslogik sauber trennen
+      // BU nur für Nicht-Beamte & nicht Nicht-berufstätig
+      if (id === "bu") {
+        if (baseData.beruf === "Beamter") return;
+        if (baseData.beruf === "Nicht berufstätig") return;
+      }
 
-    // BU nur für Erwerbstätige (nicht Beamte, nicht Nicht berufstätig)
-    if (id === "bu") {
-      if (baseData.beruf === "Beamter") return;
-      if (baseData.beruf === "Nicht berufstätig") return;
-    }
+      // DU nur für Beamte
+      if (id === "du") {
+        if (baseData.beruf !== "Beamter") return;
+      }
 
-    // DU nur für Beamte
-    if (id === "du") {
-      if (baseData.beruf !== "Beamter") return;
-    }
+      const score = getScore(id);
+      if (score === null) return;
+      if (score >= 100) return;
 
-    const score = getScore(id);
-    if (score === null) return;
+      const text = getStrategicRecommendation(id);
+      if (!text) return;
 
-    // 3️⃣ Produkte mit 100% Score nicht anzeigen
-    if (score >= 100) return;
+      if (id === "kasko" && answers[id] === "vollkasko") return;
 
-    const text = getStrategicRecommendation(id);
-    if (!text) return;
+      if (!CORE_PRODUCTS.includes(id)) return;
 
-    // 4️⃣ KASKO LOGIK
-    if (id === "kasko" && answers[id] === "vollkasko") return;
+      allRecommendations.push({
+        id,
+        text,
+        priority: PRIORITY_MAP[id] || 1,
+        score
+      });
 
-    // 5️⃣ Nur Core-Produkte berücksichtigen
-    if (!CORE_PRODUCTS.includes(id)) return;
-
-    allRecommendations.push({
-      id,
-      text,
-      priority: PRIORITY_MAP[id] || 1,
-      score
     });
 
-  });
+    allRecommendations.sort((a, b) => {
 
-  // Sortierung:
-  // Höchste Priorität zuerst
-  // Niedrigster Score zuerst
-  allRecommendations.sort((a, b) => {
+      if (b.priority !== a.priority) {
+        return b.priority - a.priority;
+      }
 
-    if (b.priority !== a.priority) {
-      return b.priority - a.priority;
-    }
+      return a.score - b.score;
+    });
 
-    return a.score - b.score;
-  });
+    return allRecommendations.slice(0, 3);
 
-  return allRecommendations.slice(0, 3);
-
-}, [answers, baseData, step]);
-
+  }, [answers, baseData, step]);
 
   /* ================= PRODUKTSEITE ================= */
 
@@ -1242,6 +1232,20 @@ const topRecommendations = useMemo(() => {
         if (verheiratet)
           return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung.";
         return "Die Absicherung der eigenen Arbeitskraft zählt zu den wichtigsten finanziellen Grundlagen.";
+
+      /* ================= DU ================= */
+
+      case "du":
+        if (value === "ja") return null;
+
+        if (unsicher)
+          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung deiner Dienstunfähigkeitsabsicherung schafft Klarheit über deinen tatsächlichen Einkommensschutz.";
+
+        if (verheiratet)
+          return "Als verbeamtete und verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Dienstunfähigkeitsversicherung schützt eure wirtschaftliche Stabilität bei Versetzung in den Ruhestand wegen Dienstunfähigkeit.";
+
+        return "Als Beamter ersetzt die Dienstunfähigkeitsversicherung die klassische Berufsunfähigkeitsabsicherung und sichert dein Einkommen bei vorzeitiger Dienstunfähigkeit.";
+
 
       /* ================= PRIVATE RENTE ================= */
 
@@ -1421,8 +1425,9 @@ const topRecommendations = useMemo(() => {
               <p><strong>Florian Löffler</strong></p>
 
               <p>
+                BarmeniaGothaer VZ Südbaden
                 Breisacher Str. 145b<br />
-                79110 Freiburg
+                79110 Freiburg im Breisgau
               </p>
 
               <p>
@@ -1537,6 +1542,8 @@ const topRecommendations = useMemo(() => {
               </p>
             </>
           )}
+
+          
         </div>
       </div>
     );
@@ -1580,6 +1587,70 @@ const topRecommendations = useMemo(() => {
       </div>
     );
   }
+  function ContactOverlayComponent() {
+  if (!contactOverlay) return null;
+
+  return (
+    <div
+      className="infoOverlay"
+      onClick={() => setContactOverlay(false)}
+    >
+      <div
+        className="infoBox"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ marginBottom: 16 }}>
+          Persönlicher Kontakt
+        </h3>
+
+        <p><strong>Florian Löffler</strong></p>
+
+        <p>
+          BarmeniaGothaer VZ Südbaden
+          Breisacher Str. 145b<br />
+          79110 Freiburg
+        </p>
+
+        <p>
+          Telefon:<br />
+          <a href="tel:+497612027423">
+            0761 2027423
+          </a>
+        </p>
+
+        <p>
+          E-Mail:<br />
+          <a href="mailto:florian.loeffler@barmenia.de">
+            florian.loeffler@barmenia.de
+          </a>
+        </p>
+
+        <div className="overlayButtons" style={{ marginTop: 20 }}>
+          <button
+            className="overlayBtn primary"
+            onClick={() =>
+              window.open(
+                "https://agentur.barmenia.de/florian_loeffler",
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
+          >
+            Zur Agentur-Website
+          </button>
+
+          <button
+            className="overlayBtn secondary"
+            onClick={() => setContactOverlay(false)}
+          >
+            Schließen
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
   /* ================= ACTION OVERLAY ================= */
 
   function ActionOverlayComponent() {
@@ -1622,7 +1693,7 @@ const topRecommendations = useMemo(() => {
               className="overlayBtn secondary"
               onClick={() => {
                 setActionOverlay(null);
-                setLegalOverlay("impressum");
+                setContactOverlay(true);
               }}
             >
               Kontakt anzeigen
@@ -2537,6 +2608,7 @@ const topRecommendations = useMemo(() => {
         <ResetOverlayComponent />
         <ActionOverlayComponent />
         <LegalOverlayComponent />
+        <ContactOverlayComponent />
       </div>
     );
   }
