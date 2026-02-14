@@ -2612,7 +2612,7 @@ export default function App() {
           style={{ marginTop: 20 }}
           onClick={() => setStep("products")}
         >
-          Alle Abschlussmöglichkeiten anzeigen
+          Alle Tarifoptionen anzeigen
         </button>
 
         <div className="legalFooter">
