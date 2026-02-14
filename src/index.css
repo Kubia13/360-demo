@@ -1289,3 +1289,33 @@ svg {
 .numberStepper button:active {
   transform: scale(0.92);
 }
+/* ================= MINI ACTION BUTTON ================= */
+
+.recommendationMiniBtn {
+  margin-top: 10px;
+
+  padding: 8px 12px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(139,124,246,0.4);
+
+  background: rgba(139,124,246,0.15);
+  backdrop-filter: blur(8px);
+
+  color: #A99BFF;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recommendationMiniBtn:hover {
+  background: rgba(139,124,246,0.25);
+  box-shadow: 0 0 14px rgba(139,124,246,0.5);
+  transform: translateY(-1px);
+}
+
+.recommendationMiniBtn:active {
+  transform: scale(0.96);
+}

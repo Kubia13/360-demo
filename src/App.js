@@ -27,7 +27,7 @@ const CATEGORY_LABELS = {
 
 const PRIORITY_MAP = {
   bu: 3,
-  du: 3,        // ← NEU
+  du: 3,
 
   haftpflicht: 3,
   pflege: 3,
@@ -47,7 +47,7 @@ const PRIORITY_MAP = {
 
 const CORE_PRODUCTS = [
   "bu",
-   "du", 
+  "du",
   "ktg",
   "haftpflicht",
   "hausrat",
@@ -71,6 +71,11 @@ const ACTION_MAP = {
   /* ===== EXISTENZ ===== */
 
   bu: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
+  },
+
+  du: {
     type: "beratung",
     calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
   },
@@ -220,6 +225,10 @@ const QUESTIONS = {
     label: "Krankentagegeld vorhanden?",
     category: "existenz",
     type: "yesno",
+    condition: (baseData) =>
+    baseData.beruf &&
+    baseData.beruf !== "Nicht berufstätig" &&
+    baseData.beruf !== "Beamter",
     info: {
       text: [
         "Nach 6 Wochen endet die Lohnfortzahlung.",
@@ -977,73 +986,73 @@ export default function App() {
     return () => clearInterval(interval);
   }, [totalScore, step]);
 
-/* ================= TOP 3 HANDLUNGSFELDER ================= */
+  /* ================= TOP 3 HANDLUNGSFELDER ================= */
 
-const topRecommendations = useMemo(() => {
+  const topRecommendations = useMemo(() => {
 
-  if (step !== "dashboard") return [];
+    if (step !== "dashboard") return [];
 
-  const EXCLUDED_FROM_TOP3 = ["elementar", "schutzbrief"];
+    const EXCLUDED_FROM_TOP3 = ["elementar", "schutzbrief"];
 
-  const allRecommendations = [];
+    const allRecommendations = [];
 
-  Object.keys(answers).forEach((id) => {
+    Object.keys(answers).forEach((id) => {
 
-    // 🔒 1️⃣ Add-on Produkte komplett ausschließen
-    if (EXCLUDED_FROM_TOP3.includes(id)) return;
+      // 🔒 1️⃣ Add-on Produkte komplett ausschließen
+      if (EXCLUDED_FROM_TOP3.includes(id)) return;
 
-    // 🔒 2️⃣ Berufslogik sauber trennen
+      // 🔒 2️⃣ Berufslogik sauber trennen
 
-    // BU nur für Erwerbstätige (nicht Beamte, nicht Nicht berufstätig)
-    if (id === "bu") {
-      if (baseData.beruf === "Beamter") return;
-      if (baseData.beruf === "Nicht berufstätig") return;
-    }
+      // BU nur für Erwerbstätige (nicht Beamte, nicht Nicht berufstätig)
+      if (id === "bu") {
+        if (baseData.beruf === "Beamter") return;
+        if (baseData.beruf === "Nicht berufstätig") return;
+      }
 
-    // DU nur für Beamte
-    if (id === "du") {
-      if (baseData.beruf !== "Beamter") return;
-    }
+      // DU nur für Beamte
+      if (id === "du") {
+        if (baseData.beruf !== "Beamter") return;
+      }
 
-    const score = getScore(id);
-    if (score === null) return;
+      const score = getScore(id);
+      if (score === null) return;
 
-    // 🔒 3️⃣ Produkte mit 100% Score nicht anzeigen
-    if (score >= 100) return;
+      // 🔒 3️⃣ Produkte mit 100% Score nicht anzeigen
+      if (score >= 100) return;
 
-    const text = getStrategicRecommendation(id);
-    if (!text) return;
+      const text = getStrategicRecommendation(id);
+      if (!text) return;
 
-    // 🔒 4️⃣ KASKO LOGIK
-    if (id === "kasko" && answers[id] === "vollkasko") return;
+      // 🔒 4️⃣ KASKO LOGIK
+      if (id === "kasko" && answers[id] === "vollkasko") return;
 
-    // 🔒 5️⃣ Optional: Nur Core-Produkte berücksichtigen
-    if (typeof CORE_PRODUCTS !== "undefined" && !CORE_PRODUCTS.includes(id)) return;
+      // 🔒 5️⃣ Optional: Nur Core-Produkte berücksichtigen
+      if (typeof CORE_PRODUCTS !== "undefined" && !CORE_PRODUCTS.includes(id)) return;
 
-    allRecommendations.push({
-      id,
-      text,
-      priority: PRIORITY_MAP[id] || 1,
-      score
+      allRecommendations.push({
+        id,
+        text,
+        priority: PRIORITY_MAP[id] || 1,
+        score
+      });
+
     });
 
-  });
+    // 🔎 Sortierung:
+    // 1️⃣ Höchste Priorität zuerst
+    // 2️⃣ Niedrigster Score zuerst
+    allRecommendations.sort((a, b) => {
 
-  // 🔎 Sortierung:
-  // 1️⃣ Höchste Priorität zuerst
-  // 2️⃣ Niedrigster Score zuerst
-  allRecommendations.sort((a, b) => {
+      if (b.priority !== a.priority) {
+        return b.priority - a.priority;
+      }
 
-    if (b.priority !== a.priority) {
-      return b.priority - a.priority;
-    }
+      return a.score - b.score;
+    });
 
-    return a.score - b.score;
-  });
+    return allRecommendations.slice(0, 3);
 
-  return allRecommendations.slice(0, 3);
-
-}, [answers, baseData, step]);
+  }, [answers, baseData, step]);
 
 
   /* ================= PRODUKTSEITE ================= */
@@ -2425,12 +2434,44 @@ const topRecommendations = useMemo(() => {
                 {isOpen && (
                   <div className="categoryDetails open">
                     {needsOptimization.length > 0 ? (
-                      needsOptimization.map((id) => (
-                        <div key={id} className="recommendationItem">
-                          <strong>{QUESTIONS[id].label}</strong>
-                          <p>{getStrategicRecommendation(id)}</p>
-                        </div>
-                      ))
+                      needsOptimization.map((id) => {
+
+                        const action = ACTION_MAP[id];
+
+                        return (
+                          <div key={id} className="recommendationItem">
+                            <strong>{QUESTIONS[id].label}</strong>
+                            <p>{getStrategicRecommendation(id)}</p>
+
+                            {action && (
+                              <button
+                                className="recommendationMiniBtn"
+                                onClick={() => {
+
+                                  if (action.type === "abschluss") {
+                                    window.open(
+                                      action.url,
+                                      "_blank",
+                                      "noopener,noreferrer"
+                                    );
+                                  }
+
+                                  if (action.type === "beratung") {
+                                    setActionOverlay(id);
+                                  }
+
+                                }}
+                              >
+                                {action.type === "abschluss"
+                                  ? "Online abschließen"
+                                  : "Beratung vereinbaren"}
+                              </button>
+                            )}
+
+                          </div>
+                        );
+
+                      })
                     ) : (
                       <p className="noIssues">
                         Kein unmittelbarer Optimierungsbedarf.
