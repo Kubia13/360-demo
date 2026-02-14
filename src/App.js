@@ -1464,27 +1464,64 @@ export default function App() {
                 <strong>Hinweis zur Nutzung dieser Anwendung</strong>
               </p>
 
-              <p style={{ fontSize: 13, opacity: 0.75 }}>
-                Der 360° Absicherungscheck stellt ein unverbindliches
-                digitales Informationsangebot dar und ersetzt keine
-                individuelle Versicherungsberatung im Sinne des
-                Versicherungsvertragsgesetzes (VVG).
-              </p>
+<p style={{ fontSize: 13, opacity: 0.75 }}>
+  Der 360° Absicherungscheck stellt ein unverbindliches digitales
+  Informations- und Analyseangebot dar. Er ersetzt keine individuelle
+  Versicherungsberatung oder Bedarfsanalyse im Sinne des
+  Versicherungsvertragsgesetzes (VVG).
+</p>
 
-              <p style={{ fontSize: 13, opacity: 0.75 }}>
-                Die dargestellten Ergebnisse beruhen ausschließlich
-                auf den vom Nutzer gemachten Angaben. Eine Haftung
-                für Entscheidungen, die auf Grundlage dieser
-                Auswertung getroffen werden, ist ausgeschlossen,
-                sofern kein vorsätzliches oder grob fahrlässiges
-                Verhalten vorliegt.
-              </p>
+<p style={{ fontSize: 13, opacity: 0.75 }}>
+  Die dargestellten Ergebnisse basieren ausschließlich auf den vom Nutzer
+  gemachten Angaben sowie auf einer algorithmischen Auswertung.
+  Angezeigte Handlungsfelder oder Abschlussmöglichkeiten stellen
+  keine individuelle Empfehlung dar.
+</p>
 
-              <p style={{ fontSize: 13, opacity: 0.75 }}>
-                Florian Löffler ist als gebundener Versicherungsvertreter
-                gemäß § 34d GewO tätig und berät ausschließlich zu den
-                Produkten der im Impressum aufgeführten Gesellschaften.
-              </p>
+<p style={{ fontSize: 13, opacity: 0.75 }}>
+  Ein Beratungsverhältnis entsteht erst im Rahmen eines persönlichen
+  Gesprächs. Die Nutzung von Abschluss- oder Terminlinks erfolgt
+  eigenverantwortlich.
+</p>
+
+<p style={{ fontSize: 13, opacity: 0.75 }}>
+  Florian Löffler ist als gebundener Versicherungsvertreter gemäß
+  § 34d Abs. 7 GewO tätig und vermittelt ausschließlich die Produkte
+  folgender Gesellschaften:
+</p>
+
+<p style={{ fontSize: 13, opacity: 0.75 }}>
+  Barmenia Versicherungen a. G.<br />
+  Barmenia Krankenversicherung AG<br />
+  Barmenia Allgemeine Versicherungs-AG<br />
+  Gothaer Krankenversicherung AG<br />
+  Gothaer Lebensversicherung AG<br />
+  Roland Rechtsschutz-Versicherungs-AG<br />
+  Roland Schutzbrief-Versicherung AG
+</p>
+
+<p style={{ fontSize: 13, opacity: 0.75 }}>
+  Für die Vermittlung erhält Florian Löffler eine Provision sowie
+  gegebenenfalls weitere Vergütungen, die in der jeweiligen
+  Versicherungsprämie enthalten sind.
+</p>
+
+<p style={{ fontSize: 13, opacity: 0.75 }}>
+  Zuständige Schlichtungsstellen:
+</p>
+
+<p style={{ fontSize: 13, opacity: 0.75 }}>
+  Versicherungsombudsmann e. V.<br />
+  Postfach 080632<br />
+  10006 Berlin
+</p>
+
+<p style={{ fontSize: 13, opacity: 0.75 }}>
+  Ombudsmann für private Kranken- und Pflegeversicherung<br />
+  Postfach 06 02 22<br />
+  10052 Berlin
+</p>
+
             </>
           )}
 
@@ -1536,9 +1573,14 @@ export default function App() {
               </p>
 
               <p style={{ fontSize: 13, opacity: 0.8 }}>
-                Es erfolgt keine verbindliche Bedarfsanalyse oder konkrete
-                Produktempfehlung. Eine rechtlich verbindliche Beratung erfolgt
-                ausschließlich im Rahmen eines persönlichen Gesprächs.
+                Die angezeigten Ergebnisse stellen eine algorithmusbasierte Orientierung dar.
+                Sofern Handlungsfelder oder Abschlussmöglichkeiten angezeigt werden,
+                erfolgt dies ohne individuelle Bedarfsanalyse im Sinne des § 6 VVG.
+              </p>
+
+              <p style={{ fontSize: 13, opacity: 0.8 }}>
+                Ein Beratungsverhältnis entsteht erst im Rahmen eines persönlichen Gesprächs.
+                Die Nutzung von Abschluss- oder Terminlinks erfolgt eigenverantwortlich.
               </p>
             </>
           )}
@@ -1605,23 +1647,23 @@ export default function App() {
 
           <p><strong>Florian Löffler</strong></p>
 
-              <p>
-                BarmeniaGothaer VZ Südbaden
-                Breisacher Str. 145b<br />
-                79110 Freiburg im Breisgau
-              </p>
+          <p>
+            BarmeniaGothaer VZ Südbaden
+            Breisacher Str. 145b<br />
+            79110 Freiburg im Breisgau
+          </p>
 
-              <p>
-                Telefon:{" "}
-                <a href="tel:+497612027423">
-                  0761-2027423
-                </a>
-                <br />
-                E-Mail:{" "}
-                <a href="mailto:florian.loeffler@barmenia.de?subject=Anfrage%20360%C2%B0%20Absicherungscheck">
-                  florian.loeffler@barmenia.de
-                </a>
-              </p>
+          <p>
+            Telefon:{" "}
+            <a href="tel:+497612027423">
+              0761-2027423
+            </a>
+            <br />
+            E-Mail:{" "}
+            <a href="mailto:florian.loeffler@barmenia.de?subject=Anfrage%20360%C2%B0%20Absicherungscheck">
+              florian.loeffler@barmenia.de
+            </a>
+          </p>
 
           <div className="overlayButtons" style={{ marginTop: 20 }}>
             <button
@@ -1767,41 +1809,33 @@ export default function App() {
             Hinweis zur Nutzung
           </h2>
 
-          <p>
-            Der 360° Absicherungscheck ist ein digitales Analyse-Tool
-            zur strukturierten Selbsteinschätzung deiner aktuellen Absicherung.
+
+          <p style={{ fontSize: 13, opacity: 0.75 }}>
+            Der 360° Absicherungscheck stellt ein unverbindliches digitales
+            Informations- und Analyseangebot dar. Er ersetzt keine individuelle
+            Versicherungsberatung oder Bedarfsanalyse im Sinne des
+            Versicherungsvertragsgesetzes (VVG).
           </p>
 
-          <p>
-            Die Ergebnisse basieren ausschließlich auf deinen eigenen
-            Angaben und stellen keine individuelle Versicherungsberatung
-            im Sinne des Versicherungsvertragsgesetzes (VVG) dar.
+          <p style={{ fontSize: 13, opacity: 0.75 }}>
+            Die dargestellten Ergebnisse basieren ausschließlich auf den vom Nutzer
+            gemachten Angaben sowie auf einer algorithmischen Auswertung.
+            Angezeigte Handlungsfelder oder Abschlussmöglichkeiten stellen
+            keine individuelle Empfehlung dar.
           </p>
 
-          <p>
-            Es erfolgt keine automatische Produktempfehlung und
-            keine rechtlich verbindliche Bedarfsanalyse gemäß § 6 VVG.
+          <p style={{ fontSize: 13, opacity: 0.75 }}>
+            Ein Beratungsverhältnis entsteht erst im Rahmen eines persönlichen
+            Gesprächs. Die Nutzung von Abschluss- oder Terminlinks erfolgt
+            eigenverantwortlich.
           </p>
 
-          <p>
-            Die Nutzung des Tools begründet kein Beratungsverhältnis.
+          <p style={{ fontSize: 13, opacity: 0.75 }}>
+            Florian Löffler ist als gebundener Versicherungsvertreter gemäß § 34d GewO tätig
+            und vermittelt ausschließlich die Produkte der im Impressum aufgeführten
+            Gesellschaften.
           </p>
 
-          <p>
-            Eine verbindliche Beratung sowie eine konkrete Produktempfehlung
-            erfolgen ausschließlich im Rahmen eines persönlichen Gesprächs.
-          </p>
-
-          <p>
-            Florian Löffler ist als gebundener Versicherungsvertreter
-            gemäß § 34d GewO tätig und berät ausschließlich zu den
-            Produkten der im Impressum genannten Gesellschaften.
-          </p>
-
-          <p>
-            Für seine Tätigkeit erhält er eine Provision,
-            die in der jeweiligen Versicherungsprämie enthalten ist.
-          </p>
 
           <div className="disclaimerCheckbox">
             <label className="checkbox">
@@ -2074,53 +2108,53 @@ export default function App() {
 
           return (
             <div key={id} className="questionCard dark">
-<div className="questionHeader">
-  <div className="questionText">
-    {q.label}
-  </div>
+              <div className="questionHeader">
+                <div className="questionText">
+                  {q.label}
+                </div>
 
-  {q.info && (
-    <span
-      className="floatingInfoSquare"
-      onClick={(e) => {
-        e.stopPropagation();
-        setShowInfo(q.info);
-      }}
-    >
-      i
-    </span>
-  )}
+                {q.info && (
+                  <span
+                    className="floatingInfoSquare"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowInfo(q.info);
+                    }}
+                  >
+                    i
+                  </span>
+                )}
 
-  {q.link && (
-    <a
-      href={q.link.url}
-      target="_blank"
-      rel="noreferrer"
-      className="calculatorIcon"
-      title={q.link.label}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect x="4" y="2" width="16" height="20" rx="3" />
-        <line x1="8" y1="6" x2="16" y2="6" />
-        <line x1="8" y1="10" x2="8" y2="14" />
-        <line x1="12" y1="10" x2="12" y2="14" />
-        <line x1="16" y1="10" x2="16" y2="14" />
-        <line x1="8" y1="17" x2="16" y2="17" />
-      </svg>
-    </a>
-  )}
+                {q.link && (
+                  <a
+                    href={q.link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="calculatorIcon"
+                    title={q.link.label}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="4" y="2" width="16" height="20" rx="3" />
+                      <line x1="8" y1="6" x2="16" y2="6" />
+                      <line x1="8" y1="10" x2="8" y2="14" />
+                      <line x1="12" y1="10" x2="12" y2="14" />
+                      <line x1="16" y1="10" x2="16" y2="14" />
+                      <line x1="8" y1="17" x2="16" y2="17" />
+                    </svg>
+                  </a>
+                )}
 
-</div>
+              </div>
 
 
               {/* SELECT */}
@@ -2177,27 +2211,27 @@ export default function App() {
                       );
                     })}
                     {/* FLOATING INFO ICON */}
-{q.info && (
-  <button
-    type="button"
-    className="floatingInfoSquare"
-    onClick={(e) => {
-      e.stopPropagation();
-      setShowInfo(q.info);
-    }}
-  >
-<svg
-  viewBox="0 0 24 24"
-  className="infoIconSvg"
->
-  {/* Punkt */}
-  <circle cx="12" cy="6" r="1.3" />
+                    {q.info && (
+                      <button
+                        type="button"
+                        className="floatingInfoSquare"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowInfo(q.info);
+                        }}
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="infoIconSvg"
+                        >
+                          {/* Punkt */}
+                          <circle cx="12" cy="6" r="1.3" />
 
-  {/* Längerer Strich mit mehr Abstand */}
-  <line x1="12" y1="10" x2="12" y2="21" />
-</svg>
-  </button>
-)}
+                          {/* Längerer Strich mit mehr Abstand */}
+                          <line x1="12" y1="10" x2="12" y2="21" />
+                        </svg>
+                      </button>
+                    )}
 
                   </div>
 
