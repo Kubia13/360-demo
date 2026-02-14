@@ -2177,17 +2177,28 @@ export default function App() {
                       );
                     })}
                     {/* FLOATING INFO ICON */}
-                    {q.info && (
-                      <span
-                        className="floatingInfoSquare"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowInfo(q.info);
-                        }}
-                      >
-                        i
-                      </span>
-                    )}
+{q.info && (
+  <button
+    type="button"
+    className="floatingInfoSquare"
+    onClick={(e) => {
+      e.stopPropagation();
+      setShowInfo(q.info);
+    }}
+  >
+<svg
+  viewBox="0 0 24 24"
+  className="infoIconSvg"
+>
+  {/* Punkt */}
+  <circle cx="12" cy="6" r="1.3" />
+
+  {/* Längerer Strich mit mehr Abstand */}
+  <line x1="12" y1="10" x2="12" y2="21" />
+</svg>
+  </button>
+)}
+
                   </div>
 
 
