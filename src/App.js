@@ -1580,78 +1580,82 @@ const [baseData, setBaseData] = useState({
     );
   }
 
-  /* ================= DISCLAIMER ================= */
+/* ================= DISCLAIMER ================= */
 
-  if (step === "disclaimer") {
-    return (
-      <div className="screen center disclaimerScreen">
+if (step === "disclaimer") {
+  return (
+    <div className="screen center disclaimerScreen">
 
-        <div className="disclaimerCard">
+      <div className="disclaimerCard">
 
-          <h2 style={{ marginBottom: 20 }}>
-            Hinweis zur Nutzung
-          </h2>
-          <p>
-            Der 360° Absicherungscheck ist ein digitales Analyse-Tool
-            zur strukturierten Selbsteinschätzung deiner aktuellen Absicherung.
-          </p>
+        <h2 style={{ marginBottom: 20 }}>
+          Hinweis zur Nutzung
+        </h2>
 
-          <p>
-            Die Ergebnisse basieren ausschließlich auf deinen eigenen
-            Angaben und stellen keine individuelle Versicherungsberatung
-            im Sinne des Versicherungsvertragsgesetzes (VVG) dar.
-          </p>
+        <p>
+          Der 360° Absicherungscheck ist ein digitales Analyse-Tool
+          zur strukturierten Selbsteinschätzung deiner aktuellen Absicherung.
+        </p>
 
-          <p>
-            Es erfolgt keine automatische Produktempfehlung und
-            keine rechtlich verbindliche Bedarfsanalyse gemäß § 6 VVG.
-          </p>
+        <p>
+          Die Ergebnisse basieren ausschließlich auf deinen eigenen
+          Angaben und stellen keine individuelle Versicherungsberatung
+          im Sinne des Versicherungsvertragsgesetzes (VVG) dar.
+        </p>
 
-          <p>
-            Eine verbindliche Beratung sowie eine konkrete Produktempfehlung
-            erfolgen ausschließlich im Rahmen eines persönlichen Gesprächs.
-          </p>
+        <p>
+          Es erfolgt keine automatische Produktempfehlung und
+          keine rechtlich verbindliche Bedarfsanalyse gemäß § 6 VVG.
+        </p>
 
-          <p>
-            Florian Löffler ist als gebundener Versicherungsvertreter
-            gemäß § 34d GewO tätig und berät ausschließlich zu den
-            Produkten der im Impressum genannten Gesellschaften.
-          </p>
+        <p>
+          Die Nutzung des Tools begründet kein Beratungsverhältnis.
+        </p>
 
-          <p>
-            Für seine Tätigkeit erhält er eine Provision,
-            die in der jeweiligen Versicherungsprämie enthalten ist.
-          </p>
+        <p>
+          Eine verbindliche Beratung sowie eine konkrete Produktempfehlung
+          erfolgen ausschließlich im Rahmen eines persönlichen Gesprächs.
+        </p>
 
-          <div className="disclaimerCheckbox">
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={disclaimerAccepted}
-                onChange={(e) => setDisclaimerAccepted(e.target.checked)}
-              />
-              Ich habe den Hinweis gelesen und akzeptiere ihn.
-            </label>
-          </div>
+        <p>
+          Florian Löffler ist als gebundener Versicherungsvertreter
+          gemäß § 34d GewO tätig und berät ausschließlich zu den
+          Produkten der im Impressum genannten Gesellschaften.
+        </p>
 
-          <button
-            className="primaryBtn big"
-            disabled={!disclaimerAccepted}
-            style={{
-              marginTop: 20,
-              opacity: disclaimerAccepted ? 1 : 0.5,
-              cursor: disclaimerAccepted ? "pointer" : "not-allowed"
-            }}
-            onClick={() => setStep("base")}
-          >
-            Weiter zu den persönlichen Angaben
-          </button>
+        <p>
+          Für seine Tätigkeit erhält er eine Provision,
+          die in der jeweiligen Versicherungsprämie enthalten ist.
+        </p>
 
+        <div className="disclaimerCheckbox">
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={disclaimerAccepted}
+              onChange={(e) => setDisclaimerAccepted(e.target.checked)}
+            />
+            Ich habe den Hinweis gelesen und akzeptiere ihn.
+          </label>
         </div>
-      </div>
-    );
-  }
 
+        <button
+          className="primaryBtn big"
+          disabled={!disclaimerAccepted}
+          style={{
+            marginTop: 20,
+            opacity: disclaimerAccepted ? 1 : 0.5,
+            cursor: disclaimerAccepted ? "pointer" : "not-allowed"
+          }}
+          onClick={() => setStep("base")}
+        >
+          Weiter zu den persönlichen Angaben
+        </button>
+
+      </div>
+    </div>
+  );
+}
 
   /* ================= BASISDATEN ================= */
 
