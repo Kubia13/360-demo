@@ -1319,3 +1319,13 @@ svg {
 .recommendationMiniBtn:active {
   transform: scale(0.96);
 }
+.infoBox a {
+  color: inherit;
+  text-decoration: underline;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.infoBox a:hover {
+  opacity: 1;
+}

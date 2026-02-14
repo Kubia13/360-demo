@@ -1543,7 +1543,7 @@ export default function App() {
             </>
           )}
 
-          
+
         </div>
       </div>
     );
@@ -1588,68 +1588,66 @@ export default function App() {
     );
   }
   function ContactOverlayComponent() {
-  if (!contactOverlay) return null;
+    if (!contactOverlay) return null;
 
-  return (
-    <div
-      className="infoOverlay"
-      onClick={() => setContactOverlay(false)}
-    >
+    return (
       <div
-        className="infoBox"
-        onClick={(e) => e.stopPropagation()}
+        className="infoOverlay"
+        onClick={() => setContactOverlay(false)}
       >
-        <h3 style={{ marginBottom: 16 }}>
-          Persönlicher Kontakt
-        </h3>
+        <div
+          className="infoBox"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 style={{ marginBottom: 16 }}>
+            Persönlicher Kontakt
+          </h3>
 
-        <p><strong>Florian Löffler</strong></p>
+          <p><strong>Florian Löffler</strong></p>
 
-        <p>
-          BarmeniaGothaer VZ Südbaden
-          Breisacher Str. 145b<br />
-          79110 Freiburg
-        </p>
+              <p>
+                BarmeniaGothaer VZ Südbaden
+                Breisacher Str. 145b<br />
+                79110 Freiburg im Breisgau
+              </p>
 
-        <p>
-          Telefon:<br />
-          <a href="tel:+497612027423">
-            0761 2027423
-          </a>
-        </p>
+              <p>
+                Telefon:{" "}
+                <a href="tel:+497612027423">
+                  0761-2027423
+                </a>
+                <br />
+                E-Mail:{" "}
+                <a href="mailto:florian.loeffler@barmenia.de?subject=Anfrage%20360%C2%B0%20Absicherungscheck">
+                  florian.loeffler@barmenia.de
+                </a>
+              </p>
 
-        <p>
-          E-Mail:<br />
-          <a href="mailto:florian.loeffler@barmenia.de">
-            florian.loeffler@barmenia.de
-          </a>
-        </p>
+          <div className="overlayButtons" style={{ marginTop: 20 }}>
+            <button
+              className="overlayBtn primary"
+              onClick={() =>
+                window.open(
+                  "https://agentur.barmenia.de/florian_loeffler",
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
+            >
+              Zur Agentur-Website
+            </button>
 
-        <div className="overlayButtons" style={{ marginTop: 20 }}>
-          <button
-            className="overlayBtn primary"
-            onClick={() =>
-              window.open(
-                "https://agentur.barmenia.de/florian_loeffler",
-                "_blank",
-                "noopener,noreferrer"
-              )
-            }
-          >
-            Zur Agentur-Website
-          </button>
-
-          <button
-            className="overlayBtn secondary"
-            onClick={() => setContactOverlay(false)}
-          >
-            Schließen
-          </button>
+            <button
+              className="overlayBtn secondary"
+              onClick={() => setContactOverlay(false)}
+            >
+              Schließen
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   /* ================= ACTION OVERLAY ================= */
 
