@@ -815,107 +815,146 @@ body::before {
 /* ================= UI UPGRADE 5 – PREMIUM FOOTER ================= */
 
 .contactFixed {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 
-  border-top: 1px solid rgba(139, 124, 246, 0.15);
+  border-top: 1px solid rgba(139, 124, 246, 0.12);
 
   box-shadow:
-    0 -8px 30px rgba(0, 0, 0, 0.6),
-    0 -1px 0 rgba(255, 255, 255, 0.04);
+    0 -6px 22px rgba(0, 0, 0, 0.55),
+    0 -1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .contactFixed::before {
   content: "";
   position: absolute;
   top: 0;
-  left: 10%;
-  width: 80%;
+  left: 15%;
+  width: 70%;
   height: 1px;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(139, 124, 246, 0.4),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 124, 246, 0.35),
+    transparent
+  );
 }
 
 .contactBtn {
   box-shadow:
-    0 6px 16px rgba(94, 74, 227, 0.35);
+    0 5px 14px rgba(94, 74, 227, 0.3);
 }
 
 .contactBtn.secondary {
   box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.5);
+    0 3px 10px rgba(0, 0, 0, 0.45);
 }
 
-/* ===== CATEGORY EXPAND ===== */
+
+/* ================= CATEGORY EXPAND ================= */
 
 .categoryDetails {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
   opacity: 0;
-  padding: 0 10px;
+  padding: 0 6px;
 }
 
 .categoryDetails.open {
-  max-height: 1000px;
-  /* etwas größer für Produktsite */
+  max-height: 900px;
   opacity: 1;
+  padding-top: 8px;
 }
 
+
+/* ================= EMPFEHLUNGS-KARTE ================= */
+
 .recommendationItem {
-  background: #0f1a23;
+  background: rgba(15, 26, 35, 0.85);
   border-left: 3px solid #8B7CF6;
-  padding: 14px 16px;
+
+  padding: 12px 14px;
   margin-top: 8px;
-  border-radius: 10px;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+
+  backdrop-filter: blur(8px);
 }
 
 .recommendationItem p {
   font-size: 13px;
-  opacity: 0.8;
+  line-height: 1.5;
+  opacity: 0.85;
   margin: 4px 0 0 0;
 }
+
+
+/* ================= KEINE PROBLEME TEXT ================= */
 
 .noIssues {
   font-size: 13px;
   opacity: 0.6;
-  padding: 8px 0;
+  padding: 6px 0;
 }
+
+
+/* ================= DASHBOARD TITLE ================= */
 
 .dashboardTitle {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
+  margin-bottom: 14px;
 }
 
+
+/* ================= CATEGORY ROW ================= */
+
+.categoryRow {
+  padding: 14px 16px;
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.categoryRow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(139,124,246,0.18);
+}
+
+
+/* ================= CATEGORY CHEVRON ================= */
 
 .categoryChevron {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
 
-  border-radius: 10px;
+  border-radius: 8px;
 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(139, 124, 246, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(139, 124, 246, 0.18);
 
   color: #A99BFF;
 
-  transition: transform 0.25s ease, background 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .categoryRow:hover .categoryChevron {
-  background: rgba(139, 124, 246, 0.15);
-
+  background: rgba(139, 124, 246, 0.12);
 }
+
 
 .legalFooter {
   margin-top: auto;
@@ -1599,4 +1638,77 @@ svg {
     line-height: 1.4;
   }
 
+}
+/* ================= GLOBAL COMPACT FIX ================= */
+
+/* Screen weniger vertikale Luft */
+.screen {
+  padding: 16px;
+  padding-bottom: 110px;
+}
+
+/* Ring kompakter */
+.ringWrap {
+  margin: 20px 0;
+}
+
+/* Score Label dichter */
+.scoreLabel {
+  margin-top: -6px;
+  margin-bottom: 16px;
+}
+
+/* H2 kompakter */
+.screen h2 {
+  margin-bottom: 16px;
+}
+
+/* Fragekarten kompakter */
+.questionCard.dark {
+  padding: 18px 18px 20px 18px;
+  margin-bottom: 16px;
+}
+
+/* Antwort-Buttons minimal enger */
+.answerBtn {
+  padding: 12px;
+}
+
+/* Kategorien dichter */
+.categoryList {
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* Kategorie-Zeile kompakter */
+.categoryRow {
+  padding: 12px 14px;
+}
+
+/* Accordion weniger Luft */
+.categoryDetails.open {
+  padding-top: 6px;
+}
+
+/* Empfehlungskarte enger */
+.recommendationItem {
+  padding: 10px 12px;
+  margin-top: 6px;
+}
+
+/* Empfehlungstext kompakter */
+.recommendationItem p {
+  margin-top: 3px;
+  line-height: 1.5;
+}
+
+/* Dashboard Title dichter */
+.dashboardTitle {
+  margin-bottom: 10px;
+}
+
+/* Footer weniger dominant */
+.legalFooter {
+  padding-top: 20px;
+  margin-bottom: 70px;
 }
