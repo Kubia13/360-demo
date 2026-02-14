@@ -1278,14 +1278,21 @@ svg {
   transition: all 0.18s ease;
 }
 
-/* Hover – subtiler Glow */
-.numberStepper button:hover {
-  background: rgba(139,124,246,0.15);
-  box-shadow: 0 0 10px rgba(139,124,246,0.4);
-  transform: scale(1.05);
+/* ===== CLEAN TOUCH BEHAVIOR ===== */
+
+.numberStepper button {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
-/* Active */
+/* Hover nur auf Geräten mit echter Maus */
+@media (hover: hover) and (pointer: fine) {
+  .numberStepper button:hover {
+    background: rgba(139,124,246,0.12);
+  }
+}
+
+/* Active Zustand dezenter */
 .numberStepper button:active {
-  transform: scale(0.92);
+  transform: scale(0.95);
 }
