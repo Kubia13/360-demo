@@ -1146,17 +1146,13 @@ svg {
 /* ================= QUESTION TEXT CLEAN ================= */
 
 .questionText {
-  margin-bottom: 14px;
+  margin-bottom: 10px;      /* war 12/14 */
   padding-right: 54px;
-  /* Platz für Info-Icon */
 
   font-size: 16px;
-  /* statt 17 */
   font-weight: 600;
-  /* etwas stärker */
-  line-height: 1.45;
-  /* ruhiger */
-  letter-spacing: 0.2px;
+  line-height: 1.38;        /* enger */
+  letter-spacing: 0.15px;
 }
 
 
