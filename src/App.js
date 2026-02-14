@@ -27,6 +27,8 @@ const CATEGORY_LABELS = {
 
 const PRIORITY_MAP = {
   bu: 3,
+  du: 3,        // ← NEU
+
   haftpflicht: 3,
   pflege: 3,
 
@@ -34,12 +36,10 @@ const PRIORITY_MAP = {
   gebaeude: 2,
   rechtsschutz: 2,
   hausrat: 2,
-  elementar: 1,
 
-  krankenzusatz: 2,
-  kinder_krankenzusatz: 2,
+  krankenzusatz: 1,
+  kinder_krankenzusatz: 1,
   kasko: 1,
-  schutzbrief: 1,
   kfz_haftpflicht: 2
 };
 
@@ -47,6 +47,7 @@ const PRIORITY_MAP = {
 
 const CORE_PRODUCTS = [
   "bu",
+   "du", 
   "ktg",
   "haftpflicht",
   "hausrat",
@@ -192,7 +193,28 @@ const QUESTIONS = {
     label: "Berufsunfähigkeitsversicherung vorhanden?",
     category: "existenz",
     type: "yesno",
+    condition: (baseData) => baseData.beruf !== "Beamter",
+    info:
+      "Eine BU leistet, wenn du deinen zuletzt ausgeübten Beruf voraussichtlich dauerhaft (mind. 6 Monate) zu mindestens 50% nicht mehr ausüben kannst.\n\n" +
+      "Sie sichert dein Einkommen ab.\n\n" +
+      "Faustformel:\n" +
+      "ca. 60–70% deines Bruttoeinkommens\n" +
+      "oder\n" +
+      "80–90% deines Nettoeinkommens.\n\n" +
+      "Ziel ist es, deinen Lebensstandard auch im Ernstfall stabil zu halten."
   },
+
+  du: {
+    label: "Dienstunfähigkeitsversicherung vorhanden?",
+    category: "existenz",
+    type: "yesno",
+    condition: (baseData) => baseData.beruf === "Beamter",
+    info:
+      "Beamte benötigen keine klassische BU, sondern eine Dienstunfähigkeitsversicherung.\n\n" +
+      "Diese leistet, wenn dich dein Dienstherr wegen Dienstunfähigkeit entlässt oder in den Ruhestand versetzt.\n\n" +
+      "Besonders wichtig ist eine echte DU-Klausel."
+  },
+
 
   ktg: {
     label: "Krankentagegeld vorhanden?",
@@ -530,25 +552,25 @@ export default function App() {
 
   /* ================= STEP & CORE STATE ================= */
 
-const [step, setStep] = useState("welcome");
-const [answers, setAnswers] = useState({});
-const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const [step, setStep] = useState("welcome");
+  const [answers, setAnswers] = useState({});
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
-const [baseData, setBaseData] = useState({
-  anrede: "",
-  vorname: "",
-  nachname: "",
-  alter: "",
-  gehalt: "",
-  beziehungsstatus: "",
-  beruf: "",
-  kinder: "",
-  kinderAnzahl: "",
-  tiere: "",
-  wohnen: "",
-  kfz: "",
-  kfzAnzahl: ""
-});
+  const [baseData, setBaseData] = useState({
+    anrede: "",
+    vorname: "",
+    nachname: "",
+    alter: "",
+    gehalt: "",
+    beziehungsstatus: "",
+    beruf: "",
+    kinder: "",
+    kinderAnzahl: "",
+    tiere: "",
+    wohnen: "",
+    kfz: "",
+    kfzAnzahl: ""
+  });
 
 
   const updateBaseData = React.useCallback((field, value) => {
@@ -594,7 +616,7 @@ const [baseData, setBaseData] = useState({
   /* ================= BASE INPUT ORDER ================= */
 
   const baseInputOrder = useMemo(() => [
-    baseFormRefs. anrede,
+    baseFormRefs.anrede,
     baseFormRefs.vorname,
     baseFormRefs.nachname,
     baseFormRefs.alter,
@@ -655,32 +677,32 @@ const [baseData, setBaseData] = useState({
 
   /* ================= RESET ================= */
 
-function resetAll() {
-  setStep("welcome");
-  setAnswers({});
-  setBaseData({
-    anrede: "",
-    vorname: "",
-    nachname: "",
-    alter: "",
-    gehalt: "",
-    beziehungsstatus: "",
-    beruf: "",
-    kinder: "",
-    kinderAnzahl: "",
-    tiere: "",
-    wohnen: "",
-    kfz: "",
-    kfzAnzahl: ""
-  });
+  function resetAll() {
+    setStep("welcome");
+    setAnswers({});
+    setBaseData({
+      anrede: "",
+      vorname: "",
+      nachname: "",
+      alter: "",
+      gehalt: "",
+      beziehungsstatus: "",
+      beruf: "",
+      kinder: "",
+      kinderAnzahl: "",
+      tiere: "",
+      wohnen: "",
+      kfz: "",
+      kfzAnzahl: ""
+    });
 
-  setCurrentCategoryIndex(0);
-  setAnimatedScore(0);
-  setExpandedCategory(null);
-  setLegalOverlay(null);
+    setCurrentCategoryIndex(0);
+    setAnimatedScore(0);
+    setExpandedCategory(null);
+    setLegalOverlay(null);
 
-  setDisclaimerAccepted(false); // <-- DAS HIER HINZUFÜGEN
-}
+    setDisclaimerAccepted(false); // <-- DAS HIER HINZUFÜGEN
+  }
 
 
   /* ================= ANSWER ================= */
@@ -970,18 +992,33 @@ const topRecommendations = useMemo(() => {
     // 🔒 1️⃣ Add-on Produkte komplett ausschließen
     if (EXCLUDED_FROM_TOP3.includes(id)) return;
 
+    // 🔒 2️⃣ Berufslogik sauber trennen
+
+    // BU nur für Erwerbstätige (nicht Beamte, nicht Nicht berufstätig)
+    if (id === "bu") {
+      if (baseData.beruf === "Beamter") return;
+      if (baseData.beruf === "Nicht berufstätig") return;
+    }
+
+    // DU nur für Beamte
+    if (id === "du") {
+      if (baseData.beruf !== "Beamter") return;
+    }
+
     const score = getScore(id);
     if (score === null) return;
 
-    // 🔒 2️⃣ Produkte mit 100% Score nicht anzeigen
+    // 🔒 3️⃣ Produkte mit 100% Score nicht anzeigen
     if (score >= 100) return;
 
     const text = getStrategicRecommendation(id);
     if (!text) return;
 
-    // 🔒 3️⃣ KASKO LOGIK
-    // Wenn Vollkasko vorhanden → keine Empfehlung
+    // 🔒 4️⃣ KASKO LOGIK
     if (id === "kasko" && answers[id] === "vollkasko") return;
+
+    // 🔒 5️⃣ Optional: Nur Core-Produkte berücksichtigen
+    if (typeof CORE_PRODUCTS !== "undefined" && !CORE_PRODUCTS.includes(id)) return;
 
     allRecommendations.push({
       id,
@@ -1007,6 +1044,7 @@ const topRecommendations = useMemo(() => {
   return allRecommendations.slice(0, 3);
 
 }, [answers, baseData, step]);
+
 
   /* ================= PRODUKTSEITE ================= */
 
@@ -1150,6 +1188,11 @@ const topRecommendations = useMemo(() => {
   /* ===== STRATEGISCHE EMPFEHLUNGEN ===== */
 
   function getStrategicRecommendation(id) {
+
+    // 🔒 KASKO FIX
+    if (id === "kasko" && answers[id] === "vollkasko") {
+      return null;
+    }
 
     const value = answers[id];
     const age = Number(baseData.alter);
@@ -1617,82 +1660,82 @@ const topRecommendations = useMemo(() => {
     );
   }
 
-/* ================= DISCLAIMER ================= */
+  /* ================= DISCLAIMER ================= */
 
-if (step === "disclaimer") {
-  return (
-    <div className="screen center disclaimerScreen">
+  if (step === "disclaimer") {
+    return (
+      <div className="screen center disclaimerScreen">
 
-      <div className="disclaimerCard">
+        <div className="disclaimerCard">
 
-        <h2 style={{ marginBottom: 20 }}>
-          Hinweis zur Nutzung
-        </h2>
+          <h2 style={{ marginBottom: 20 }}>
+            Hinweis zur Nutzung
+          </h2>
 
-        <p>
-          Der 360° Absicherungscheck ist ein digitales Analyse-Tool
-          zur strukturierten Selbsteinschätzung deiner aktuellen Absicherung.
-        </p>
+          <p>
+            Der 360° Absicherungscheck ist ein digitales Analyse-Tool
+            zur strukturierten Selbsteinschätzung deiner aktuellen Absicherung.
+          </p>
 
-        <p>
-          Die Ergebnisse basieren ausschließlich auf deinen eigenen
-          Angaben und stellen keine individuelle Versicherungsberatung
-          im Sinne des Versicherungsvertragsgesetzes (VVG) dar.
-        </p>
+          <p>
+            Die Ergebnisse basieren ausschließlich auf deinen eigenen
+            Angaben und stellen keine individuelle Versicherungsberatung
+            im Sinne des Versicherungsvertragsgesetzes (VVG) dar.
+          </p>
 
-        <p>
-          Es erfolgt keine automatische Produktempfehlung und
-          keine rechtlich verbindliche Bedarfsanalyse gemäß § 6 VVG.
-        </p>
+          <p>
+            Es erfolgt keine automatische Produktempfehlung und
+            keine rechtlich verbindliche Bedarfsanalyse gemäß § 6 VVG.
+          </p>
 
-        <p>
-          Die Nutzung des Tools begründet kein Beratungsverhältnis.
-        </p>
+          <p>
+            Die Nutzung des Tools begründet kein Beratungsverhältnis.
+          </p>
 
-        <p>
-          Eine verbindliche Beratung sowie eine konkrete Produktempfehlung
-          erfolgen ausschließlich im Rahmen eines persönlichen Gesprächs.
-        </p>
+          <p>
+            Eine verbindliche Beratung sowie eine konkrete Produktempfehlung
+            erfolgen ausschließlich im Rahmen eines persönlichen Gesprächs.
+          </p>
 
-        <p>
-          Florian Löffler ist als gebundener Versicherungsvertreter
-          gemäß § 34d GewO tätig und berät ausschließlich zu den
-          Produkten der im Impressum genannten Gesellschaften.
-        </p>
+          <p>
+            Florian Löffler ist als gebundener Versicherungsvertreter
+            gemäß § 34d GewO tätig und berät ausschließlich zu den
+            Produkten der im Impressum genannten Gesellschaften.
+          </p>
 
-        <p>
-          Für seine Tätigkeit erhält er eine Provision,
-          die in der jeweiligen Versicherungsprämie enthalten ist.
-        </p>
+          <p>
+            Für seine Tätigkeit erhält er eine Provision,
+            die in der jeweiligen Versicherungsprämie enthalten ist.
+          </p>
 
-        <div className="disclaimerCheckbox">
-          <label className="checkbox">
-            <input
-              type="checkbox"
-              checked={disclaimerAccepted}
-              onChange={(e) => setDisclaimerAccepted(e.target.checked)}
-            />
-            Ich habe den Hinweis gelesen und akzeptiere ihn.
-          </label>
+          <div className="disclaimerCheckbox">
+            <label className="checkbox">
+              <input
+                type="checkbox"
+                checked={disclaimerAccepted}
+                onChange={(e) => setDisclaimerAccepted(e.target.checked)}
+              />
+              Ich habe den Hinweis gelesen und akzeptiere ihn.
+            </label>
+          </div>
+
+          <button
+            className="primaryBtn big"
+            disabled={!disclaimerAccepted}
+            style={{
+              marginTop: 20,
+              opacity: disclaimerAccepted ? 1 : 0.5,
+              cursor: disclaimerAccepted ? "pointer" : "not-allowed"
+            }}
+            onClick={() => setStep("base")}
+          >
+            Weiter zu den persönlichen Angaben
+          </button>
+
         </div>
-
-        <button
-          className="primaryBtn big"
-          disabled={!disclaimerAccepted}
-          style={{
-            marginTop: 20,
-            opacity: disclaimerAccepted ? 1 : 0.5,
-            cursor: disclaimerAccepted ? "pointer" : "not-allowed"
-          }}
-          onClick={() => setStep("base")}
-        >
-          Weiter zu den persönlichen Angaben
-        </button>
-
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   /* ================= BASISDATEN ================= */
 
@@ -1704,14 +1747,14 @@ if (step === "disclaimer") {
 
         <h2>Persönliche Angaben</h2>
 
-<Select
-  label="Anrede"
-  options={["Herr", "Frau", "Divers", "Keine Angabe"]}
-  value={baseData.anrede}
-  onChange={(v) => updateBaseData("anrede", v)}
-  selectRef={baseFormRefs.anrede}
-  onEnter={() => focusNext(baseFormRefs.anrede)}
-/>
+        <Select
+          label="Anrede"
+          options={["Herr", "Frau", "Divers", "Keine Angabe"]}
+          value={baseData.anrede}
+          onChange={(v) => updateBaseData("anrede", v)}
+          selectRef={baseFormRefs.anrede}
+          onEnter={() => focusNext(baseFormRefs.anrede)}
+        />
 
         <Input
           label="Vorname"
@@ -1765,6 +1808,9 @@ if (step === "disclaimer") {
           options={[
             "Angestellt",
             "Öffentlicher Dienst",
+            "Beamter",
+            "Student",
+            "In Ausbildung",
             "Selbstständig",
             "Nicht berufstätig",
           ]}
@@ -2333,9 +2379,10 @@ if (step === "disclaimer") {
               return true;
             });
 
-            const needsOptimization = questionsInCat.filter((id) =>
-              getStrategicRecommendation(id)
-            );
+            const needsOptimization = questionsInCat.filter((id) => {
+              const recommendation = getStrategicRecommendation(id);
+              return recommendation !== null && recommendation !== undefined;
+            });
 
             const isOpen = expandedCategory === cat;
 
