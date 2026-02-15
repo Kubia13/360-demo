@@ -1035,11 +1035,6 @@ body::before {
   transform: scale(0.97);
 }
 
-.screen h2 {
-  margin-bottom: 24px;
-  text-align: center;
-}
-
 .productName {
   font-size: 15px;
   font-weight: 500;
@@ -1611,10 +1606,16 @@ svg {
   padding-bottom: 110px;
 }
 
-/* H2 kompakter */
+/* ================= DASHBOARD TITLE ================= */
+
 .screen h2 {
-  margin-bottom: 16px;
+  text-align: center;
+  margin: 0 0 18px 0;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  opacity: 0.95;
 }
+
 
 /* Fragekarten kompakter */
 .questionCard.dark {
@@ -1661,7 +1662,7 @@ svg {
   margin-bottom: 70px;
 }
 
-/* ================= PREMIUM SCORE RING – DYNAMIC CLEAN ================= */
+/* ================= PREMIUM SCORE FINAL ================= */
 
 .ringWrap {
   position: relative;
@@ -1669,29 +1670,24 @@ svg {
   justify-content: center;
   align-items: center;
 
-  margin: 6px 0 8px 0;      /* enger zum Titel + Text */
-  padding: 34px;            /* Platz für Glow */
-  overflow: visible;
+  margin: 12px 0 8px 0;  /* enger zum Text */
+  overflow: visible;     /* Glow darf raus */
 }
 
-/* Dynamischer Glow (Farbe kommt aus Inline Style) */
+/* OUTER GLOW */
+
 .ringGlow {
   position: absolute;
-  width: 260px;
-  height: 260px;
-
+  width: 340px;
+  height: 340px;
   border-radius: 50%;
-  pointer-events: none;
   z-index: 0;
-  transition: 0.4s ease;
+
+  filter: blur(50px);
+  pointer-events: none;
 }
 
-.ringWrap svg {
-  position: relative;
-  z-index: 1;
-}
-
-/* ================= SCORE CENTER ================= */
+/* SCORE CENTER */
 
 .ringCenter {
   position: absolute;
@@ -1704,7 +1700,6 @@ svg {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   text-align: center;
 }
 

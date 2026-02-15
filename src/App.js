@@ -3264,7 +3264,7 @@ export default function App() {
             : "Dein Absicherungs-Status"}
         </h2>
 
-        {/* ================= SCORE RING – PREMIUM CLEAN ================= */}
+        {/* ================= SCORE RING – PREMIUM FINAL ================= */}
 
 <div className="ringWrap">
 
@@ -3272,6 +3272,7 @@ export default function App() {
 
     const circumference = 2 * Math.PI * 95;
     const normalizedScore = Math.min(animatedScore, 100);
+
     const dashOffset =
       normalizedScore === 100
         ? 0
@@ -3280,35 +3281,44 @@ export default function App() {
     let gradientStart = "#5E4AE3";
     let gradientEnd = "#8B7CF6";
     let statusLabel = "Handlungsbedarf";
-    let glowStrength = 0.15;
+    let glowStrength = 0.16;
+
+    if (animatedScore >= 60) {
+      gradientStart = "#6E5CF0";
+      gradientEnd = "#A99BFF";
+      statusLabel = "Gute Basis";
+      glowStrength = 0.32;
+    }
 
     if (animatedScore >= 80) {
       gradientStart = "#8B7CF6";
       gradientEnd = "#C4BAFF";
       statusLabel = "Sehr solide";
-      glowStrength = 0.45;
-    } else if (animatedScore >= 60) {
-      gradientStart = "#6E5CF0";
-      gradientEnd = "#A99BFF";
-      statusLabel = "Gute Basis";
-      glowStrength = 0.3;
+      glowStrength = 0.48;
+    }
+
+    if (animatedScore === 100) {
+      glowStrength = 0.65;
     }
 
     return (
       <>
-        {/* DYNAMISCHER GLOW */}
+        {/* WEICHER OUTER GLOW */}
         <div
           className="ringGlow"
           style={{
-            background: `radial-gradient(circle,
-              rgba(139,124,246,${glowStrength}) 0%,
-              rgba(139,124,246,${glowStrength * 0.6}) 40%,
-              rgba(139,124,246,${glowStrength * 0.3}) 65%,
-              transparent 85%)`
+background: `radial-gradient(circle,
+  rgba(139,124,246,0) 0%,
+  rgba(139,124,246,${glowStrength * 0.35}) 40%,
+  rgba(139,124,246,${glowStrength * 0.7}) 60%,
+  rgba(139,124,246,${glowStrength * 0.35}) 75%,
+  rgba(139,124,246,${glowStrength * 0.1}) 88%,
+  transparent 100%)`
           }}
         />
 
         <svg width="260" height="260" viewBox="0 0 260 260">
+
           <defs>
             <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor={gradientStart} />
@@ -3316,6 +3326,7 @@ export default function App() {
             </linearGradient>
           </defs>
 
+          {/* Hintergrundring */}
           <circle
             cx="130"
             cy="130"
@@ -3325,6 +3336,7 @@ export default function App() {
             fill="none"
           />
 
+          {/* Aktiver Ring */}
           <circle
             cx="130"
             cy="130"
@@ -3337,22 +3349,23 @@ export default function App() {
             strokeLinecap={normalizedScore === 100 ? "butt" : "round"}
             transform="rotate(-90 130 130)"
             style={{
+              filter: `drop-shadow(0 0 10px rgba(139,124,246,${glowStrength}))`,
               transition: "0.9s ease"
             }}
           />
+
         </svg>
 
         <div className="ringCenter">
           <div className="ringScore">{animatedScore}%</div>
           <div className="ringStatus">{statusLabel}</div>
         </div>
+
       </>
     );
   })()}
 
 </div>
-
-
 
         {/* ================= SCORE STATUS ================= */}
 
