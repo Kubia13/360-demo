@@ -3209,73 +3209,139 @@ function ContactOverlayComponent() {
             : "Dein Absicherungs-Status"}
         </h2>
 
-        {/* Score Ring */}
-        <div className="ringWrap">
-          <svg width="220" height="220">
-            <circle
-              cx="110"
-              cy="110"
-              r="90"
-              stroke="#1a2a36"
-              strokeWidth="16"
-              fill="none"
-            />
+{/* ================= SCORE RING – PREMIUM LEVEL 2 ================= */}
 
-            <circle
-              cx="110"
-              cy="110"
-              r="90"
-              stroke="url(#grad)"
-              strokeWidth="16"
-              fill="none"
-              strokeDasharray="565"
-              strokeDashoffset={565 - (565 * animatedScore) / 100}
-              strokeLinecap="round"
-              transform="rotate(-90 110 110)"
-              style={{
-                filter: "drop-shadow(0 0 12px rgba(139,124,246,0.6))",
-                transition: "0.6s ease",
-              }}
-            />
+<div className="ringWrap premium">
 
-            <defs>
-              <linearGradient id="grad">
-                <stop offset="0%" stopColor="#8B7CF6" />
-                <stop offset="100%" stopColor="#5E4AE3" />
-              </linearGradient>
-            </defs>
-          </svg>
+  {(() => {
 
-          <div className="ringCenter">{animatedScore}%</div>
+const circumference = 2 * Math.PI * 95;
+
+const normalizedScore = Math.min(animatedScore, 100);
+const dashOffset =
+  normalizedScore === 100
+    ? 0
+    : circumference - (normalizedScore / 100) * circumference;
+
+    let gradientStart = "#5E4AE3";
+    let gradientEnd = "#8B7CF6";
+    let glowOpacity = 0.25;
+    let statusLabel = "Handlungsbedarf";
+
+    if (animatedScore >= 80) {
+      gradientStart = "#8B7CF6";
+      gradientEnd = "#B5A9FF";
+      glowOpacity = 0.4;
+      statusLabel = "Sehr solide";
+    } 
+    else if (animatedScore >= 60) {
+      gradientStart = "#6E5CF0";
+      gradientEnd = "#9C8CFF";
+      glowOpacity = 0.3;
+      statusLabel = "Gute Basis";
+    }
+
+    return (
+      <>
+        <svg width="240" height="240">
+
+          <defs>
+            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={gradientStart} />
+              <stop offset="100%" stopColor={gradientEnd} />
+            </linearGradient>
+          </defs>
+
+          {/* Hintergrundring */}
+          <circle
+            cx="120"
+            cy="120"
+            r="95"
+            stroke="#1A2A36"
+            strokeWidth="18"
+            fill="none"
+          />
+
+          {/* Aktiver Ring */}
+          <circle
+            cx="120"
+            cy="120"
+            r="95"
+            stroke="url(#scoreGrad)"
+            strokeWidth="18"
+            fill="none"
+            strokeDasharray={circumference}
+            strokeDashoffset={dashOffset}
+            strokeLinecap={animatedScore === 100 ? "butt" : "round"}
+            transform="rotate(-90 120 120)"
+            style={{
+              filter: `drop-shadow(0 0 20px rgba(139,124,246,${glowOpacity}))`,
+              transition: "0.9s ease"
+            }}
+          />
+
+        </svg>
+
+        <div className="ringCenter">
+          <div className="ringScore">{animatedScore}%</div>
+          <div className="ringStatus">{statusLabel}</div>
         </div>
+      </>
+    );
 
-        {/* Bewertung + Hinweis */}
-        <div className="scoreLabel">
-          <p>
-            {animatedScore >= 80
-              ? "Sehr gut abgesichert"
-              : animatedScore >= 60
-                ? "Solide Basis"
-                : "Optimierung sinnvoll"}
-          </p>
+  })()}
 
-          <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
-            {getDynamicHint()}
-          </p>
-        </div>
+</div>
 
-        {/* Dynamische Conversion-Hinweise */}
-        {animatedScore < 60 && (
-          <div className="riskWarning">
-            <strong>Handlungsbedarf:</strong> Es bestehen mehrere relevante Absicherungslücken.
-          </div>
-        )}
 
-        {animatedScore >= 80 && (
-          <div className="upgradeHint">
-            Sehr gute Basis. Mit gezielter Feinoptimierung sind 90%+ erreichbar.
-          </div>
-        )}
+{/* ================= SCORE STATUS ================= */}
+
+<div className="scoreLabel" style={{ textAlign: "center" }}>
+  <p>
+    {animatedScore === 100
+      ? "Exzellent abgesichert"
+      : animatedScore >= 80
+      ? "Sehr gut abgesichert"
+      : animatedScore >= 60
+      ? "Solide Basis"
+      : "Optimierung sinnvoll"}
+  </p>
+
+  <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
+    {getDynamicHint()}
+  </p>
+</div>
+
+{/* ================= DYNAMISCHE STATUS-TEXTE ================= */}
+
+{animatedScore < 60 && (
+  <div className="riskWarning" style={{ textAlign: "center" }}>
+    <strong>Handlungsbedarf:</strong> Es bestehen mehrere relevante
+    Absicherungslücken.
+  </div>
+)}
+
+{animatedScore >= 60 && animatedScore < 80 && (
+  <div className="upgradeHint" style={{ textAlign: "center" }}>
+    Gute Ausgangsbasis. Mit gezielten Anpassungen lässt sich dein
+    Absicherungsniveau deutlich verbessern.
+  </div>
+)}
+
+{animatedScore >= 80 && animatedScore < 100 && (
+  <div className="upgradeHint" style={{ textAlign: "center" }}>
+    Sehr starke Struktur. Mit wenigen strategischen Optimierungen
+    sind 90%+ realistisch erreichbar.
+  </div>
+)}
+
+{animatedScore === 100 && (
+  <div className="upgradeHint" style={{ textAlign: "center" }}>
+    Sehr stark aufgestellt. In einem kurzen Strategie-Check lässt sich prüfen, 
+    ob sich weitere Optimierungspotenziale ergeben.
+  </div>
+)}
+
 
 
         {/* ================= TOP 3 HANDLUNGSFELDER ================= */}
