@@ -381,22 +381,29 @@ body {
 .infoOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
   display: flex;
   justify-content: center;
   align-items: center;
 
   padding: 20px;
+
+  overflow-y: auto;     /* Overlay selbst scrollt */
   z-index: 1000;
 }
+
 
 /* ================= OVERLAY BOX ================= */
 
 .infoBox,
-.legalBox {
+.legalBox,
+.contactBox {
+  position: relative;   /* ← DAS IST DER WICHTIGE TEIL */
+
   width: 100%;
   max-width: 600px;
 
@@ -406,23 +413,70 @@ body {
   padding: 28px;
   border-radius: 18px;
 
-  background: rgba(20, 28, 36, 0.95);
-  border: 1px solid rgba(139, 124, 246, 0.3);
+  background: rgba(20, 28, 36, 0.97);
+  border: 1px solid rgba(139, 124, 246, 0.25);
 
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
 }
 
-/* Scrollbar dezenter */
+
+/* ================= OVERLAY HEADER ================= */
+
+.overlayHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+
+/* ================= CLOSE BUTTON ================= */
+
+.overlayClose {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+  border: 1px solid rgba(139,124,246,0.4);
+
+  background: rgba(20, 30, 45, 0.6);
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.overlayClose:hover {
+  background: rgba(139,124,246,0.2);
+  transform: translateY(-1px);
+}
+
+.overlayClose:active {
+  transform: scale(0.95);
+}
+
+
+/* ================= SCROLLBAR CLEAN ================= */
+
 .infoBox::-webkit-scrollbar,
-.legalBox::-webkit-scrollbar {
+.legalBox::-webkit-scrollbar,
+.contactBox::-webkit-scrollbar {
   width: 6px;
 }
 
 .infoBox::-webkit-scrollbar-thumb,
-.legalBox::-webkit-scrollbar-thumb {
+.legalBox::-webkit-scrollbar-thumb,
+.contactBox::-webkit-scrollbar-thumb {
   background: rgba(139, 124, 246, 0.4);
   border-radius: 6px;
 }
+
 
 /* ================= LINKS IM IMPRESSUM ================= */
 
@@ -1815,3 +1869,25 @@ svg {
   color: rgba(255,255,255,0.75);
 }
 
+/* ================= OVERLAY CLOSE BUTTON ================= */
+
+.overlayClose {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+
+  font-size: 22px;
+  font-weight: 600;
+
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  color: rgba(255,255,255,0.7);
+  transition: 0.2s ease;
+}
+
+.overlayClose:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+}

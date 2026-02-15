@@ -1151,6 +1151,21 @@ export default function App() {
     return () => clearInterval(interval);
   }, [totalScore, step]);
 
+  /* ===== OVERLAY SCROLL LOCK ===== */
+
+useEffect(() => {
+  if (legalOverlay || contactOverlay || showResetConfirm || actionOverlay) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
+
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, [legalOverlay, contactOverlay, showResetConfirm, actionOverlay]);
+
+
 /* ================= TOP 3 HANDLUNGSFELDER ================= */
 
 const topRecommendations = useMemo(() => {
@@ -2124,6 +2139,13 @@ const topRecommendations = useMemo(() => {
           className="infoBox legalBox"
           onClick={(e) => e.stopPropagation()}
         >
+          {/* CLOSE BUTTON */}
+  <button
+    className="overlayClose"
+    onClick={() => setLegalOverlay(null)}
+  >
+    ×
+  </button>
           <h3 style={{ marginBottom: 12 }}>
             {legalOverlay === "impressum" && "Impressum"}
             {legalOverlay === "datenschutz" && "Datenschutz"}
@@ -2315,6 +2337,15 @@ const topRecommendations = useMemo(() => {
           className="infoBox"
           onClick={(e) => e.stopPropagation()}
         >
+<button
+  type="button"
+  className="overlayClose"
+  onClick={() => setShowResetConfirm(false)}
+>
+  ×
+</button>
+
+
           <p>Möchtest du von vorne beginnen?</p>
 
           <div className="overlayButtons">
@@ -2354,6 +2385,14 @@ function ContactOverlayComponent() {
         className="infoBox"
         onClick={(e) => e.stopPropagation()}
       >
+<button
+  type="button"
+  className="overlayClose"
+  onClick={() => setContactOverlay(false)}
+>
+  ×
+</button>
+
         <h3 style={{ marginBottom: 14 }}>
           Persönliche Beratung & Strategiegespräch
         </h3>
@@ -2439,6 +2478,13 @@ function ContactOverlayComponent() {
           className="infoBox"
           onClick={(e) => e.stopPropagation()}
         >
+<button
+  type="button"
+  className="overlayClose"
+  onClick={() => setActionOverlay(null)}
+>
+  ×
+</button>
           <h3 style={{ marginBottom: 12 }}>
             {QUESTIONS[actionOverlay]?.label}
           </h3>
@@ -3263,22 +3309,22 @@ const dashOffset =
           />
 
           {/* Aktiver Ring */}
-          <circle
-            cx="120"
-            cy="120"
-            r="95"
-            stroke="url(#scoreGrad)"
-            strokeWidth="18"
-            fill="none"
-            strokeDasharray={circumference}
-            strokeDashoffset={dashOffset}
-            strokeLinecap={animatedScore === 100 ? "butt" : "round"}
-            transform="rotate(-90 120 120)"
-            style={{
-              filter: `drop-shadow(0 0 20px rgba(139,124,246,${glowOpacity}))`,
-              transition: "0.9s ease"
-            }}
-          />
+      <circle
+  cx="120"
+  cy="120"
+  r="95"
+  stroke="url(#scoreGrad)"
+  strokeWidth="18"
+  fill="none"
+  strokeDasharray={circumference}
+  strokeDashoffset={dashOffset}
+  strokeLinecap={normalizedScore === 100 ? "butt" : "round"}
+  transform="rotate(-90 120 120)"
+  style={{
+    filter: `drop-shadow(0 0 20px rgba(139,124,246,${glowOpacity}))`,
+    transition: "0.9s ease"
+  }}
+/>
 
         </svg>
 
