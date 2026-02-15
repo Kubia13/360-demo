@@ -3043,7 +3043,7 @@ function ContactOverlayComponent() {
                           className="infoIconSvg"
                         >
                           {/* Punkt */}
-                          <circle cx="12" cy="6" r="1.3" />
+                          <circle cx="12" cy="6" r="1" />
 
                           {/* Längerer Strich mit mehr Abstand */}
                           <line x1="12" y1="10" x2="12" y2="21" />
@@ -3154,14 +3154,23 @@ function ContactOverlayComponent() {
         </button>
 
         {showInfo && (
-          <div
-            className="infoOverlay"
-            onClick={() => setShowInfo(null)}
-          >
-            <div
-              className="infoBox"
-              onClick={(e) => e.stopPropagation()}
-            >
+  <div
+    className="infoOverlay"
+    onClick={() => setShowInfo(null)}
+  >
+    <div
+      className="infoBox"
+      onClick={(e) => e.stopPropagation()}
+    >
+
+      <button
+        type="button"
+        className="overlayClose"
+        onClick={() => setShowInfo(null)}
+      >
+        ×
+      </button>
+
 
               {/* TEXT HANDLING – STRING ODER OBJEKT */}
               {(typeof showInfo === "string"
