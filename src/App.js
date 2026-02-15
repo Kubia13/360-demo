@@ -1153,167 +1153,171 @@ export default function App() {
 
   /* ===== OVERLAY SCROLL LOCK ===== */
 
-useEffect(() => {
-  if (legalOverlay || contactOverlay || showResetConfirm || actionOverlay) {
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "auto";
-  }
-
-  return () => {
-    document.body.style.overflow = "auto";
-  };
-}, [legalOverlay, contactOverlay, showResetConfirm, actionOverlay]);
-
-
-/* ================= TOP 3 HANDLUNGSFELDER ================= */
-
-const topRecommendations = useMemo(() => {
-
-  if (step !== "dashboard") return [];
-
-  const EXCLUDED_FROM_TOP3 = [
-    "elementar",
-    "schutzbrief"
-  ];
-
-  const hatKinder = baseData.kinder === "Ja";
-  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
-  const hatHaus = baseData.wohnen === "Eigentum Haus";
-  const income = Number(baseData.gehalt);
-  const age = Number(baseData.alter);
-
-  const existenzProdukte = [
-    "bu", "du", "haftpflicht",
-    "risiko_lv", "ruecklagen"
-  ];
-
-  const kinderProdukte = [
-    "kinder_unfall",
-    "kinder_vorsorge",
-    "kinder_krankenzusatz"
-  ];
-
-  const komfortProdukte = [
-    "kasko",
-    "krankenzusatz",
-    "hausrat"
-  ];
-
-  const allRecommendations = Object.keys(QUESTIONS)
-    .filter((id) => {
-
-      if (!CORE_PRODUCTS.includes(id)) return false;
-      if (EXCLUDED_FROM_TOP3.includes(id)) return false;
-
-      const q = QUESTIONS[id];
-      if (q.condition && !q.condition(baseData)) return false;
-
-      const score = getScore(id);
-      if (score === null) return false;
-      if (score >= 100) return false;
-
-      // Vollkasko nie empfehlen
-      if (id === "kasko" && answers[id] === "vollkasko") return false;
-
-      const text = getStrategicRecommendation(id);
-      if (!text) return false;
-
-      return true;
-
-    })
-    .map((id) => {
-
-      let dynamicPriority = PRIORITY_MAP[id] || 1;
-      const score = getScore(id);
-      const text = getStrategicRecommendation(id);
-
-      /* ================= SCORE-SCHWEREGRAD ================= */
-      // Große Lücke stärker gewichten
-      if (score <= 20) dynamicPriority += 2;
-      else if (score <= 40) dynamicPriority += 1;
-
-      /* ================= EXISTENZ VOR KOMFORT ================= */
-
-      if (existenzProdukte.includes(id)) {
-        dynamicPriority += 2;
-      }
-
-      /* ================= FAMILIEN-BOOST ================= */
-
-      if (hatKinder || verheiratet) {
-
-        if (["bu", "du", "risiko_lv", "ruecklagen"].includes(id)) {
-          dynamicPriority += 2;
-        }
-
-        if (kinderProdukte.includes(id)) {
-          dynamicPriority += 1.5;
-        }
-      }
-
-      /* ================= IMMOBILIEN-BOOST ================= */
-
-      if (hatHaus) {
-
-        if (["gebaeude", "risiko_lv", "ruecklagen"].includes(id)) {
-          dynamicPriority += 2;
-        }
-      }
-
-      /* ================= EINKOMMENS-HEBEL ================= */
-
-      if (income >= 4000) {
-
-        if (["bu", "du", "private_rente", "ruecklagen"].includes(id)) {
-          dynamicPriority += 1;
-        }
-      }
-
-      /* ================= ALTER-LOGIK ================= */
-
-      if (age < 30) {
-
-        if (["bu", "bav", "private_rente"].includes(id)) {
-          dynamicPriority += 1;
-        }
-      }
-
-      if (age >= 45) {
-
-        if (["pflege", "private_rente"].includes(id)) {
-          dynamicPriority += 1;
-        }
-      }
-
-      /* ================= KOMFORT DECKEL ================= */
-      // Komfortprodukte können nie höher als Priorität 4 steigen
-
-      if (komfortProdukte.includes(id)) {
-        dynamicPriority = Math.min(dynamicPriority, 4);
-      }
-
-      return {
-        id,
-        text,
-        priority: dynamicPriority,
-        score
-      };
-
-    });
-
-  allRecommendations.sort((a, b) => {
-
-    if (b.priority !== a.priority) {
-      return b.priority - a.priority;
+  useEffect(() => {
+    if (legalOverlay || contactOverlay || showResetConfirm || actionOverlay) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
     }
 
-    return a.score - b.score;
-  });
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [legalOverlay, contactOverlay, showResetConfirm, actionOverlay]);
 
-  return allRecommendations.slice(0, 3);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
 
-}, [answers, baseData, step]);
+
+  /* ================= TOP 3 HANDLUNGSFELDER ================= */
+
+  const topRecommendations = useMemo(() => {
+
+    if (step !== "dashboard") return [];
+
+    const EXCLUDED_FROM_TOP3 = [
+      "elementar",
+      "schutzbrief"
+    ];
+
+    const hatKinder = baseData.kinder === "Ja";
+    const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+    const hatHaus = baseData.wohnen === "Eigentum Haus";
+    const income = Number(baseData.gehalt);
+    const age = Number(baseData.alter);
+
+    const existenzProdukte = [
+      "bu", "du", "haftpflicht",
+      "risiko_lv", "ruecklagen"
+    ];
+
+    const kinderProdukte = [
+      "kinder_unfall",
+      "kinder_vorsorge",
+      "kinder_krankenzusatz"
+    ];
+
+    const komfortProdukte = [
+      "kasko",
+      "krankenzusatz",
+      "hausrat"
+    ];
+
+    const allRecommendations = Object.keys(QUESTIONS)
+      .filter((id) => {
+
+        if (!CORE_PRODUCTS.includes(id)) return false;
+        if (EXCLUDED_FROM_TOP3.includes(id)) return false;
+
+        const q = QUESTIONS[id];
+        if (q.condition && !q.condition(baseData)) return false;
+
+        const score = getScore(id);
+        if (score === null) return false;
+        if (score >= 100) return false;
+
+        // Vollkasko nie empfehlen
+        if (id === "kasko" && answers[id] === "vollkasko") return false;
+
+        const text = getStrategicRecommendation(id);
+        if (!text) return false;
+
+        return true;
+
+      })
+      .map((id) => {
+
+        let dynamicPriority = PRIORITY_MAP[id] || 1;
+        const score = getScore(id);
+        const text = getStrategicRecommendation(id);
+
+        /* ================= SCORE-SCHWEREGRAD ================= */
+        // Große Lücke stärker gewichten
+        if (score <= 20) dynamicPriority += 2;
+        else if (score <= 40) dynamicPriority += 1;
+
+        /* ================= EXISTENZ VOR KOMFORT ================= */
+
+        if (existenzProdukte.includes(id)) {
+          dynamicPriority += 2;
+        }
+
+        /* ================= FAMILIEN-BOOST ================= */
+
+        if (hatKinder || verheiratet) {
+
+          if (["bu", "du", "risiko_lv", "ruecklagen"].includes(id)) {
+            dynamicPriority += 2;
+          }
+
+          if (kinderProdukte.includes(id)) {
+            dynamicPriority += 1.5;
+          }
+        }
+
+        /* ================= IMMOBILIEN-BOOST ================= */
+
+        if (hatHaus) {
+
+          if (["gebaeude", "risiko_lv", "ruecklagen"].includes(id)) {
+            dynamicPriority += 2;
+          }
+        }
+
+        /* ================= EINKOMMENS-HEBEL ================= */
+
+        if (income >= 4000) {
+
+          if (["bu", "du", "private_rente", "ruecklagen"].includes(id)) {
+            dynamicPriority += 1;
+          }
+        }
+
+        /* ================= ALTER-LOGIK ================= */
+
+        if (age < 30) {
+
+          if (["bu", "bav", "private_rente"].includes(id)) {
+            dynamicPriority += 1;
+          }
+        }
+
+        if (age >= 45) {
+
+          if (["pflege", "private_rente"].includes(id)) {
+            dynamicPriority += 1;
+          }
+        }
+
+        /* ================= KOMFORT DECKEL ================= */
+        // Komfortprodukte können nie höher als Priorität 4 steigen
+
+        if (komfortProdukte.includes(id)) {
+          dynamicPriority = Math.min(dynamicPriority, 4);
+        }
+
+        return {
+          id,
+          text,
+          priority: dynamicPriority,
+          score
+        };
+
+      });
+
+    allRecommendations.sort((a, b) => {
+
+      if (b.priority !== a.priority) {
+        return b.priority - a.priority;
+      }
+
+      return a.score - b.score;
+    });
+
+    return allRecommendations.slice(0, 3);
+
+  }, [answers, baseData, step]);
 
   /* ================= PRODUKTSEITE ================= */
 
@@ -1411,14 +1415,14 @@ const topRecommendations = useMemo(() => {
           </span>
         </div>
 
-<ContactButton
-  onReset={() => setShowResetConfirm(true)}
-  onContact={() => setContactOverlay(true)}
-/>
+        <ContactButton
+          onReset={() => setShowResetConfirm(true)}
+          onContact={() => setContactOverlay(true)}
+        />
 
-<ResetOverlayComponent />
-<LegalOverlayComponent />
-<ContactOverlayComponent />
+        <ResetOverlayComponent />
+        <LegalOverlayComponent />
+        <ContactOverlayComponent />
 
       </div>
     );
@@ -2140,12 +2144,12 @@ const topRecommendations = useMemo(() => {
           onClick={(e) => e.stopPropagation()}
         >
           {/* CLOSE BUTTON */}
-  <button
-    className="overlayClose"
-    onClick={() => setLegalOverlay(null)}
-  >
-    ×
-  </button>
+          <button
+            className="overlayClose"
+            onClick={() => setLegalOverlay(null)}
+          >
+            ×
+          </button>
           <h3 style={{ marginBottom: 12 }}>
             {legalOverlay === "impressum" && "Impressum"}
             {legalOverlay === "datenschutz" && "Datenschutz"}
@@ -2337,13 +2341,13 @@ const topRecommendations = useMemo(() => {
           className="infoBox"
           onClick={(e) => e.stopPropagation()}
         >
-<button
-  type="button"
-  className="overlayClose"
-  onClick={() => setShowResetConfirm(false)}
->
-  ×
-</button>
+          <button
+            type="button"
+            className="overlayClose"
+            onClick={() => setShowResetConfirm(false)}
+          >
+            ×
+          </button>
 
 
           <p>Möchtest du von vorne beginnen?</p>
@@ -2371,95 +2375,95 @@ const topRecommendations = useMemo(() => {
     );
   }
 
-    /* ================= Contact Overlay ================= */
+  /* ================= Contact Overlay ================= */
 
-function ContactOverlayComponent() {
-  if (!contactOverlay) return null;
+  function ContactOverlayComponent() {
+    if (!contactOverlay) return null;
 
-  return (
-    <div
-      className="infoOverlay"
-      onClick={() => setContactOverlay(false)}
-    >
+    return (
       <div
-        className="infoBox"
-        onClick={(e) => e.stopPropagation()}
+        className="infoOverlay"
+        onClick={() => setContactOverlay(false)}
       >
-<button
-  type="button"
-  className="overlayClose"
-  onClick={() => setContactOverlay(false)}
->
-  ×
-</button>
-
-        <h3 style={{ marginBottom: 14 }}>
-          Persönliche Beratung & Strategiegespräch
-        </h3>
-
-        <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.6 }}>
-          In einem strukturierten Gespräch analysieren wir gemeinsam deine aktuelle
-          Absicherung, priorisieren sinnvolle Maßnahmen und prüfen,
-          welche Lösungen wirtschaftlich und langfristig sinnvoll sind.
-        </p>
-
-        <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.6 }}>
-          Transparent. Individuell. Ohne Verpflichtung.
-        </p>
-
-        <div style={{ marginTop: 18 }}>
-          <p><strong>Florian Löffler</strong></p>
-
-          <p style={{ fontSize: 13, opacity: 0.75 }}>
-            BarmeniaGothaer VZ Südbaden<br />
-            Breisacher Str. 145b<br />
-            79110 Freiburg im Breisgau
-          </p>
-
-          <p style={{ fontSize: 13, opacity: 0.75 }}>
-            Telefon:{" "}
-            <a href="tel:+497612027423">
-              0761-2027423
-            </a>
-            <br />
-            E-Mail:{" "}
-            <a href="mailto:florian.loeffler@barmenia.de?subject=Anfrage%20360%C2%B0%20Absicherungscheck">
-              florian.loeffler@barmenia.de
-            </a>
-          </p>
-        </div>
-
-        <div className="overlayButtons" style={{ marginTop: 20 }}>
-
+        <div
+          className="infoBox"
+          onClick={(e) => e.stopPropagation()}
+        >
           <button
-            className="overlayBtn primary"
-            onClick={() =>
-              window.open(
-                "https://agentur.barmenia.de/florian_loeffler",
-                "_blank",
-                "noopener,noreferrer"
-              )
-            }
-          >
-            Zur Agentur-Website
-          </button>
-
-          <button
-            className="overlayBtn secondary"
+            type="button"
+            className="overlayClose"
             onClick={() => setContactOverlay(false)}
           >
-            Schließen
+            ×
           </button>
+
+          <h3 style={{ marginBottom: 14 }}>
+            Persönliche Beratung & Strategiegespräch
+          </h3>
+
+          <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.6 }}>
+            In einem strukturierten Gespräch analysieren wir gemeinsam deine aktuelle
+            Absicherung, priorisieren sinnvolle Maßnahmen und prüfen,
+            welche Lösungen wirtschaftlich und langfristig sinnvoll sind.
+          </p>
+
+          <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.6 }}>
+            Transparent. Individuell. Ohne Verpflichtung.
+          </p>
+
+          <div style={{ marginTop: 18 }}>
+            <p><strong>Florian Löffler</strong></p>
+
+            <p style={{ fontSize: 13, opacity: 0.75 }}>
+              BarmeniaGothaer VZ Südbaden<br />
+              Breisacher Str. 145b<br />
+              79110 Freiburg im Breisgau
+            </p>
+
+            <p style={{ fontSize: 13, opacity: 0.75 }}>
+              Telefon:{" "}
+              <a href="tel:+497612027423">
+                0761-2027423
+              </a>
+              <br />
+              E-Mail:{" "}
+              <a href="mailto:florian.loeffler@barmenia.de?subject=Anfrage%20360%C2%B0%20Absicherungscheck">
+                florian.loeffler@barmenia.de
+              </a>
+            </p>
+          </div>
+
+          <div className="overlayButtons" style={{ marginTop: 20 }}>
+
+            <button
+              className="overlayBtn primary"
+              onClick={() =>
+                window.open(
+                  "https://agentur.barmenia.de/florian_loeffler",
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
+            >
+              Zur Agentur-Website
+            </button>
+
+            <button
+              className="overlayBtn secondary"
+              onClick={() => setContactOverlay(false)}
+            >
+              Schließen
+            </button>
+          </div>
+
+          <p style={{ fontSize: 12, opacity: 0.6, marginTop: 14 }}>
+            100% unverbindlich · Persönliche Analyse · Keine automatische Datenübertragung
+          </p>
+
         </div>
-
-        <p style={{ fontSize: 12, opacity: 0.6, marginTop: 14 }}>
-          100% unverbindlich · Persönliche Analyse · Keine automatische Datenübertragung
-        </p>
-
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   /* ================= ACTION OVERLAY ================= */
 
@@ -2478,13 +2482,13 @@ function ContactOverlayComponent() {
           className="infoBox"
           onClick={(e) => e.stopPropagation()}
         >
-<button
-  type="button"
-  className="overlayClose"
-  onClick={() => setActionOverlay(null)}
->
-  ×
-</button>
+          <button
+            type="button"
+            className="overlayClose"
+            onClick={() => setActionOverlay(null)}
+          >
+            ×
+          </button>
           <h3 style={{ marginBottom: 12 }}>
             {QUESTIONS[actionOverlay]?.label}
           </h3>
@@ -2567,14 +2571,14 @@ function ContactOverlayComponent() {
           </span>
         </div>
 
-<ContactButton
-  onReset={() => setShowResetConfirm(true)}
-  onContact={() => setContactOverlay(true)}
-/>
+        <ContactButton
+          onReset={() => setShowResetConfirm(true)}
+          onContact={() => setContactOverlay(true)}
+        />
 
-<ResetOverlayComponent />
-<LegalOverlayComponent />
-<ContactOverlayComponent />
+        <ResetOverlayComponent />
+        <LegalOverlayComponent />
+        <ContactOverlayComponent />
 
       </div>
     );
@@ -2851,14 +2855,14 @@ function ContactOverlayComponent() {
           </span>
         </div>
 
-<ContactButton
-  onReset={() => setShowResetConfirm(true)}
-  onContact={() => setContactOverlay(true)}
-/>
+        <ContactButton
+          onReset={() => setShowResetConfirm(true)}
+          onContact={() => setContactOverlay(true)}
+        />
 
-<ResetOverlayComponent />
-<LegalOverlayComponent />
-<ContactOverlayComponent />
+        <ResetOverlayComponent />
+        <LegalOverlayComponent />
+        <ContactOverlayComponent />
 
       </div>
     );
@@ -3154,22 +3158,22 @@ function ContactOverlayComponent() {
         </button>
 
         {showInfo && (
-  <div
-    className="infoOverlay"
-    onClick={() => setShowInfo(null)}
-  >
-    <div
-      className="infoBox"
-      onClick={(e) => e.stopPropagation()}
-    >
+          <div
+            className="infoOverlay"
+            onClick={() => setShowInfo(null)}
+          >
+            <div
+              className="infoBox"
+              onClick={(e) => e.stopPropagation()}
+            >
 
-      <button
-        type="button"
-        className="overlayClose"
-        onClick={() => setShowInfo(null)}
-      >
-        ×
-      </button>
+              <button
+                type="button"
+                className="overlayClose"
+                onClick={() => setShowInfo(null)}
+              >
+                ×
+              </button>
 
 
               {/* TEXT HANDLING – STRING ODER OBJEKT */}
@@ -3238,14 +3242,14 @@ function ContactOverlayComponent() {
           </span>
         </div>
 
-<ContactButton
-  onReset={() => setShowResetConfirm(true)}
-  onContact={() => setContactOverlay(true)}
-/>
+        <ContactButton
+          onReset={() => setShowResetConfirm(true)}
+          onContact={() => setContactOverlay(true)}
+        />
 
-<ResetOverlayComponent />
-<LegalOverlayComponent />
-<ContactOverlayComponent />
+        <ResetOverlayComponent />
+        <LegalOverlayComponent />
+        <ContactOverlayComponent />
 
       </div>
     );
@@ -3264,145 +3268,158 @@ function ContactOverlayComponent() {
             : "Dein Absicherungs-Status"}
         </h2>
 
-{/* ================= SCORE RING – PREMIUM LEVEL 2 ================= */}
+        {/* ================= SCORE RING – PREMIUM LEVEL 2 ================= */}
 
-<div className="ringWrap premium">
+        <div className="ringWrap premium">
 
-  {(() => {
+          {(() => {
 
-const circumference = 2 * Math.PI * 95;
+            const circumference = 2 * Math.PI * 95;
 
-const normalizedScore = Math.min(animatedScore, 100);
-const dashOffset =
-  normalizedScore === 100
-    ? 0
-    : circumference - (normalizedScore / 100) * circumference;
+            const normalizedScore = Math.min(animatedScore, 100);
+            const dashOffset =
+              normalizedScore === 100
+                ? 0
+                : circumference - (normalizedScore / 100) * circumference;
 
-    let gradientStart = "#5E4AE3";
-    let gradientEnd = "#8B7CF6";
-    let glowOpacity = 0.25;
-    let statusLabel = "Handlungsbedarf";
+            let gradientStart = "#5E4AE3";
+            let gradientEnd = "#8B7CF6";
+            let glowOpacity = 0.25;
+            let statusLabel = "Handlungsbedarf";
 
-    if (animatedScore >= 80) {
-      gradientStart = "#8B7CF6";
-      gradientEnd = "#B5A9FF";
-      glowOpacity = 0.4;
-      statusLabel = "Sehr solide";
-    } 
-    else if (animatedScore >= 60) {
-      gradientStart = "#6E5CF0";
-      gradientEnd = "#9C8CFF";
-      glowOpacity = 0.3;
-      statusLabel = "Gute Basis";
-    }
+            if (animatedScore >= 80) {
+              gradientStart = "#8B7CF6";
+              gradientEnd = "#B5A9FF";
+              glowOpacity = 0.4;
+              statusLabel = "Sehr solide";
+            }
+            else if (animatedScore >= 60) {
+              gradientStart = "#6E5CF0";
+              gradientEnd = "#9C8CFF";
+              glowOpacity = 0.3;
+              statusLabel = "Gute Basis";
+            }
 
-    return (
-      <>
-        <svg width="240" height="240">
+            return (
+              <>
+                <svg width="240" height="240">
 
-          <defs>
-            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={gradientStart} />
-              <stop offset="100%" stopColor={gradientEnd} />
-            </linearGradient>
-          </defs>
+                  <defs>
+                    <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor={gradientStart} />
+                      <stop offset="100%" stopColor={gradientEnd} />
+                    </linearGradient>
+                  </defs>
 
-          {/* Hintergrundring */}
-          <circle
-            cx="120"
-            cy="120"
-            r="95"
-            stroke="#1A2A36"
-            strokeWidth="18"
-            fill="none"
-          />
+                  {/* Hintergrundring */}
+                  <circle
+                    cx="120"
+                    cy="120"
+                    r="95"
+                    stroke="#1A2A36"
+                    strokeWidth="18"
+                    fill="none"
+                  />
 
-          {/* Aktiver Ring */}
-      <circle
-  cx="120"
-  cy="120"
-  r="95"
-  stroke="url(#scoreGrad)"
-  strokeWidth="18"
-  fill="none"
-  strokeDasharray={circumference}
-  strokeDashoffset={dashOffset}
-  strokeLinecap={normalizedScore === 100 ? "butt" : "round"}
-  transform="rotate(-90 120 120)"
-  style={{
-    filter: `drop-shadow(0 0 20px rgba(139,124,246,${glowOpacity}))`,
-    transition: "0.9s ease"
-  }}
-/>
+                  {/* Aktiver Ring */}
+                  <circle
+                    cx="120"
+                    cy="120"
+                    r="95"
+                    stroke="url(#scoreGrad)"
+                    strokeWidth="18"
+                    fill="none"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={dashOffset}
+                    strokeLinecap={normalizedScore === 100 ? "butt" : "round"}
+                    transform="rotate(-90 120 120)"
+                    style={{
+                      filter: `drop-shadow(0 0 20px rgba(139,124,246,${glowOpacity}))`,
+                      transition: "0.9s ease"
+                    }}
+                  />
 
-        </svg>
+                </svg>
 
-        <div className="ringCenter">
-          <div className="ringScore">{animatedScore}%</div>
-          <div className="ringStatus">{statusLabel}</div>
+                <div className="ringCenter">
+                  <div className="ringScore">{animatedScore}%</div>
+                  <div className="ringStatus">{statusLabel}</div>
+                </div>
+              </>
+            );
+
+          })()}
+
         </div>
-      </>
-    );
-
-  })()}
-
-</div>
 
 
-{/* ================= SCORE STATUS ================= */}
+        {/* ================= SCORE STATUS ================= */}
 
-<div className="scoreLabel" style={{ textAlign: "center" }}>
-  <p>
-    {animatedScore === 100
-      ? "Exzellent abgesichert"
-      : animatedScore >= 80
-      ? "Sehr gut abgesichert"
-      : animatedScore >= 60
-      ? "Solide Basis"
-      : "Optimierung sinnvoll"}
-  </p>
+        <div className="scoreLabel" style={{ textAlign: "center" }}>
+          <p>
+            {animatedScore === 100
+              ? "Exzellent abgesichert"
+              : animatedScore >= 80
+                ? "Sehr gut abgesichert"
+                : animatedScore >= 60
+                  ? "Solide Basis"
+                  : "Optimierung sinnvoll"}
+          </p>
 
-  <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
-    {getDynamicHint()}
-  </p>
-</div>
+          <p
+            style={{
+              fontSize: 14,
+              opacity: 0.75,
+              marginTop: 6,
+              textAlign: "center",
+              maxWidth: 320,
+              marginLeft: "auto",
+              marginRight: "auto",
+              lineHeight: 1.5
+            }}
+          >
+            {getDynamicHint()}
+          </p>
 
-{/* ================= DYNAMISCHE STATUS-TEXTE ================= */}
+        </div>
 
-{animatedScore < 60 && (
-  <div className="riskWarning" style={{ textAlign: "center" }}>
-    <strong>Handlungsbedarf:</strong> Es bestehen mehrere relevante
-    Absicherungslücken.
-  </div>
-)}
+        {/* ================= DYNAMISCHE STATUS-TEXTE ================= */}
 
-{animatedScore >= 60 && animatedScore < 80 && (
-  <div className="upgradeHint" style={{ textAlign: "center" }}>
-    Gute Ausgangsbasis. Mit gezielten Anpassungen lässt sich dein
-    Absicherungsniveau deutlich verbessern.
-  </div>
-)}
+        {animatedScore < 60 && (
+          <div className="riskWarning" style={{ textAlign: "center" }}>
+            <strong>Handlungsbedarf:</strong> Es bestehen mehrere relevante
+            Absicherungslücken.
+          </div>
+        )}
 
-{animatedScore >= 80 && animatedScore < 100 && (
-  <div className="upgradeHint" style={{ textAlign: "center" }}>
-    Sehr starke Struktur. Mit wenigen strategischen Optimierungen
-    sind 90%+ realistisch erreichbar.
-  </div>
-)}
+        {animatedScore >= 60 && animatedScore < 80 && (
+          <div className="upgradeHint" style={{ textAlign: "center" }}>
+            Gute Ausgangsbasis. Mit gezielten Anpassungen lässt sich dein
+            Absicherungsniveau deutlich verbessern.
+          </div>
+        )}
 
-{animatedScore === 100 && (
-  <div className="upgradeHint" style={{ textAlign: "center" }}>
-    Sehr stark aufgestellt. In einem kurzen Strategie-Check lässt sich prüfen, 
-    ob sich weitere Optimierungspotenziale ergeben.
-  </div>
-)}
+        {animatedScore >= 80 && animatedScore < 100 && (
+          <div className="upgradeHint" style={{ textAlign: "center" }}>
+            Sehr starke Struktur. Mit wenigen strategischen Optimierungen
+            sind 90%+ realistisch erreichbar.
+          </div>
+        )}
+
+        {animatedScore === 100 && (
+          <div className="upgradeHint" style={{ textAlign: "center" }}>
+            Sehr stark aufgestellt. In einem kurzen Strategie-Check lässt sich prüfen,
+            ob sich weitere Optimierungspotenziale ergeben.
+          </div>
+        )}
 
 
 
         {/* ================= TOP 3 HANDLUNGSFELDER ================= */}
         {topRecommendations.length > 0 && (
-          <div className="categoryList" style={{ marginTop: 20 }}>
-            <h3 style={{ marginBottom: 12 }}>
+         <div className="categoryList" style={{ marginTop: 20 }}>
+
+            <h3 className="top3Headline">
               {animatedScore < 60
                 ? "Hier sollten wir gezielt nachschärfen"
                 : animatedScore < 80
@@ -3558,23 +3575,17 @@ const dashOffset =
           })}
         </div>
 
-        <button
-          className="primaryBtn"
-          style={{ marginTop: 20 }}
-          onClick={() => setStep("products")}
-        >
-          Alle Tarifoptionen anzeigen
-        </button>
+        {/* ================= STRATEGIE CTA – PRIORITÄT ================= */}
 
+        <div className="conversionBox">
 
-        {/* ================= STRATEGIE CTA ================= */}
+          <h3 className="conversionHeadline">
+            Persönliche Strategie-Empfehlung
+          </h3>
 
-        <div className="conversionBox" style={{ marginTop: 30 }}>
-          <h3>Individuelle Strategie-Empfehlung</h3>
-
-          <p>
+          <p className="conversionText">
             In einem kurzen, unverbindlichen Gespräch analysieren wir gemeinsam,
-            welche Maßnahmen deinen Absicherungs-Score konkret verbessern
+            welche Maßnahmen deinen Absicherungs-Score gezielt verbessern
             und wirtschaftlich sinnvoll sind.
           </p>
 
@@ -3591,10 +3602,24 @@ const dashOffset =
             Kostenloses Strategiegespräch sichern
           </button>
 
-          <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10 }}>
-            100% unverbindlich · Keine Verpflichtung · Persönlich & transparent
+          <p className="conversionSub">
+            100 % unverbindlich · Keine Verpflichtung · Persönlich & transparent
           </p>
+
         </div>
+
+
+        {/* ================= SEKUNDÄR – TARIFOPTIONEN ================= */}
+
+        <button
+          className="secondaryBtn"
+          onClick={() => setStep("products")}
+        >
+          Alle Tarifoptionen anzeigen
+        </button>
+
+
+        {/* ================= LEGAL FOOTER ================= */}
 
         <div className="legalFooter">
           <span onClick={() => setLegalOverlay("impressum")}>
@@ -3610,14 +3635,17 @@ const dashOffset =
           </span>
         </div>
 
+
         <ContactButton
-  onReset={() => setShowResetConfirm(true)}
-  onContact={() => setContactOverlay(true)}
-/>
+          onReset={() => setShowResetConfirm(true)}
+          onContact={() => setContactOverlay(true)}
+        />
+
         <ResetOverlayComponent />
         <ActionOverlayComponent />
         <LegalOverlayComponent />
         <ContactOverlayComponent />
+
       </div>
     );
   }

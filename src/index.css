@@ -200,9 +200,6 @@ body {
   margin: 30px 0;
 }
 
-.categoryList {
-  margin-top: 20px;
-}
 
 .categoryRow {
   display: flex;
@@ -392,7 +389,8 @@ body {
 
   padding: 20px;
 
-  overflow-y: auto;     /* Overlay selbst scrollt */
+  overflow-y: auto;
+  /* Overlay selbst scrollt */
   z-index: 1000;
 }
 
@@ -402,7 +400,8 @@ body {
 .infoBox,
 .legalBox,
 .contactBox {
-  position: relative;   /* ← DAS IST DER WICHTIGE TEIL */
+  position: relative;
+  /* ← DAS IST DER WICHTIGE TEIL */
 
   width: 100%;
   max-width: 600px;
@@ -440,7 +439,7 @@ body {
   justify-content: center;
 
   border-radius: 10px;
-  border: 1px solid rgba(139,124,246,0.4);
+  border: 1px solid rgba(139, 124, 246, 0.4);
 
   background: rgba(20, 30, 45, 0.6);
   color: #ffffff;
@@ -453,7 +452,7 @@ body {
 }
 
 .overlayClose:hover {
-  background: rgba(139,124,246,0.2);
+  background: rgba(139, 124, 246, 0.2);
   transform: translateY(-1px);
 }
 
@@ -660,28 +659,13 @@ body {
 }
 
 
-.scoreLabel {
-  text-align: center;
-  margin-top: -10px;
-  margin-bottom: 20px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  opacity: 0.85;
-}
 
 .categoryRow span:last-child {
   font-weight: 600;
   color: #A99BFF;
 }
 
-.scoreLabel {
-  text-align: center;
-  margin-top: -8px;
-  margin-bottom: 25px;
-  font-weight: 500;
-  color: #A99BFF;
-  opacity: 0.9;
-}
+
 
 .questionCard.dark {
   background: rgba(15, 26, 35, 0.85);
@@ -868,7 +852,7 @@ body::before {
   margin-top: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 
@@ -892,12 +876,10 @@ body::before {
   left: 15%;
   width: 70%;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(139, 124, 246, 0.35),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(139, 124, 246, 0.35),
+      transparent);
 }
 
 .contactBtn {
@@ -941,7 +923,7 @@ body::before {
 
   box-shadow:
     0 6px 16px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255,255,255,0.03);
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 
   backdrop-filter: blur(8px);
 }
@@ -984,7 +966,7 @@ body::before {
 
 .categoryRow:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(139,124,246,0.18);
+  box-shadow: 0 6px 18px rgba(139, 124, 246, 0.18);
 }
 
 
@@ -1136,11 +1118,6 @@ body::before {
   /* minimaler Sicherheitspuffer */
 }
 
-.categoryList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
 
 .categoryDetails {
   display: flex;
@@ -1245,19 +1222,21 @@ svg {
 /* ================= QUESTION TEXT CLEAN ================= */
 
 .questionText {
-  margin-bottom: 10px;      /* war 12/14 */
+  margin-bottom: 10px;
+  /* war 12/14 */
   padding-right: 54px;
 
   font-size: 16px;
   font-weight: 600;
-  line-height: 1.38;        /* enger */
+  line-height: 1.38;
+  /* enger */
   letter-spacing: 0.15px;
 }
 
 
 /* Mehr visuelle Ruhe */
 .questionCard.dark {
- padding: 20px 20px 22px 20px;
+  padding: 20px 20px 22px 20px;
 }
 
 
@@ -1278,24 +1257,26 @@ svg {
   border-radius: 8px;
 
   background: rgba(20, 30, 45, 0.6);
-  border: 1px solid rgba(139,124,246,0.6);
+  border: 1px solid rgba(139, 124, 246, 0.6);
 
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .infoIconSvg {
-  width: 25px;          /* 16px → +20% ≈ 19px */
+  width: 25px;
+  /* 16px → +20% ≈ 19px */
   height: 25px;
 
   stroke: #8B7CF6;
-  stroke-width: 2.2;      /* nicht erhöhen! sonst wird es klobig */
+  stroke-width: 2.2;
+  /* nicht erhöhen! sonst wird es klobig */
   fill: none;
 }
 
 
 .floatingInfoSquare:hover {
-  background: rgba(139,124,246,0.15);
+  background: rgba(139, 124, 246, 0.15);
   transform: translateY(-1px);
 }
 
@@ -1321,24 +1302,26 @@ svg {
   border-radius: 8px;
 
   background: rgba(20, 30, 45, 0.6);
-  border: 1px solid rgba(139,124,246,0.6);
+  border: 1px solid rgba(139, 124, 246, 0.6);
 
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .infoIconSvg {
-  width: 25px;          /* 16px → +20% ≈ 19px */
+  width: 25px;
+  /* 16px → +20% ≈ 19px */
   height: 25px;
 
   stroke: #8B7CF6;
-  stroke-width: 2.2;      /* nicht erhöhen! sonst wird es klobig */
+  stroke-width: 2.2;
+  /* nicht erhöhen! sonst wird es klobig */
   fill: none;
 }
 
 
 .floatingInfoSquare:hover {
-  background: rgba(139,124,246,0.15);
+  background: rgba(139, 124, 246, 0.15);
   transform: translateY(-1px);
 }
 
@@ -1688,6 +1671,7 @@ svg {
   }
 
 }
+
 /* ================= GLOBAL COMPACT FIX ================= */
 
 /* Screen weniger vertikale Luft */
@@ -1701,11 +1685,6 @@ svg {
   margin: 20px 0;
 }
 
-/* Score Label dichter */
-.scoreLabel {
-  margin-top: -6px;
-  margin-bottom: 16px;
-}
 
 /* H2 kompakter */
 .screen h2 {
@@ -1723,15 +1702,10 @@ svg {
   padding: 12px;
 }
 
-/* Kategorien dichter */
 .categoryList {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  margin-top: 16px;
-}
-
-/* Kategorie-Zeile kompakter */
-.categoryRow {
-  padding: 12px 14px;
 }
 
 /* Accordion weniger Luft */
@@ -1761,6 +1735,7 @@ svg {
   padding-top: 20px;
   margin-bottom: 70px;
 }
+
 /* ================= PREMIUM SCORE ================= */
 
 .ringWrap {
@@ -1799,7 +1774,7 @@ svg {
   margin-top: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 
@@ -1816,11 +1791,9 @@ svg {
   position: absolute;
   width: 200px;
   height: 200px;
-  background: radial-gradient(
-    circle,
-    rgba(139, 124, 246, 0.12) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(139, 124, 246, 0.12) 0%,
+      transparent 70%);
   border-radius: 50%;
   z-index: 0;
 }
@@ -1855,7 +1828,7 @@ svg {
   margin-top: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 /* ================= OVERLAY CLOSE BUTTON ================= */
@@ -1872,7 +1845,7 @@ svg {
   border: none;
   cursor: pointer;
 
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   transition: 0.2s ease;
 }
 
@@ -1880,6 +1853,7 @@ svg {
   color: #ffffff;
   transform: scale(1.1);
 }
+
 /* ================= MOBILE FINAL COMPACT FIX ================= */
 
 @media (max-width: 480px) {
@@ -1905,4 +1879,125 @@ svg {
     font-size: 14px;
   }
 
+}
+
+/* ================= CONVERSION BOX CLEAN ================= */
+
+.conversionBox {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.conversionHeadline {
+  margin-bottom: 14px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.conversionText {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+  margin-bottom: 18px;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.conversionSub {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 12px;
+}
+
+/* ================= SEKUNDÄR BUTTON ================= */
+
+.secondaryBtn {
+  width: 100%;
+  margin-top: 18px;
+
+  padding: 14px;
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(139, 124, 246, 0.35);
+
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: rgba(139, 124, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ================= SCORE LABEL FINAL CLEAN ================= */
+
+.scoreLabel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* horizontale Zentrierung */
+  justify-content: center;
+
+  text-align: center;
+
+  margin-top: -6px;
+  /* weniger Luft */
+  margin-bottom: 16px;
+  /* kompakter */
+
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: #A99BFF;
+  opacity: 0.9;
+}
+
+.scoreLabel p {
+  margin: 2px 0;
+  /* WICHTIG: entfernt große Absatzabstände */
+}
+
+/* ================= SCORE STATUS HINTS ================= */
+
+.riskWarning,
+.upgradeHint {
+  text-align: center;
+  margin: 10px auto 0 auto;
+  max-width: 90%;
+  line-height: 1.4;
+}
+
+/* ================= TOP 3 HEADLINE PREMIUM FIXED ================= */
+
+.top3Headline {
+  text-align: center;
+  margin: 0 0 2px 0;
+
+  font-size: 21px;
+  font-weight: 650;
+
+  line-height: 1.35;        /* war zu eng */
+  padding-bottom: 2px;      /* verhindert Abschneiden */
+  overflow: visible;        /* extra Sicherheit */
+
+  background: linear-gradient(135deg, #ffffff, #A99BFF);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+/* ================= TOP 3 WRAPPER ================= */
+
+.top3Wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-top: 12px;   /* Abstand zum Score */
 }
