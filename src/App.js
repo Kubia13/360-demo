@@ -1605,9 +1605,11 @@ export default function App() {
           className="infoBox legalBox"
           onClick={(e) => e.stopPropagation()}
         >
-          <h3 style={{ marginBottom: 12 }}>
-            {legalOverlay === "impressum" ? "Impressum" : "Datenschutz"}
-          </h3>
+ <h3 style={{ marginBottom: 12 }}>
+  {legalOverlay === "impressum" && "Impressum"}
+  {legalOverlay === "datenschutz" && "Datenschutz"}
+  {legalOverlay === "hinweis" && "Hinweis"}
+</h3>
 
           {legalOverlay === "impressum" && (
             <>
