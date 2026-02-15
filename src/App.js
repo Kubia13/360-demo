@@ -27,7 +27,9 @@ const CATEGORY_LABELS = {
 
 const PRIORITY_MAP = {
 
-  /* ===== EXISTENZ (KRITISCH) ===== */
+  /* ===================================================== */
+  /* ===== EXISTENZIELL – ABSOLUTE PRIORITÄT (3) ======== */
+  /* ===================================================== */
 
   bu: 3,
   du: 3,
@@ -35,7 +37,9 @@ const PRIORITY_MAP = {
   ruecklagen: 3,
   haftpflicht: 3,
 
-  /* ===== WICHTIG ABER NICHT EXISTENZBEDROHEND ===== */
+  /* ===================================================== */
+  /* ===== FAMILIEN- & EINKOMMENSVERANTWORTUNG (2) ====== */
+  /* ===================================================== */
 
   pflege: 2,
   bav: 2,
@@ -44,7 +48,13 @@ const PRIORITY_MAP = {
   rechtsschutz: 2,
   kfz_haftpflicht: 2,
 
-  /* ===== KOMFORT / OPTIMIERUNG ===== */
+  // Kinder – echte Verantwortung, aber nicht über Existenz
+  kinder_unfall: 2,
+  kinder_vorsorge: 2,
+
+  /* ===================================================== */
+  /* ===== OPTIMIERUNG / KOMFORT (1) ===================== */
+  /* ===================================================== */
 
   krankenzusatz: 1,
   kinder_krankenzusatz: 1,
@@ -898,12 +908,13 @@ export default function App() {
 
     if (key === "bav") {
 
-      if (baseData.beruf !== "Angestellter") return null;
+      if (baseData.beruf !== "Angestellt") return null;
 
       if (value === "ja") return 100;
 
-      return 0;
+      return 40;
     }
+
 
     /* ========================================================= */
     /* ===== PFLEGE ============================================ */
@@ -1123,7 +1134,8 @@ export default function App() {
   useEffect(() => {
     if (step !== "dashboard") return;
 
-   let current = animatedScore;
+    let current = 0; // immer neu starten
+    setAnimatedScore(0);
 
     const interval = setInterval(() => {
       current++;
@@ -1139,62 +1151,154 @@ export default function App() {
     return () => clearInterval(interval);
   }, [totalScore, step]);
 
-  /* ================= TOP 3 HANDLUNGSFELDER ================= */
+/* ================= TOP 3 HANDLUNGSFELDER ================= */
 
-  const topRecommendations = useMemo(() => {
+const topRecommendations = useMemo(() => {
 
-    if (step !== "dashboard") return [];
+  if (step !== "dashboard") return [];
 
-    const EXCLUDED_FROM_TOP3 = [
-      "elementar",
-      "schutzbrief"
-    ];
+  const EXCLUDED_FROM_TOP3 = [
+    "elementar",
+    "schutzbrief"
+  ];
 
-    const allRecommendations = Object.keys(QUESTIONS)
-      .filter((id) => {
+  const hatKinder = baseData.kinder === "Ja";
+  const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+  const hatHaus = baseData.wohnen === "Eigentum Haus";
+  const income = Number(baseData.gehalt);
+  const age = Number(baseData.alter);
 
-        if (!CORE_PRODUCTS.includes(id)) return false;
-        if (EXCLUDED_FROM_TOP3.includes(id)) return false;
+  const existenzProdukte = [
+    "bu", "du", "haftpflicht",
+    "risiko_lv", "ruecklagen"
+  ];
 
-        const q = QUESTIONS[id];
-        if (q.condition && !q.condition(baseData)) return false;
+  const kinderProdukte = [
+    "kinder_unfall",
+    "kinder_vorsorge",
+    "kinder_krankenzusatz"
+  ];
 
-        const score = getScore(id);
-        if (score === null) return false;
-        if (score >= 100) return false;
+  const komfortProdukte = [
+    "kasko",
+    "krankenzusatz",
+    "hausrat"
+  ];
 
-        // Vollkasko nie empfehlen
-        if (id === "kasko" && answers[id] === "vollkasko") return false;
+  const allRecommendations = Object.keys(QUESTIONS)
+    .filter((id) => {
 
-        const text = getStrategicRecommendation(id);
-        if (!text) return false;
+      if (!CORE_PRODUCTS.includes(id)) return false;
+      if (EXCLUDED_FROM_TOP3.includes(id)) return false;
 
-        return true;
+      const q = QUESTIONS[id];
+      if (q.condition && !q.condition(baseData)) return false;
 
-      })
-      .map((id) => ({
-        id,
-        text: getStrategicRecommendation(id),
-        priority: PRIORITY_MAP[id] || 1,
-        score: getScore(id)
-      }));
+      const score = getScore(id);
+      if (score === null) return false;
+      if (score >= 100) return false;
 
+      // Vollkasko nie empfehlen
+      if (id === "kasko" && answers[id] === "vollkasko") return false;
 
-    allRecommendations.sort((a, b) => {
+      const text = getStrategicRecommendation(id);
+      if (!text) return false;
 
-      // 1️⃣ Höhere Priorität zuerst
-      if (b.priority !== a.priority) {
-        return b.priority - a.priority;
+      return true;
+
+    })
+    .map((id) => {
+
+      let dynamicPriority = PRIORITY_MAP[id] || 1;
+      const score = getScore(id);
+      const text = getStrategicRecommendation(id);
+
+      /* ================= SCORE-SCHWEREGRAD ================= */
+      // Große Lücke stärker gewichten
+      if (score <= 20) dynamicPriority += 2;
+      else if (score <= 40) dynamicPriority += 1;
+
+      /* ================= EXISTENZ VOR KOMFORT ================= */
+
+      if (existenzProdukte.includes(id)) {
+        dynamicPriority += 2;
       }
 
-      // 2️⃣ Schlechterer Score zuerst
-      return a.score - b.score;
+      /* ================= FAMILIEN-BOOST ================= */
+
+      if (hatKinder || verheiratet) {
+
+        if (["bu", "du", "risiko_lv", "ruecklagen"].includes(id)) {
+          dynamicPriority += 2;
+        }
+
+        if (kinderProdukte.includes(id)) {
+          dynamicPriority += 1.5;
+        }
+      }
+
+      /* ================= IMMOBILIEN-BOOST ================= */
+
+      if (hatHaus) {
+
+        if (["gebaeude", "risiko_lv", "ruecklagen"].includes(id)) {
+          dynamicPriority += 2;
+        }
+      }
+
+      /* ================= EINKOMMENS-HEBEL ================= */
+
+      if (income >= 4000) {
+
+        if (["bu", "du", "private_rente", "ruecklagen"].includes(id)) {
+          dynamicPriority += 1;
+        }
+      }
+
+      /* ================= ALTER-LOGIK ================= */
+
+      if (age < 30) {
+
+        if (["bu", "bav", "private_rente"].includes(id)) {
+          dynamicPriority += 1;
+        }
+      }
+
+      if (age >= 45) {
+
+        if (["pflege", "private_rente"].includes(id)) {
+          dynamicPriority += 1;
+        }
+      }
+
+      /* ================= KOMFORT DECKEL ================= */
+      // Komfortprodukte können nie höher als Priorität 4 steigen
+
+      if (komfortProdukte.includes(id)) {
+        dynamicPriority = Math.min(dynamicPriority, 4);
+      }
+
+      return {
+        id,
+        text,
+        priority: dynamicPriority,
+        score
+      };
+
     });
 
-    return allRecommendations.slice(0, 3);
+  allRecommendations.sort((a, b) => {
 
-  }, [answers, baseData, step]);
+    if (b.priority !== a.priority) {
+      return b.priority - a.priority;
+    }
 
+    return a.score - b.score;
+  });
+
+  return allRecommendations.slice(0, 3);
+
+}, [answers, baseData, step]);
 
   /* ================= PRODUKTSEITE ================= */
 
@@ -1292,10 +1396,15 @@ export default function App() {
           </span>
         </div>
 
-        <ContactButton onReset={() => setShowResetConfirm(true)} />
-        <ResetOverlayComponent />
-        <ActionOverlayComponent />
-        <LegalOverlayComponent />
+<ContactButton
+  onReset={() => setShowResetConfirm(true)}
+  onContact={() => setContactOverlay(true)}
+/>
+
+<ResetOverlayComponent />
+<LegalOverlayComponent />
+<ContactOverlayComponent />
+
       </div>
     );
   }
@@ -1359,232 +1468,642 @@ export default function App() {
 
       /* ================= BU ================= */
 
-      case "bu":
+      case "bu": {
+
         if (value === "ja") return null;
+
+        const income = Number(baseData.gehalt);
+        const age = Number(baseData.alter);
+        const hatKinder = baseData.kinder === "Ja";
+        const hatHaus = baseData.wohnen === "Eigentum Haus";
+        const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+
         if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung deiner Einkommensabsicherung ist sinnvoll.";
-        if (verheiratet)
-          return "Als verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Berufsunfähigkeitsabsicherung schützt die wirtschaftliche Stabilität eurer Lebensplanung.";
-        return "Die Absicherung der eigenen Arbeitskraft zählt zu den wichtigsten finanziellen Grundlagen.";
+          return "Ob deine aktuelle Einkommensabsicherung im Ernstfall wirklich ausreicht, lässt sich oft erst bei genauer Prüfung feststellen. Eine strukturierte Analyse schafft hier Klarheit.";
+
+        // Hohe Verantwortung (Familie oder Immobilie)
+        if (hatKinder || hatHaus || verheiratet)
+          return "Dein Einkommen sichert nicht nur dich selbst. Bei Familie oder finanziellen Verpflichtungen kann ein längerer Ausfall die gesamte Planung gefährden. Eine stabile Absicherung schützt eure wirtschaftliche Basis.";
+
+        // Hohes Einkommen
+        if (income >= 3500)
+          return "Mit steigendem Einkommen wächst auch das finanzielle Risiko bei längerer Krankheit. Ohne Absicherung entsteht schnell eine erhebliche Einkommenslücke.";
+
+        // Jünger = Gesundheitsargument
+        if (age && age < 30)
+          return "In jungen Jahren ist eine Absicherung meist günstiger und gesundheitlich leichter zugänglich. Frühzeitige Planung sichert langfristige Stabilität.";
+
+        // Standardfall
+        return "Deine Arbeitskraft ist dein größtes finanzielles Kapital. Fällt sie weg, entsteht sofort eine Einkommenslücke. Eine passende Absicherung schützt deinen Lebensstandard nachhaltig.";
+      }
 
       /* ================= DU ================= */
 
-      case "du":
+      case "du": {
+
         if (value === "ja") return null;
 
+        const income = Number(baseData.gehalt);
+        const age = Number(baseData.alter);
+        const hatKinder = baseData.kinder === "Ja";
+        const hatHaus = baseData.wohnen === "Eigentum Haus";
+        const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+
         if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung deiner Dienstunfähigkeitsabsicherung schafft Klarheit über deinen tatsächlichen Einkommensschutz.";
+          return "Ob deine aktuelle Dienstunfähigkeitsabsicherung im Ernstfall tatsächlich ausreicht, lässt sich häufig erst bei genauer Prüfung feststellen. Eine strukturierte Analyse schafft hier Klarheit über Versorgungslücken.";
 
-        if (verheiratet)
-          return "Als verbeamtete und verheiratete Person trägt dein Einkommen besondere Verantwortung. Eine Dienstunfähigkeitsversicherung schützt eure wirtschaftliche Stabilität bei Versetzung in den Ruhestand wegen Dienstunfähigkeit.";
+        // Hohe Verantwortung
+        if (hatKinder || hatHaus || verheiratet)
+          return "Dein Einkommen trägt Verantwortung – besonders bei Familie oder finanziellen Verpflichtungen. Wird eine Dienstunfähigkeit ausgesprochen, kann die staatliche Versorgung deutlich geringer ausfallen als erwartet. Eine ergänzende Absicherung schützt eure wirtschaftliche Stabilität.";
 
-        return "Als Beamter ersetzt die Dienstunfähigkeitsversicherung die klassische Berufsunfähigkeitsabsicherung und sichert dein Einkommen bei vorzeitiger Dienstunfähigkeit.";
+        // Höheres Einkommen = höherer Versorgungsbedarf
+        if (income >= 3500)
+          return "Mit steigendem Einkommen wächst auch die Versorgungslücke im Fall einer Dienstunfähigkeit. Die staatliche Absicherung orientiert sich nicht automatisch an deinem aktuellen Lebensstandard.";
 
+        // Jünger = Gesundheitsargument
+        if (age && age < 35)
+          return "In jungen Jahren ist eine Dienstunfähigkeitsabsicherung meist günstiger und gesundheitlich leichter zugänglich. Eine frühzeitige Lösung sichert langfristige Planungssicherheit.";
+
+        // Standardfall
+        return "Als Beamter ersetzt die Dienstunfähigkeitsversicherung die klassische Berufsunfähigkeitsabsicherung. Sie schützt dein Einkommen, falls dich dein Dienstherr wegen Dienstunfähigkeit in den Ruhestand versetzt.";
+      }
 
       /* ================= PRIVATE RENTE ================= */
 
-      case "private_rente":
+      case "private_rente": {
+
         if (value === "ja") return null;
+
+        const income = Number(baseData.gehalt);
+        const age = Number(baseData.alter);
+        const hatKinder = baseData.kinder === "Ja";
+        const hatHaus = baseData.wohnen === "Eigentum Haus";
+        const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+        const kenntLuecke = answers.rentenluecke === "ja";
+
         if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine strukturierte Ruhestandsplanung schafft Klarheit über Versorgungslücken.";
+          return "Ob deine aktuelle Altersvorsorge ausreicht, lässt sich häufig erst bei einer strukturierten Ruhestandsanalyse feststellen. Eine Prüfung schafft Klarheit über mögliche Versorgungslücken.";
+
+        // Verantwortungssituation
+        if (hatKinder || hatHaus || verheiratet)
+          return "Mit familiärer Verantwortung oder finanziellen Verpflichtungen wird eine planbare Altersvorsorge besonders wichtig. Die gesetzliche Rente allein reicht in diesen Konstellationen meist nicht aus, um den gewohnten Lebensstandard zu sichern.";
+
+        // Höheres Einkommen = größere Lücke
+        if (income >= 3500)
+          return "Mit steigendem Einkommen wächst in der Regel auch die spätere Rentenlücke. Wer heute gut verdient, sollte frühzeitig strategisch vorsorgen, um den Lebensstandard im Ruhestand zu erhalten.";
+
+        // Rentenlücke noch nicht bekannt
+        if (!kenntLuecke)
+          return "Ohne Kenntnis der eigenen Rentenlücke bleibt unklar, wie hoch der tatsächliche Vorsorgebedarf ist. Eine transparente Analyse bildet die Grundlage für eine fundierte Entscheidung.";
+
+        // Alterslogik
         if (age >= 50)
-          return "Im fortgeschrittenen Erwerbsleben lassen sich Vorsorgelücken nur noch begrenzt aufholen.";
+          return "Je näher der Ruhestand rückt, desto geringer ist der zeitliche Spielraum zum Ausgleich möglicher Vorsorgelücken. Eine strukturierte Planung gewinnt jetzt an Bedeutung.";
+
         if (age >= 30)
-          return "Je früher private Altersvorsorge beginnt, desto geringer ist der monatliche Aufwand.";
-        return "Früher Vorsorgebeginn schafft langfristige finanzielle Flexibilität.";
+          return "Je früher private Altersvorsorge beginnt, desto geringer ist der monatliche Aufwand bei gleicher Zielrente. Zeit ist hier der größte Hebel.";
+
+        // Jüngere Zielgruppe
+        return "Ein früher Vorsorgebeginn schafft langfristige finanzielle Freiheit und nutzt den Zinseszinseffekt optimal aus.";
+      }
+
 
       /* ================= PFLEGE ================= */
 
-      case "pflege":
+      case "pflege": {
+
         if (value === "ja") return null;
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Prüfung der Pflegeabsicherung kann finanzielle Risiken reduzieren.";
+
+        const age = Number(baseData.alter);
+        const income = Number(baseData.gehalt);
+        const hatKinder = baseData.kinder === "Ja";
+        const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+        const hatHaus = baseData.wohnen === "Eigentum Haus";
+
+        if (value === "unbekannt")
+          return "Ob eine private Pflegeabsicherung besteht, sollte geprüft werden. Die gesetzliche Pflegepflichtversicherung deckt in der Regel nur einen Teil der tatsächlichen Kosten ab.";
+
+        // 50+ → deutlich relevanter
         if (age >= 50)
-          return "Mit steigendem Alter erhöhen sich Eintrittswahrscheinlichkeit und Beitragshöhe.";
-        if (age >= 30)
-          return "Pflegekosten können erhebliche Eigenanteile verursachen.";
-        return "Frühe Gesundheitsabsicherung sichert langfristig günstige Beiträge.";
+          return "Mit zunehmendem Alter steigen Eintrittswahrscheinlichkeit und Beitragshöhe deutlich. Gleichzeitig können Eigenanteile im Pflegefall mehrere tausend Euro monatlich betragen.";
+
+        // 30–49 → strategische Phase
+        if (age >= 30) {
+
+          if (hatKinder || verheiratet)
+            return "Pflegebedürftigkeit kann auch Angehörige finanziell belasten. Eine private Absicherung schützt Partner und Familie vor zusätzlichen Verpflichtungen.";
+
+          if (hatHaus)
+            return "Ohne private Absicherung kann im Pflegefall unter Umständen auf Vermögen oder Immobilieneigentum zurückgegriffen werden.";
+
+          return "Eine frühzeitige Absicherung sichert langfristig stabile Beiträge und schützt vor hohen Eigenanteilen im Pflegefall.";
+        }
+
+        // Unter 30 → Beitragsvorteil-Argument
+        if (age < 30)
+          return "Ein früher Abschluss sichert besonders günstige Beiträge und langfristige Planbarkeit.";
+
+        // Einkommen hoch → Eigenanteil tragbar aber trotzdem sinnvoll
+        if (income >= 4000)
+          return "Auch bei höherem Einkommen können langfristige Pflegekosten erhebliche Vermögenswerte binden. Eine strukturierte Vorsorge schafft finanzielle Stabilität.";
+
+        return "Die gesetzliche Pflegepflichtversicherung deckt meist nur einen Teil der tatsächlichen Kosten. Eine ergänzende Absicherung schafft finanzielle Sicherheit.";
+      }
 
       /* ================= KRANKENZUSATZ ================= */
 
-      case "krankenzusatz":
+      case "krankenzusatz": {
 
-        if (value !== "ja") return value === "nein"
-          ? "Eine Krankenzusatzversicherung kann Eigenkosten im Leistungsfall deutlich reduzieren."
-          : null;
+        const income = Number(baseData.gehalt);
+        const age = Number(baseData.alter);
+        const kvArt = baseData.krankenversicherung;
 
-        const kzBereiche = [
-          "Ambulant",
-          "Stationär",
-          "Zähne",
-          "Brille",
-          "Krankenhaustagegeld"
-        ];
+        // PKV oder Heilfürsorge → keine klassische Zusatz
+        if (kvArt !== "Gesetzlich versichert (GKV)")
+          return null;
 
-        const fehlendKZ = kzBereiche.filter(
-          opt => !answers["krankenzusatz_" + opt]
+        // Keine Zusatzversicherung
+        if (value === "nein") {
+
+          if (income > 4000)
+            return "Als gesetzlich Versicherter kann eine Zusatzversicherung helfen, Leistungsunterschiede zur privaten Versorgung auszugleichen und medizinische Wahlfreiheit zu erweitern.";
+
+          if (age >= 40)
+            return "Mit zunehmendem Alter steigen statistisch medizinische Eigenanteile. Eine ergänzende Absicherung kann finanzielle Belastungen reduzieren.";
+
+          return "Eine Krankenzusatzversicherung kann Eigenanteile bei Zahnbehandlungen, stationären Aufenthalten oder ambulanten Leistungen deutlich reduzieren.";
+        }
+
+        // Unbekannt
+        if (value === "unbekannt")
+          return "Eine Überprüfung deines Leistungsumfangs kann helfen, mögliche Versorgungslücken frühzeitig zu erkennen.";
+
+        // Zusatz vorhanden → prüfen Umfang
+        if (value !== "ja") return null;
+
+        const gewichtung = {
+          "Stationär": 30,
+          "Zähne": 25,
+          "Ambulant": 20,
+          "Krankenhaustagegeld": 15,
+          "Brille": 10
+        };
+
+        const fehlend = Object.keys(gewichtung).filter(
+          bereich => !answers["krankenzusatz_" + bereich]
         );
 
-        if (fehlendKZ.length === 0) return null;
+        if (fehlend.length === 0) return null;
 
-        return "Eine umfassende Gesundheitsabsicherung sollte mehrere Leistungsbereiche abdecken. Eine Überprüfung des Umfangs kann sinnvoll sein.";
+        if (fehlend.includes("Zähne"))
+          return "Zahnleistungen verursachen häufig hohe Eigenanteile. Eine Ergänzung in diesem Bereich kann langfristig sinnvoll sein.";
+
+        if (fehlend.includes("Stationär"))
+          return "Stationäre Zusatzleistungen ermöglichen im Ernstfall mehr Wahlfreiheit bei Unterbringung und Behandlung.";
+
+        return "Eine umfassende Gesundheitsabsicherung sollte mehrere relevante Leistungsbereiche abdecken.";
+      }
 
       /* ================= KINDER KRANKENZUSATZ ================= */
 
-      case "kinder_krankenzusatz":
+      case "kinder_krankenzusatz": {
 
-        // Wenn Kinder-KV unklar ist → erst System klären
-        if (baseData.kinderKrankenversicherung === "Weiß nicht")
-          return "Die Krankenversicherung deiner Kinder sollte geklärt werden, um mögliche Versorgungslücken einschätzen zu können.";
+        const income = Number(baseData.gehalt);
+        const kinderAnzahl = Number(baseData.kinderAnzahl) || 1;
+        const kvArt = baseData.kinderKrankenversicherung;
 
-        // Wenn keine Zusatz vorhanden
-        if (value === "nein")
-          return "Für gesetzlich versicherte Kinder kann eine ergänzende Gesundheitsabsicherung sinnvoll sein.";
+        // Wenn KV-System unklar
+        if (kvArt === "Weiß nicht")
+          return "Die Krankenversicherung deiner Kinder sollte zunächst geklärt werden, um mögliche Versorgungslücken realistisch einschätzen zu können.";
 
-        // Wenn nicht beantwortet
+        // Nur relevant bei gesetzlich versicherten Kindern
+        if (kvArt !== "Gesetzlich versichert (GKV)")
+          return null;
+
+        // Keine Zusatzversicherung vorhanden
+        if (value === "nein") {
+
+          if (kinderAnzahl >= 2)
+            return "Bei mehreren gesetzlich versicherten Kindern können sich Eigenanteile (z. B. Zahnbehandlungen oder stationäre Leistungen) finanziell deutlich summieren.";
+
+          if (income > 4000)
+            return "Eine ergänzende Gesundheitsabsicherung kann Leistungsunterschiede zur privaten Versorgung reduzieren und medizinische Optionen erweitern.";
+
+          return "Für gesetzlich versicherte Kinder kann eine ergänzende Gesundheitsabsicherung sinnvoll sein, um Leistungsunterschiede auszugleichen.";
+        }
+
+        // Unbekannt
+        if (value === "unbekannt")
+          return "Eine Überprüfung des Leistungsumfangs kann helfen, mögliche Lücken frühzeitig zu erkennen.";
+
+        // Zusatz vorhanden → prüfen ob vollständig
         if (value !== "ja") return null;
 
-        const kinderBereiche = [
-          "Ambulant",
-          "Stationär",
-          "Zähne",
-          "Brille",
-          "Krankenhaustagegeld"
-        ];
+        const gewichtung = {
+          "Stationär": 30,
+          "Zähne": 25,
+          "Ambulant": 20,
+          "Krankenhaustagegeld": 15,
+          "Brille": 10
+        };
 
-        const fehlendKinder = kinderBereiche.filter(
-          opt => !answers["kinder_krankenzusatz_" + opt]
+        const fehlend = Object.keys(gewichtung).filter(
+          bereich => !answers["kinder_krankenzusatz_" + bereich]
         );
 
-        if (fehlendKinder.length === 0) return null;
+        if (fehlend.length === 0) return null;
 
-        return "Für Kinder kann eine umfassende Gesundheitsabsicherung sinnvoll sein. Eine Überprüfung des Leistungsumfangs schafft Transparenz.";
+        if (fehlend.includes("Zähne"))
+          return "Zahnleistungen verursachen bei Kindern häufig hohe Eigenanteile. Eine Ergänzung kann langfristig sinnvoll sein.";
+
+        if (fehlend.includes("Stationär"))
+          return "Stationäre Zusatzleistungen ermöglichen im Ernstfall bessere Wahlmöglichkeiten bei Unterbringung und Behandlung.";
+
+        return "Eine umfassende Gesundheitsabsicherung für Kinder sollte mehrere Leistungsbereiche abdecken.";
+      }
+
+      /* ================= KINDER VORSORGE ================= */
+
+      case "kinder_vorsorge": {
+
+        if (value === "ja") return null;
+
+        const income = Number(baseData.gehalt);
+        const kinderAnzahl = Number(baseData.kinderAnzahl) || 1;
+        const hatHaus = baseData.wohnen === "Eigentum Haus";
+
+        if (value === "unbekannt")
+          return "Ob bereits strukturiert für dein Kind vorgesorgt wird, sollte geprüft werden. Frühzeitige Planung schafft langfristige finanzielle Vorteile.";
+
+        if (kinderAnzahl >= 2)
+          return "Bei mehreren Kindern summieren sich spätere Ausbildungs- oder Startkosten erheblich. Eine strukturierte Vorsorge schafft Planungssicherheit.";
+
+        if (hatHaus)
+          return "Neben Immobilienfinanzierung und laufenden Verpflichtungen sollte auch die langfristige Zukunft deines Kindes strukturiert geplant werden.";
+
+        if (income >= 3500)
+          return "Mit höherem Einkommen lassen sich frühzeitig Vermögenswerte für Ausbildung, Studium oder Startkapital aufbauen.";
+
+        return "Eine frühzeitige Vorsorge für dein Kind nutzt den langfristigen Zinseszinseffekt und schafft finanzielle Freiheit für Ausbildung oder Start ins Berufsleben.";
+      }
+
+      /* ================= KINDER UNFALL ================= */
+
+      case "kinder_unfall": {
+
+        if (value === "ja") return null;
+
+        const income = Number(baseData.gehalt);
+        const kinderAnzahl = Number(baseData.kinderAnzahl) || 1;
+
+        if (value === "unbekannt")
+          return "Ob für dein Kind eine eigenständige Unfallabsicherung besteht, sollte geprüft werden. Gerade bei dauerhaften Unfallfolgen entstehen langfristige finanzielle Belastungen.";
+
+        if (kinderAnzahl >= 2)
+          return "Bei mehreren Kindern steigt das Risiko statistisch. Eine Unfallabsicherung schützt vor finanziellen Folgen bei dauerhaften Beeinträchtigungen.";
+
+        if (income >= 3500)
+          return "Eine Kinder-Unfallversicherung kann finanzielle Folgen bei Invalidität absichern und zusätzliche Therapien oder Umbauten ermöglichen.";
+
+        return "Eine Unfallversicherung für dein Kind schützt bei dauerhaften körperlichen Beeinträchtigungen und sichert finanzielle Unterstützung für Therapien oder Anpassungen.";
+      }
 
       /* ================= HAUSRAT ================= */
 
-      case "hausrat":
+      case "hausrat": {
+
         if (value === "ja") return null;
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Versicherungssumme schützt vor Unterversicherung.";
-        return "Der Schutz deines beweglichen Eigentums sollte regelmäßig am Neuwert ausgerichtet sein.";
+
+        const wohnen = baseData.wohnen;
+        const hatKinder = baseData.kinder === "Ja";
+        const income = Number(baseData.gehalt);
+
+        if (value === "unbekannt")
+          return "Die Versicherungssumme sollte regelmäßig geprüft werden, um Unterversicherung im Schadenfall zu vermeiden.";
+
+        if (wohnen === "Miete Wohnung" || wohnen === "Miete Haus") {
+          if (hatKinder)
+            return "Gerade mit Familie summiert sich der Hausrat schnell auf hohe Werte. Eine ausreichende Absicherung schützt vor finanziellen Belastungen im Schadenfall.";
+
+          if (income >= 3500)
+            return "Bei höherem Lebensstandard steigt meist auch der Wert des Hausrats. Eine passende Absicherung schützt vor unerwarteten Ersatzkosten.";
+
+          return "Der gesamte bewegliche Besitz – Möbel, Kleidung, Technik – sollte zum Neuwert abgesichert sein.";
+        }
+
+        return "Der Schutz des eigenen Hausrats sollte regelmäßig überprüft und am aktuellen Neuwert ausgerichtet sein.";
+      }
 
       /* ================= ELEMENTAR ================= */
 
-      case "elementar":
+      case "elementar": {
+
         if (value === "ja") return null;
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Elementarschäden sind häufig nicht automatisch eingeschlossen.";
-        return "Naturgefahren nehmen statistisch zu. Elementarschutz ergänzt die Wohnabsicherung sinnvoll.";
+
+        const wohnen = baseData.wohnen;
+        const hatHaus = wohnen === "Eigentum Haus";
+
+        if (value === "unbekannt")
+          return "Elementarschäden wie Starkregen oder Überschwemmung sind häufig nicht automatisch mitversichert.";
+
+        if (hatHaus)
+          return "Als Eigentümer trägst du das volle Risiko bei Naturereignissen. Elementarschutz schützt vor existenziellen Schäden am Gebäude.";
+
+        return "Naturereignisse wie Starkregen oder Überschwemmung treten zunehmend auf. Eine Ergänzung um Elementarschutz kann sinnvoll sein.";
+      }
 
       /* ================= GEBÄUDE ================= */
 
-      case "gebaeude":
-        if (value === "ja") return null;
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine vollständige Gebäudeabsicherung ist essenziell.";
-        return "Als Eigentümer ist eine vollständige Gebäudeabsicherung essenziell.";
+      case "gebaeude": {
 
+        if (value === "ja") return null;
+
+        const hatKinder = baseData.kinder === "Ja";
+        const income = Number(baseData.gehalt);
+
+        if (value === "unbekannt")
+          return "Die Wohngebäudeversicherung sollte vollständig und aktuell sein, um existenzielle Schäden abzusichern.";
+
+        if (hatKinder)
+          return "Als Eigentümer mit Familie ist der Schutz der Immobilie zentral für die finanzielle Stabilität.";
+
+        if (income >= 3500)
+          return "Immobilieneigentum bindet erhebliche Vermögenswerte. Eine vollständige Absicherung schützt langfristig dein Kapital.";
+
+        return "Als Eigentümer ist eine vollständige Wohngebäudeabsicherung essenziell.";
+      }
       /* ================= HAFTPFLICHT ================= */
 
-      case "haftpflicht":
+      case "haftpflicht": {
+
         if (value === "ja") return null;
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Eine Überprüfung der Deckungssumme ist sinnvoll.";
-        return "Die private Haftpflichtversicherung zählt zu den elementaren Basisabsicherungen.";
+
+        const hatKinder = baseData.kinder === "Ja";
+        const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+
+        if (value === "unbekannt")
+          return "Die private Haftpflicht sollte eine ausreichend hohe Deckungssumme enthalten (mind. 10 Mio. €).";
+
+        if (hatKinder)
+          return "Mit Kindern steigt das Haftungsrisiko deutlich. Eine private Haftpflicht schützt vor existenzbedrohenden Schadenersatzforderungen.";
+
+        if (verheiratet)
+          return "Als verheiratete Person schützt eine Haftpflichtversicherung euch beide vor hohen Schadenersatzansprüchen.";
+
+        return "Ein einzelner Haftpflichtschaden kann existenzielle Folgen haben. Diese Absicherung gehört zur absoluten Basis.";
+      }
 
       /* ================= RECHTSSCHUTZ ================= */
 
-      case "rechtsschutz":
+      case "rechtsschutz": {
 
-        if (value !== "ja")
-          return value === "nein"
-            ? "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen."
-            : null;
+        const beruf = baseData.beruf;
+        const hatKFZ = baseData.kfz === "Ja";
+        const wohntSelbst = baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern";
+        const hatKinder = baseData.kinder === "Ja";
 
-        const rsBereiche = [
-          { key: "Privat", relevant: true },
-          { key: "Beruf", relevant: baseData.beruf && baseData.beruf !== "Nicht berufstätig" },
-          { key: "Verkehr", relevant: baseData.kfz === "Ja" },
-          { key: "Immobilie/Miete", relevant: baseData.wohnen && baseData.wohnen !== "Wohne bei Eltern" }
-        ];
+        if (value !== "ja") {
 
-        const relevante = rsBereiche.filter(b => b.relevant);
+          if (value === "unbekannt")
+            return "Eine Überprüfung deiner Rechtsschutzabsicherung kann sinnvoll sein, da rechtliche Konflikte in vielen Lebensbereichen entstehen können.";
 
-        const fehlendRS = relevante.filter(
-          b => !answers["rechtsschutz_" + b.key]
+          // keine Rechtsschutzversicherung
+          if (beruf && beruf !== "Nicht berufstätig")
+            return "Arbeitsrechtliche Auseinandersetzungen können schnell hohe Kosten verursachen. Ohne Rechtsschutz trägst du Anwalts- und Gerichtskosten selbst.";
+
+          if (hatKFZ)
+            return "Im Straßenverkehr entstehen häufig rechtliche Streitigkeiten. Eine Verkehrsrechtsschutz-Komponente kann finanzielle Risiken reduzieren.";
+
+          if (wohntSelbst)
+            return "Streitigkeiten rund um Miet- oder Immobilienfragen können hohe Kosten verursachen. Eine passende Rechtsschutzabsicherung schafft Planungssicherheit.";
+
+          return "Rechtliche Auseinandersetzungen können erhebliche Kosten verursachen. Eine strukturierte Absicherung kann finanzielle Risiken begrenzen.";
+        }
+
+        /* ===== Wenn vorhanden → prüfen, ob Lücken bestehen ===== */
+
+        const gewichtung = {
+          "Privat": 30,
+          "Beruf": 25,
+          "Verkehr": 25,
+          "Immobilie/Miete": 20
+        };
+
+        const relevant = {
+          "Privat": true,
+          "Beruf": beruf && beruf !== "Nicht berufstätig",
+          "Verkehr": hatKFZ,
+          "Immobilie/Miete": wohntSelbst
+        };
+
+        const relevanteBereiche = Object.keys(gewichtung).filter(
+          key => relevant[key]
         );
 
-        if (fehlendRS.length === 0) return null;
+        const fehlend = relevanteBereiche.filter(
+          key => !answers["rechtsschutz_" + key]
+        );
 
-        return "Eine vollständige Rechtsschutzabsicherung sollte alle relevanten Lebensbereiche abdecken.";
+        if (fehlend.length === 0) return null;
+
+        // gezielte Lückenkommunikation
+        if (fehlend.includes("Beruf"))
+          return "Der berufliche Bereich ist nicht abgesichert. Arbeitsrechtliche Streitigkeiten zählen zu den häufigsten Konflikten.";
+
+        if (fehlend.includes("Verkehr"))
+          return "Im Verkehrsbereich entstehen besonders häufig Streitigkeiten. Eine Ergänzung kann finanzielle Risiken reduzieren.";
+
+        if (fehlend.includes("Immobilie/Miete"))
+          return "Rechtsstreitigkeiten rund um Miete oder Immobilieneigentum können kostspielig werden.";
+
+        return "Eine vollständige Rechtsschutzabsicherung sollte alle für dich relevanten Lebensbereiche abdecken.";
+      }
 
       /* ================= ANWARTSCHAFT ================= */
 
-      case "anwartschaft":
+      case "anwartschaft": {
 
-        if (value === "Große Anwartschaft") return null;
+        const age = Number(baseData.alter);
+        const income = Number(baseData.gehalt);
 
-        if (value === "Kleine Anwartschaft")
-          return "Eine große Anwartschaft sichert zusätzlich das Eintrittsalter und kann langfristig Beitragssicherheit bieten.";
+        if (value === "Große Anwartschaft")
+          return null;
+
+        if (value === "Kleine Anwartschaft") {
+
+          if (age < 35)
+            return "Eine große Anwartschaft sichert neben dem Gesundheitszustand auch dein heutiges Eintrittsalter. Gerade in jüngeren Jahren kann das langfristig deutliche Beitragsvorteile bringen.";
+
+          return "Eine große Anwartschaft sichert zusätzlich dein aktuelles Eintrittsalter und kann langfristig zu stabileren Beiträgen in der privaten Krankenversicherung führen.";
+        }
 
         if (value === "Weiß nicht")
-          return "Bei Heilfürsorge ist eine Anwartschaft entscheidend, um später ohne erneute Gesundheitsprüfung in die private Krankenversicherung wechseln zu können.";
+          return "Bei Heilfürsorge ist eine Anwartschaft entscheidend, um später ohne erneute Gesundheitsprüfung in die private Krankenversicherung wechseln zu können. Eine Klärung schafft hier Planungssicherheit.";
 
-        return "Ohne Anwartschaft kann bei späterem Wechsel in die private Krankenversicherung eine erneute Gesundheitsprüfung erforderlich sein.";
+        // Keine Anwartschaft
+        if (income > 3500)
+          return "Ohne Anwartschaft kann bei einem späteren Wechsel in die private Krankenversicherung eine erneute Gesundheitsprüfung erfolgen – mit möglichen Risikozuschlägen oder Leistungsausschlüssen.";
+
+        return "Ohne Anwartschaft ist ein späterer Wechsel in die private Krankenversicherung regelmäßig mit erneuter Gesundheitsprüfung verbunden. Bestehende Vorerkrankungen können dann relevant werden.";
+      }
 
       /* ================= RISIKO-LEBENSVERSICHERUNG ================= */
 
-      case "risiko_lv":
+      case "risiko_lv": {
 
         if (value === "ja") return null;
 
-        if (value === "unbekannt")
-          return "Hier besteht möglicher Klärungsbedarf. Eine Risikolebensversicherung sichert Hinterbliebene oder finanzielle Verpflichtungen im Todesfall ab.";
+        const income = Number(baseData.gehalt);
+        const hatKinder = baseData.kinder === "Ja";
+        const hatHaus = baseData.wohnen === "Eigentum Haus";
+        const verheiratet = baseData.beziehungsstatus === "Verheiratet";
+        const age = Number(baseData.alter);
 
-        return "Eine Risikolebensversicherung schützt Familie, Partner oder laufende Darlehen im Todesfall und verhindert finanzielle Engpässe.";
+        if (value === "unbekannt")
+          return "Ob bereits eine ausreichende Absicherung im Todesfall besteht, sollte geprüft werden. Gerade bei familiären oder finanziellen Verpflichtungen kann hier ein erhebliches Risiko entstehen.";
+
+        // Hohe Verantwortungssituation
+        if (hatKinder && hatHaus)
+          return "Bei Familie und Immobilienfinanzierung trägt dein Einkommen eine zentrale Verantwortung. Eine Risikolebensversicherung schützt Hinterbliebene vor finanziellen Belastungen im Todesfall.";
+
+        if (hatKinder || verheiratet)
+          return "Mit familiärer Verantwortung gewinnt die finanzielle Absicherung im Todesfall deutlich an Bedeutung. Ziel ist es, Partner oder Kinder wirtschaftlich abzusichern.";
+
+        if (hatHaus)
+          return "Bei Immobilienfinanzierung sollte geprüft werden, ob Darlehensverpflichtungen im Todesfall vollständig abgesichert sind.";
+
+        // Höheres Einkommen = größere wirtschaftliche Lücke
+        if (income >= 4000)
+          return "Mit steigendem Einkommen wächst auch die wirtschaftliche Verantwortung. Eine Absicherung verhindert, dass im Ernstfall größere Versorgungslücken entstehen.";
+
+        // Jüngere ohne Verpflichtung
+        if (age < 30)
+          return "Auch ohne aktuelle Verpflichtungen kann eine frühe Absicherung gesundheitliche Vorteile bieten und langfristig günstige Konditionen sichern.";
+
+        return "Eine Risikolebensversicherung sichert finanzielle Verpflichtungen und schützt nahestehende Personen vor wirtschaftlichen Engpässen.";
+      }
 
       /* ================= RÜCKLAGEN ================= */
 
-      case "ruecklagen":
+      case "ruecklagen": {
 
         if (value === "ja") return null;
 
-        if (value === "unbekannt")
-          return "Eine Überprüfung deiner Liquiditätsreserve kann sinnvoll sein.";
+        const income = Number(baseData.gehalt);
+        const hatKinder = baseData.kinder === "Ja";
+        const hatHaus = baseData.wohnen === "Eigentum Haus";
+        const verheiratet = baseData.beziehungsstatus === "Verheiratet";
 
-        return "Eine Notfallreserve von 3–6 Monatsnettoeinkommen schützt vor finanziellen Engpässen bei unerwarteten Ereignissen wie Jobverlust oder Reparaturen.";
+        if (value === "unbekannt")
+          return "Eine klare Übersicht über deine verfügbare Liquiditätsreserve ist entscheidend, um finanzielle Engpässe realistisch einschätzen zu können.";
+
+        // Hohe Fixkosten-Situation
+        if (hatHaus && hatKinder)
+          return "Mit Immobilie und familiärer Verantwortung steigen laufende Fixkosten erheblich. Eine ausreichende Liquiditätsreserve schützt vor finanziellen Engpässen bei unerwarteten Ereignissen.";
+
+        if (hatHaus)
+          return "Immobilien verursachen laufende Verpflichtungen und potenzielle Reparaturkosten. Eine stabile Rücklage schafft finanzielle Sicherheit.";
+
+        if (hatKinder)
+          return "Mit Kindern erhöhen sich laufende Ausgaben und unvorhersehbare Kosten. Eine Reserve sorgt für Stabilität in Übergangsphasen.";
+
+        // Einkommensskalierung
+        if (income >= 4000)
+          return "Bei höherem Einkommen steigt meist auch der Lebensstandard und damit das finanzielle Risiko bei Einkommensausfall. Eine Reserve von mindestens 3–6 Monatsnettoeinkommen schafft Planungssicherheit.";
+
+        if (income >= 2500)
+          return "Eine Liquiditätsreserve von mehreren Monatsnettoeinkommen schützt vor finanziellen Engpässen bei Krankheit oder Arbeitsplatzwechsel.";
+
+        return "Eine Notfallreserve schützt vor kurzfristigen finanziellen Belastungen und schafft Unabhängigkeit von Krediten oder Dispo.";
+      }
 
       /* ================= BETRIEBLICHE ALTERSVORSORGE ================= */
 
-      case "betriebliche_altersvorsorge":
+      case "bav": {
 
         if (value === "ja") return null;
 
-        if (value === "unbekannt")
-          return "Hier besteht möglicher Klärungsbedarf. Eine betriebliche Altersvorsorge kann staatliche Förderung und Arbeitgeberzuschüsse nutzen.";
+        const income = Number(baseData.gehalt);
+        const age = Number(baseData.alter);
+        const hatKinder = baseData.kinder === "Ja";
+        const verheiratet = baseData.beziehungsstatus === "Verheiratet";
 
-        return "Die betriebliche Altersvorsorge ermöglicht staatlich geförderten Vermögensaufbau und sollte bei Angestellten geprüft werden.";
+        if (value === "unbekannt")
+          return "Ob bereits eine betriebliche Altersvorsorge genutzt wird, sollte geprüft werden. Arbeitgeberzuschüsse und steuerliche Vorteile können die Effektivität deutlich erhöhen.";
+
+        // Höheres Einkommen → größerer Steuervorteil
+        if (income >= 4000)
+          return "Bei höherem Einkommen wirkt die steuerliche Förderung besonders stark. In Kombination mit einem Arbeitgeberzuschuss entsteht ein struktureller Renditevorteil.";
+
+        // Familienverantwortung
+        if (hatKinder || verheiratet)
+          return "Mit familiärer Verantwortung gewinnt zusätzliche Altersvorsorge an Bedeutung. Eine betriebliche Altersvorsorge kann hier eine stabile Grundstruktur bilden.";
+
+        // Jüngere profitieren vom Zinseszinseffekt
+        if (age < 30)
+          return "Ein früher Einstieg in die betriebliche Altersvorsorge nutzt den langfristigen Zinseszinseffekt und reduziert den späteren Sparaufwand erheblich.";
+
+        // Standard
+        return "Die betriebliche Altersvorsorge verbindet steuerliche Förderung mit Arbeitgeberzuschüssen und stellt für Angestellte eine solide Ergänzung zur gesetzlichen Rente dar.";
+      }
 
 
       /* ================= KFZ ================= */
 
-      case "kfz_haftpflicht":
-        if (value === "ja") return null;
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Die gesetzliche Haftpflicht sollte eindeutig geprüft werden.";
-        return "Die KFZ-Haftpflicht schützt vor existenzbedrohenden Schadenersatzforderungen.";
+      case "kfz_haftpflicht": {
 
-      case "kasko":
-        if (value === "ja") return null;
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Der passende Kaskoschutz hängt vom Fahrzeugwert ab.";
-        return "Der passende Kaskoschutz hängt vom Fahrzeugwert und deiner Risikobereitschaft ab.";
+        const fahrzeuge = Number(baseData.kfzAnzahl) || 1;
 
-      case "schutzbrief":
         if (value === "ja") return null;
-        if (unsicher)
-          return "Hier besteht eventuell Optimierungsbedarf. Ein Schutzbrief kann im Notfall organisatorische Sicherheit bieten.";
-        return "Ein Schutzbrief reduziert organisatorische und finanzielle Belastungen im Notfall.";
+
+        if (value === "unbekannt")
+          return "Die gesetzliche Kfz-Haftpflicht ist verpflichtend. Eine Klärung ist wichtig, da ohne Versicherung kein Schutz bei Schadenersatzforderungen besteht.";
+
+        if (fahrzeuge > 1)
+          return "Bei mehreren Fahrzeugen steigt das Haftungsrisiko. Eine fehlende Kfz-Haftpflicht kann erhebliche finanzielle Folgen haben.";
+
+        return "Die Kfz-Haftpflicht schützt vor hohen Schadenersatzforderungen bei Personen- und Sachschäden und ist gesetzlich vorgeschrieben.";
+      }
+
+
+      case "kasko": {
+
+        const income = Number(baseData.gehalt);
+
+        if (value === "vollkasko") return null;
+
+        if (value === "unbekannt")
+          return "Der passende Kaskoschutz hängt vom Fahrzeugwert, einer Finanzierung und deiner persönlichen Risikobereitschaft ab.";
+
+        if (value === "keine") {
+
+          if (income > 4000)
+            return "Bei höherwertigen Fahrzeugen kann fehlender Kaskoschutz im Schadenfall zu erheblichen finanziellen Belastungen führen.";
+
+          return "Ohne Kaskoversicherung trägst du Schäden am eigenen Fahrzeug selbst. Ob das wirtschaftlich sinnvoll ist, hängt vom Fahrzeugwert ab.";
+        }
+
+        if (value === "teilkasko")
+          return "Teilkasko deckt bestimmte Risiken ab (z. B. Diebstahl, Sturm, Glasbruch). Bei neueren oder finanzierten Fahrzeugen kann Vollkasko sinnvoller sein.";
+
+        return null;
+      }
+
+
+      case "schutzbrief": {
+
+        const fahrzeugAnzahl = Number(baseData.kfzAnzahl) || 1;
+
+        if (value === "ja") return null;
+
+        if (value === "unbekannt")
+          return "Ein Schutzbrief kann organisatorische Hilfe bei Pannen oder Unfällen bieten. Ob er sinnvoll ist, hängt von deinem Mobilitätsbedarf ab.";
+
+        if (fahrzeugAnzahl > 1)
+          return "Bei mehreren Fahrzeugen kann ein Schutzbrief zusätzlichen organisatorischen Schutz bei Pannen oder Ausfällen bieten.";
+
+        return "Ein Schutzbrief bietet Hilfeleistungen bei Pannen, Abschleppkosten oder Mobilitätsausfällen. Er ist kein existenzieller Schutz, kann aber organisatorische Sicherheit erhöhen.";
+      }
 
       default:
         return null;
@@ -1605,11 +2124,11 @@ export default function App() {
           className="infoBox legalBox"
           onClick={(e) => e.stopPropagation()}
         >
- <h3 style={{ marginBottom: 12 }}>
-  {legalOverlay === "impressum" && "Impressum"}
-  {legalOverlay === "datenschutz" && "Datenschutz"}
-  {legalOverlay === "hinweis" && "Hinweis"}
-</h3>
+          <h3 style={{ marginBottom: 12 }}>
+            {legalOverlay === "impressum" && "Impressum"}
+            {legalOverlay === "datenschutz" && "Datenschutz"}
+            {legalOverlay === "hinweis" && "Hinweis"}
+          </h3>
 
           {legalOverlay === "impressum" && (
             <>
@@ -1820,31 +2339,45 @@ export default function App() {
       </div>
     );
   }
-  function ContactOverlayComponent() {
-    if (!contactOverlay) return null;
 
-    return (
+    /* ================= Contact Overlay ================= */
+
+function ContactOverlayComponent() {
+  if (!contactOverlay) return null;
+
+  return (
+    <div
+      className="infoOverlay"
+      onClick={() => setContactOverlay(false)}
+    >
       <div
-        className="infoOverlay"
-        onClick={() => setContactOverlay(false)}
+        className="infoBox"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className="infoBox"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <h3 style={{ marginBottom: 16 }}>
-            Persönlicher Kontakt
-          </h3>
+        <h3 style={{ marginBottom: 14 }}>
+          Persönliche Beratung & Strategiegespräch
+        </h3>
 
+        <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.6 }}>
+          In einem strukturierten Gespräch analysieren wir gemeinsam deine aktuelle
+          Absicherung, priorisieren sinnvolle Maßnahmen und prüfen,
+          welche Lösungen wirtschaftlich und langfristig sinnvoll sind.
+        </p>
+
+        <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.6 }}>
+          Transparent. Individuell. Ohne Verpflichtung.
+        </p>
+
+        <div style={{ marginTop: 18 }}>
           <p><strong>Florian Löffler</strong></p>
 
-          <p>
-            BarmeniaGothaer VZ Südbaden
+          <p style={{ fontSize: 13, opacity: 0.75 }}>
+            BarmeniaGothaer VZ Südbaden<br />
             Breisacher Str. 145b<br />
             79110 Freiburg im Breisgau
           </p>
 
-          <p>
+          <p style={{ fontSize: 13, opacity: 0.75 }}>
             Telefon:{" "}
             <a href="tel:+497612027423">
               0761-2027423
@@ -1855,32 +2388,39 @@ export default function App() {
               florian.loeffler@barmenia.de
             </a>
           </p>
-
-          <div className="overlayButtons" style={{ marginTop: 20 }}>
-            <button
-              className="overlayBtn primary"
-              onClick={() =>
-                window.open(
-                  "https://agentur.barmenia.de/florian_loeffler",
-                  "_blank",
-                  "noopener,noreferrer"
-                )
-              }
-            >
-              Zur Agentur-Website
-            </button>
-
-            <button
-              className="overlayBtn secondary"
-              onClick={() => setContactOverlay(false)}
-            >
-              Schließen
-            </button>
-          </div>
         </div>
+
+        <div className="overlayButtons" style={{ marginTop: 20 }}>
+
+          <button
+            className="overlayBtn primary"
+            onClick={() =>
+              window.open(
+                "https://agentur.barmenia.de/florian_loeffler",
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
+          >
+            Zur Agentur-Website
+          </button>
+
+          <button
+            className="overlayBtn secondary"
+            onClick={() => setContactOverlay(false)}
+          >
+            Schließen
+          </button>
+        </div>
+
+        <p style={{ fontSize: 12, opacity: 0.6, marginTop: 14 }}>
+          100% unverbindlich · Persönliche Analyse · Keine automatische Datenübertragung
+        </p>
+
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   /* ================= ACTION OVERLAY ================= */
 
@@ -1981,9 +2521,15 @@ export default function App() {
           </span>
         </div>
 
-        <ContactButton onReset={() => setShowResetConfirm(true)} />
-        <ResetOverlayComponent />
-        <LegalOverlayComponent />
+<ContactButton
+  onReset={() => setShowResetConfirm(true)}
+  onContact={() => setContactOverlay(true)}
+/>
+
+<ResetOverlayComponent />
+<LegalOverlayComponent />
+<ContactOverlayComponent />
+
       </div>
     );
   }
@@ -2259,9 +2805,15 @@ export default function App() {
           </span>
         </div>
 
-        <ContactButton onReset={() => setShowResetConfirm(true)} />
-        <ResetOverlayComponent />
-        <LegalOverlayComponent />
+<ContactButton
+  onReset={() => setShowResetConfirm(true)}
+  onContact={() => setContactOverlay(true)}
+/>
+
+<ResetOverlayComponent />
+<LegalOverlayComponent />
+<ContactOverlayComponent />
+
       </div>
     );
   }
@@ -2631,9 +3183,15 @@ export default function App() {
           </span>
         </div>
 
-        <ContactButton onReset={() => setShowResetConfirm(true)} />
-        <ResetOverlayComponent />
-        <LegalOverlayComponent />
+<ContactButton
+  onReset={() => setShowResetConfirm(true)}
+  onContact={() => setContactOverlay(true)}
+/>
+
+<ResetOverlayComponent />
+<LegalOverlayComponent />
+<ContactOverlayComponent />
+
       </div>
     );
   }
@@ -2647,8 +3205,8 @@ export default function App() {
 
         <h2 className="dashboardTitle">
           {baseData.vorname
-            ? `${baseData.vorname}, dein Status`
-            : "Dein Status"}
+            ? `${baseData.vorname}, dein Absicherungs-Status`
+            : "Dein Absicherungs-Status"}
         </h2>
 
         {/* Score Ring */}
@@ -2706,11 +3264,29 @@ export default function App() {
           </p>
         </div>
 
+        {/* Dynamische Conversion-Hinweise */}
+        {animatedScore < 60 && (
+          <div className="riskWarning">
+            <strong>Handlungsbedarf:</strong> Es bestehen mehrere relevante Absicherungslücken.
+          </div>
+        )}
+
+        {animatedScore >= 80 && (
+          <div className="upgradeHint">
+            Sehr gute Basis. Mit gezielter Feinoptimierung sind 90%+ erreichbar.
+          </div>
+        )}
+
+
         {/* ================= TOP 3 HANDLUNGSFELDER ================= */}
         {topRecommendations.length > 0 && (
           <div className="categoryList" style={{ marginTop: 20 }}>
             <h3 style={{ marginBottom: 12 }}>
-              Deine wichtigsten Handlungsfelder
+              {animatedScore < 60
+                ? "Hier sollten wir gezielt nachschärfen"
+                : animatedScore < 80
+                  ? "Hier steckt noch Potenzial"
+                  : "Sehr gute Basis – jetzt geht es um Feinschliff"}
             </h3>
 
             {topRecommendations.map((item) => {
@@ -2869,6 +3445,36 @@ export default function App() {
           Alle Tarifoptionen anzeigen
         </button>
 
+
+        {/* ================= STRATEGIE CTA ================= */}
+
+        <div className="conversionBox" style={{ marginTop: 30 }}>
+          <h3>Individuelle Strategie-Empfehlung</h3>
+
+          <p>
+            In einem kurzen, unverbindlichen Gespräch analysieren wir gemeinsam,
+            welche Maßnahmen deinen Absicherungs-Score konkret verbessern
+            und wirtschaftlich sinnvoll sind.
+          </p>
+
+          <button
+            className="primaryBtn big"
+            onClick={() =>
+              window.open(
+                "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N",
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
+          >
+            Kostenloses Strategiegespräch sichern
+          </button>
+
+          <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10 }}>
+            100% unverbindlich · Keine Verpflichtung · Persönlich & transparent
+          </p>
+        </div>
+
         <div className="legalFooter">
           <span onClick={() => setLegalOverlay("impressum")}>
             Impressum
@@ -2883,7 +3489,10 @@ export default function App() {
           </span>
         </div>
 
-        <ContactButton onReset={() => setShowResetConfirm(true)} />
+        <ContactButton
+  onReset={() => setShowResetConfirm(true)}
+  onContact={() => setContactOverlay(true)}
+/>
         <ResetOverlayComponent />
         <ActionOverlayComponent />
         <LegalOverlayComponent />
@@ -3031,19 +3640,16 @@ function Checkbox({
   );
 }
 
-function ContactButton({ onReset }) {
+/* ================= Contact Button ================= */
+
+function ContactButton({ onReset, onContact }) {
   return (
     <div className="contactFixed">
       <button
         className="contactBtn"
-        onClick={() =>
-          window.open(
-            "https://agentur.barmenia.de/florian_loeffler",
-            "_blank"
-          )
-        }
+        onClick={onContact}
       >
-        Kontakt aufnehmen
+        Beratung sichern
       </button>
 
       <button
