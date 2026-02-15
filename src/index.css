@@ -1891,3 +1891,29 @@ svg {
   color: #ffffff;
   transform: scale(1.1);
 }
+/* ================= MOBILE FINAL COMPACT FIX ================= */
+
+@media (max-width: 480px) {
+
+  .questionCard.dark {
+    padding: 16px 16px 18px 16px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .questionText {
+    font-size: 15px !important;
+    line-height: 1.32 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .buttonRow {
+    gap: 8px !important;
+    margin-top: 6px !important;
+  }
+
+  .answerBtn {
+    padding: 11px !important;
+    font-size: 14px;
+  }
+
+}
