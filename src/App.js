@@ -2354,15 +2354,6 @@ export default function App() {
           className="infoBox"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
-            type="button"
-            className="overlayClose"
-            onClick={() => setShowResetConfirm(false)}
-          >
-            ×
-          </button>
-
-
           <p>Möchtest du von vorne beginnen?</p>
 
           <div className="overlayButtons">
@@ -2402,14 +2393,6 @@ export default function App() {
           className="infoBox"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
-            type="button"
-            className="overlayClose"
-            onClick={() => setContactOverlay(false)}
-          >
-            ×
-          </button>
-
           <h3 style={{ marginBottom: 14 }}>
             Persönliche Beratung & Strategiegespräch
           </h3>
@@ -3281,89 +3264,94 @@ export default function App() {
             : "Dein Absicherungs-Status"}
         </h2>
 
-        {/* ================= SCORE RING – PREMIUM LEVEL 2 ================= */}
+        {/* ================= SCORE RING – PREMIUM CLEAN ================= */}
 
-        <div className="ringWrap premium">
+<div className="ringWrap">
 
-          {(() => {
+  {(() => {
 
-            const circumference = 2 * Math.PI * 95;
+    const circumference = 2 * Math.PI * 95;
+    const normalizedScore = Math.min(animatedScore, 100);
+    const dashOffset =
+      normalizedScore === 100
+        ? 0
+        : circumference - (normalizedScore / 100) * circumference;
 
-            const normalizedScore = Math.min(animatedScore, 100);
-            const dashOffset =
-              normalizedScore === 100
-                ? 0
-                : circumference - (normalizedScore / 100) * circumference;
+    let gradientStart = "#5E4AE3";
+    let gradientEnd = "#8B7CF6";
+    let statusLabel = "Handlungsbedarf";
+    let glowStrength = 0.15;
 
-            let gradientStart = "#5E4AE3";
-            let gradientEnd = "#8B7CF6";
-            let glowOpacity = 0.25;
-            let statusLabel = "Handlungsbedarf";
+    if (animatedScore >= 80) {
+      gradientStart = "#8B7CF6";
+      gradientEnd = "#C4BAFF";
+      statusLabel = "Sehr solide";
+      glowStrength = 0.45;
+    } else if (animatedScore >= 60) {
+      gradientStart = "#6E5CF0";
+      gradientEnd = "#A99BFF";
+      statusLabel = "Gute Basis";
+      glowStrength = 0.3;
+    }
 
-            if (animatedScore >= 80) {
-              gradientStart = "#8B7CF6";
-              gradientEnd = "#B5A9FF";
-              glowOpacity = 0.4;
-              statusLabel = "Sehr solide";
-            }
-            else if (animatedScore >= 60) {
-              gradientStart = "#6E5CF0";
-              gradientEnd = "#9C8CFF";
-              glowOpacity = 0.3;
-              statusLabel = "Gute Basis";
-            }
+    return (
+      <>
+        {/* DYNAMISCHER GLOW */}
+        <div
+          className="ringGlow"
+          style={{
+            background: `radial-gradient(circle,
+              rgba(139,124,246,${glowStrength}) 0%,
+              rgba(139,124,246,${glowStrength * 0.6}) 40%,
+              rgba(139,124,246,${glowStrength * 0.3}) 65%,
+              transparent 85%)`
+          }}
+        />
 
-            return (
-              <>
-                <svg width="240" height="240">
+        <svg width="260" height="260" viewBox="0 0 260 260">
+          <defs>
+            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={gradientStart} />
+              <stop offset="100%" stopColor={gradientEnd} />
+            </linearGradient>
+          </defs>
 
-                  <defs>
-                    <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor={gradientStart} />
-                      <stop offset="100%" stopColor={gradientEnd} />
-                    </linearGradient>
-                  </defs>
+          <circle
+            cx="130"
+            cy="130"
+            r="95"
+            stroke="#1A2A36"
+            strokeWidth="18"
+            fill="none"
+          />
 
-                  {/* Hintergrundring */}
-                  <circle
-                    cx="120"
-                    cy="120"
-                    r="95"
-                    stroke="#1A2A36"
-                    strokeWidth="18"
-                    fill="none"
-                  />
+          <circle
+            cx="130"
+            cy="130"
+            r="95"
+            stroke="url(#scoreGrad)"
+            strokeWidth="18"
+            fill="none"
+            strokeDasharray={circumference}
+            strokeDashoffset={dashOffset}
+            strokeLinecap={normalizedScore === 100 ? "butt" : "round"}
+            transform="rotate(-90 130 130)"
+            style={{
+              transition: "0.9s ease"
+            }}
+          />
+        </svg>
 
-                  {/* Aktiver Ring */}
-                  <circle
-                    cx="120"
-                    cy="120"
-                    r="95"
-                    stroke="url(#scoreGrad)"
-                    strokeWidth="18"
-                    fill="none"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={dashOffset}
-                    strokeLinecap={normalizedScore === 100 ? "butt" : "round"}
-                    transform="rotate(-90 120 120)"
-                    style={{
-                      filter: `drop-shadow(0 0 20px rgba(139,124,246,${glowOpacity}))`,
-                      transition: "0.9s ease"
-                    }}
-                  />
-
-                </svg>
-
-                <div className="ringCenter">
-                  <div className="ringScore">{animatedScore}%</div>
-                  <div className="ringStatus">{statusLabel}</div>
-                </div>
-              </>
-            );
-
-          })()}
-
+        <div className="ringCenter">
+          <div className="ringScore">{animatedScore}%</div>
+          <div className="ringStatus">{statusLabel}</div>
         </div>
+      </>
+    );
+  })()}
+
+</div>
+
 
 
         {/* ================= SCORE STATUS ================= */}

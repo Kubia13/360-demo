@@ -193,13 +193,6 @@ body {
   font-weight: bold;
 }
 
-.ringWrap {
-  display: flex;
-  justify-content: center;
-  position: relative;
-  margin: 30px 0;
-}
-
 
 .categoryRow {
   display: flex;
@@ -793,68 +786,6 @@ body::before {
     0 0 12px rgba(139, 124, 246, 0.6),
     0 0 22px rgba(94, 74, 227, 0.4);
 }
-
-/* ================= UI UPGRADE 4 – PREMIUM SCORE RING ================= */
-
-.ringWrap svg {
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.6));
-}
-
-.ringWrap svg circle:nth-child(2) {
-  filter:
-    drop-shadow(0 0 14px rgba(139, 124, 246, 0.7)) drop-shadow(0 0 28px rgba(94, 74, 227, 0.5));
-}
-
-.ringWrap::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  width: 220px;
-  height: 220px;
-
-  border-radius: 50%;
-
-  background: radial-gradient(circle,
-      rgba(139, 124, 246, 0.12),
-      transparent 65%);
-
-  z-index: 0;
-}
-
-/* ================= SCORE CENTER CLEAN ================= */
-
-.ringCenter {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-}
-
-.ringScore {
-  font-size: 42px;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1;
-}
-
-.ringStatus {
-  margin-top: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
-}
-
 
 /* ================= UI UPGRADE 5 – PREMIUM FOOTER ================= */
 
@@ -1680,12 +1611,6 @@ svg {
   padding-bottom: 110px;
 }
 
-/* Ring kompakter */
-.ringWrap {
-  margin: 20px 0;
-}
-
-
 /* H2 kompakter */
 .screen h2 {
   margin-bottom: 16px;
@@ -1736,71 +1661,37 @@ svg {
   margin-bottom: 70px;
 }
 
-/* ================= PREMIUM SCORE ================= */
+/* ================= PREMIUM SCORE RING – DYNAMIC CLEAN ================= */
 
 .ringWrap {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 30px 0;
+
+  margin: 6px 0 8px 0;      /* enger zum Titel + Text */
+  padding: 34px;            /* Platz für Glow */
+  overflow: visible;
 }
 
-/* ================= SCORE CENTER CLEAN ================= */
-
-.ringCenter {
+/* Dynamischer Glow (Farbe kommt aus Inline Style) */
+.ringGlow {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
+  width: 260px;
+  height: 260px;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-}
-
-.ringScore {
-  font-size: 42px;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1;
-}
-
-.ringStatus {
-  margin-top: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-
-.ringWrap.premium {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 30px 0;
-}
-
-.ringWrap.premium::before {
-  content: "";
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle,
-      rgba(139, 124, 246, 0.12) 0%,
-      transparent 70%);
   border-radius: 50%;
+  pointer-events: none;
   z-index: 0;
+  transition: 0.4s ease;
 }
 
+.ringWrap svg {
+  position: relative;
+  z-index: 1;
+}
 
-
-/* ================= SCORE CENTER CLEAN ================= */
+/* ================= SCORE CENTER ================= */
 
 .ringCenter {
   position: absolute;
@@ -1828,7 +1719,7 @@ svg {
   margin-top: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255,255,255,0.75);
 }
 
 /* ================= OVERLAY CLOSE BUTTON ================= */
