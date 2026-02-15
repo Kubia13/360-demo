@@ -2001,3 +2001,168 @@ svg {
 
   margin-top: 12px;   /* Abstand zum Score */
 }
+/* ================= CTA CLEAN ================= */
+
+.conversionBox {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.ctaSubline {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 10px;
+}
+
+/* ===== Secondary Actions ===== */
+
+.secondaryActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.secondaryMiniBtn {
+  flex: 1;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid rgba(139,124,246,0.4);
+  background: rgba(139,124,246,0.08);
+  color: #A99BFF;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.secondaryMiniBtn:hover {
+  background: rgba(139,124,246,0.18);
+  transform: translateY(-2px);
+}
+
+/* ===== Outline Button ===== */
+
+.outlineBtn {
+  width: 100%;
+  height: 52px;
+  margin-top: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(139,124,246,0.5);
+  background: transparent;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.outlineBtn:hover {
+  background: rgba(139,124,246,0.15);
+}
+/* ================= CALCULATOR OVERLAY ================= */
+
+.calculatorBox h3 {
+  text-align: left;
+}
+
+.calculatorList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.calculatorItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  padding: 16px;
+  border-radius: 14px;
+
+  background: rgba(139,124,246,0.08);
+  border: 1px solid rgba(139,124,246,0.25);
+
+  text-decoration: none;
+  color: white;
+
+  transition: 0.2s ease;
+}
+
+.calculatorItem:hover {
+  background: rgba(139,124,246,0.18);
+  transform: translateY(-2px);
+}
+
+.calculatorItem strong {
+  font-size: 15px;
+}
+
+.calculatorItem span {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+
+/* ================= BU CALCULATOR LAYOUT CLEAN ================= */
+
+.buCalculatorRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start; /* statt end */
+  margin-top: 14px;
+}
+
+/* Label */
+
+.buInput label,
+.buResultLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.75;
+  margin-bottom: 8px;
+}
+
+/* INPUT (links) */
+
+.buInput input {
+  width: 100%;
+  height: 52px;
+
+  padding: 0 16px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(139,124,246,0.25);
+
+  background: rgba(15, 25, 40, 0.8);
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 500;
+
+  box-sizing: border-box;
+}
+
+/* ERGEBNIS (rechts – OHNE KASTEN) */
+
+.buResultValue {
+  width: 100%;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+
+  font-size: 27px;      /* +50% */
+  font-weight: 600;
+  color: #8B7CF6;
+
+  padding: 0;           /* kein Feld-Look */
+  border: none;         /* sicherstellen */
+  background: none;     /* kein Hintergrund */
+}
+
+.secondaryMiniBtn.disabled,
+.secondaryMiniBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}

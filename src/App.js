@@ -706,6 +706,19 @@ export default function App() {
   // "impressum" | "datenschutz" | "hinweis" | null
   const [expandedProductCategory, setExpandedProductCategory] = useState(null);
   const [actionOverlay, setActionOverlay] = useState(null);
+  const [calculatorOverlay, setCalculatorOverlay] = useState(false);
+  const [buIncome, setBuIncome] = useState("");
+
+  /* ===== BU RECHNER VORBELEGUNG ===== */
+
+  useEffect(() => {
+    if (baseData.gehalt) {
+      setBuIncome(String(baseData.gehalt));
+    } else {
+      setBuIncome("");
+    }
+  }, [baseData.gehalt]);
+
 
 
   /* ================= BASE FORM REFS ================= */
@@ -3417,7 +3430,7 @@ export default function App() {
 
         {/* ================= TOP 3 HANDLUNGSFELDER ================= */}
         {topRecommendations.length > 0 && (
-         <div className="categoryList" style={{ marginTop: 20 }}>
+          <div className="categoryList" style={{ marginTop: 20 }}>
 
             <h3 className="top3Headline">
               {animatedScore < 60
@@ -3575,15 +3588,13 @@ export default function App() {
           })}
         </div>
 
-        {/* ================= STRATEGIE CTA – PRIORITÄT ================= */}
+        {/* ================= STRATEGIE CTA ================= */}
 
         <div className="conversionBox">
 
-          <h3 className="conversionHeadline">
-            Persönliche Strategie-Empfehlung
-          </h3>
+          <h3>Persönliche Strategie-Empfehlung</h3>
 
-          <p className="conversionText">
+          <p>
             In einem kurzen, unverbindlichen Gespräch analysieren wir gemeinsam,
             welche Maßnahmen deinen Absicherungs-Score gezielt verbessern
             und wirtschaftlich sinnvoll sind.
@@ -3602,21 +3613,41 @@ export default function App() {
             Kostenloses Strategiegespräch sichern
           </button>
 
-          <p className="conversionSub">
+          <p className="ctaSubline">
             100 % unverbindlich · Keine Verpflichtung · Persönlich & transparent
           </p>
 
-        </div>
+          {/* ===== SEKUNDÄRE AKTIONEN ===== */}
 
+          <div className="secondaryActions">
+
+            <button
+              className="secondaryMiniBtn"
+              onClick={() => setCalculatorOverlay(true)}
+            >
+              Rechner öffnen
+            </button>
+
+            <button
+              className="secondaryMiniBtn disabled"
+              disabled
+            >
+              PDF-Auswertung herunterladen
+            </button>
+
+          </div>
+
+        </div>
 
         {/* ================= SEKUNDÄR – TARIFOPTIONEN ================= */}
 
         <button
-          className="secondaryBtn"
+          className="outlineBtn"
           onClick={() => setStep("products")}
         >
           Alle Tarifoptionen anzeigen
         </button>
+
 
 
         {/* ================= LEGAL FOOTER ================= */}
@@ -3645,6 +3676,12 @@ export default function App() {
         <ActionOverlayComponent />
         <LegalOverlayComponent />
         <ContactOverlayComponent />
+        <CalculatorOverlayComponent
+          calculatorOverlay={calculatorOverlay}
+          setCalculatorOverlay={setCalculatorOverlay}
+          buIncome={buIncome}
+          setBuIncome={setBuIncome}
+        />
 
       </div>
     );
@@ -3810,3 +3847,108 @@ function ContactButton({ onReset, onContact }) {
     </div>
   );
 }
+
+/* ================= CALCULATOR OVERLAY ================= */
+
+const CalculatorOverlayComponent = React.memo(function CalculatorOverlayComponent({
+  calculatorOverlay,
+  setCalculatorOverlay,
+  buIncome,
+  setBuIncome
+}) {
+  if (!calculatorOverlay) return null;
+
+  return (
+    <div
+      className="infoOverlay"
+      onClick={() => setCalculatorOverlay(false)}
+    >
+      <div
+        className="infoBox calculatorBox"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="overlayClose"
+          onClick={() => setCalculatorOverlay(false)}
+        >
+          ×
+        </button>
+
+        <h3 style={{ marginBottom: 16 }}>
+          Rechner & Analyse-Tools
+        </h3>
+
+        <p style={{ opacity: 0.75, fontSize: 14, marginBottom: 20 }}>
+          Mit diesen Tools kannst du zentrale Versorgungslücken selbst berechnen
+          und deine Absicherung gezielt prüfen.
+        </p>
+
+        {/* EXTERNE RECHNER */}
+
+        <div className="calculatorList">
+
+          <a
+            href="https://ssl.barmenia.de/formular-view/#/krankentagegeldrechner?prd=Apps%2Bund%2BRechner&dom=www.barmenia.de&p0=334300"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="calculatorItem"
+          >
+            <strong>Krankentagegeld-Rechner</strong>
+            <span>Ermittelt deinen Einkommensbedarf bei längerer Krankheit.</span>
+          </a>
+
+          <a
+            href="https://rentenrechner.dieversicherer.de/app/gdv.html#start"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="calculatorItem"
+          >
+            <strong>Rentenlücken-Rechner</strong>
+            <span>Berechnet deine voraussichtliche Versorgungslücke im Ruhestand.</span>
+          </a>
+
+        </div>
+
+        <hr style={{ margin: "20px 0", opacity: 0.15 }} />
+
+        {/* BU RECHNER */}
+
+        <h4 style={{ marginBottom: 14 }}>
+          BU-Bedarfsrechner
+        </h4>
+
+        <div className="buCalculatorRow">
+
+          <div className="buInput">
+            <Input
+              label="Monatliches Netto-Einkommen (€)"
+              type="number"
+              value={buIncome}
+              onChange={(v) => setBuIncome(v)}
+            />
+          </div>
+
+          <div className="buResult">
+            <div className="buResultLabel">
+              Empfohlene BU-Rente (80%)
+            </div>
+
+            <div className="buResultValue">
+              {buIncome
+                ? `${Math.round(Number(buIncome) * 0.8)} €`
+                : "–"}
+            </div>
+          </div>
+
+        </div>
+
+        <p className="buDisclaimer">
+          Orientierung auf Basis der Faustformel (80 % des Nettoeinkommens).
+          Keine individuelle Bedarfsanalyse im Sinne des VVG.
+        </p>
+
+      </div>
+    </div>
+  );
+});
