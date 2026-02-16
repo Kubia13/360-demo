@@ -1827,21 +1827,31 @@ svg {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* horizontale Zentrierung */
   justify-content: center;
 
   text-align: center;
 
   margin-top: -6px;
-  /* weniger Luft */
   margin-bottom: 16px;
-  /* kompakter */
 
   font-weight: 500;
   letter-spacing: 0.2px;
+}
+
+/* Erste Zeile (z.B. „Optimierung sinnvoll“) */
+.scoreLabel p:first-child {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Zweite Zeile (Erklärungstext) */
+.scoreLabel p:nth-child(2) {
   color: #A99BFF;
+  font-size: 14px;
   opacity: 0.9;
 }
+
 
 .scoreLabel p {
   margin: 2px 0;

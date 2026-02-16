@@ -357,6 +357,7 @@ const QUESTIONS = {
     type: "yesno",
     condition: (baseData) =>
       baseData.tiere === "Hund" ||
+      baseData.tiere === "Katze" ||
       baseData.tiere === "Hund und Katze",
   },
 
@@ -693,6 +694,63 @@ export default function App() {
     });
   }, []);
 
+  /* ===== CLEANUP NICHT MEHR RELEVANTE ANTWORTEN ===== */
+
+  useEffect(() => {
+
+    setAnswers(prev => {
+      let updated = { ...prev };
+      let changed = false;
+
+      /* ===== KINDER ===== */
+
+      if (baseData.kinder !== "Ja") {
+        [
+          "kinder_unfall",
+          "kinder_vorsorge",
+          "kinder_krankenzusatz"
+        ].forEach(key => {
+          if (updated[key] !== undefined) {
+            delete updated[key];
+            changed = true;
+          }
+        });
+
+        Object.keys(updated).forEach(key => {
+          if (key.startsWith("kinder_krankenzusatz_")) {
+            delete updated[key];
+            changed = true;
+          }
+        });
+      }
+
+      /* ===== KFZ ===== */
+
+      if (baseData.kfz !== "Ja") {
+        ["kfz_haftpflicht", "kasko", "schutzbrief"].forEach(key => {
+          if (updated[key] !== undefined) {
+            delete updated[key];
+            changed = true;
+          }
+        });
+      }
+
+      /* ===== TIERE ===== */
+
+      if (!baseData.tiere || baseData.tiere === "Keine Tiere") {
+        ["tierhaft", "tier_op"].forEach(key => {
+          if (updated[key] !== undefined) {
+            delete updated[key];
+            changed = true;
+          }
+        });
+      }
+
+      return changed ? updated : prev;
+
+    });
+
+  }, [baseData.kinder, baseData.kfz, baseData.tiere]);
 
   /* ================= UI STATE ================= */
 
@@ -1089,23 +1147,26 @@ export default function App() {
 
     return categories.reduce((acc, cat) => {
 
-      const scores = Object.keys(QUESTIONS)
+      const relevantQuestions = Object.keys(QUESTIONS)
         .filter((id) => {
           const q = QUESTIONS[id];
           if (q.category !== cat) return false;
           if (q.condition && !q.condition(baseData)) return false;
+          if (answers[id] === undefined) return false;
           return true;
-        })
+        });
+
+      const scores = relevantQuestions
         .map((id) => getScore(id))
         .filter((score) => score !== null);
 
-      if (scores.length === 0) {
-        acc[cat] = 0;
+      // Weniger als 2 beantwortete Fragen → keine Bewertung
+      if (scores.length < 2) {
+        acc[cat] = null;
         return acc;
       }
 
       const sum = scores.reduce((total, s) => total + s, 0);
-
       acc[cat] = Math.round(sum / scores.length);
 
       return acc;
@@ -1119,10 +1180,26 @@ export default function App() {
 
   const totalScore = useMemo(() => {
 
+    const answeredRelevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
+
+      if (q.condition && !q.condition(baseData)) return false;
+      if (answers[id] === undefined) return false;
+
+      const score = getScore(id);
+      return score !== null;
+    });
+
+    // Mindestanzahl definieren (z.B. 3 relevante Antworten)
+    if (answeredRelevantQuestions.length < 6) {
+      return 0;
+    }
+
     const activeCategories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
 
       const hasRelevant = Object.keys(QUESTIONS).some((id) => {
         const q = QUESTIONS[id];
+
         if (q.category !== cat) return false;
         if (q.condition && !q.condition(baseData)) return false;
 
@@ -1145,17 +1222,155 @@ export default function App() {
       return sum + (categoryScores[cat] || 0) * CATEGORY_WEIGHTS[cat];
     }, 0);
 
-    return Math.round(weightedScore / totalWeight);
+    let finalScore = Math.round(weightedScore / totalWeight);
 
-  }, [categoryScores, baseData]);
+    /* ===== KOMFORT-DECKELUNG ===== */
 
+    // Kategorien mit eher "Komfort-/Optimierungscharakter"
+    const komfortKategorien = ["wohnen", "mobilitaet", "gesundheit"];
+
+    let komfortBoost = 0;
+
+    komfortKategorien.forEach((cat) => {
+      const score = categoryScores[cat];
+
+      if (score !== null && score !== undefined) {
+        komfortBoost += score * CATEGORY_WEIGHTS[cat];
+      }
+    });
+
+    // maximal 5 Punkte dürfen aus Komfort stammen
+    if (komfortBoost > 5) {
+      const reduzierung = komfortBoost - 5;
+      finalScore = Math.max(finalScore - reduzierung, 0);
+    }
+
+
+    /* ===== EXISTENZIELLE DECKELUNG ===== */
+
+    let kritisch = false;
+    let sehrKritisch = false;
+
+    const existenzScore = categoryScores["existenz"];
+
+    if (existenzScore !== null && existenzScore !== undefined) {
+      if (existenzScore < 25) sehrKritisch = true;
+      else if (existenzScore < 40) kritisch = true;
+    }
+
+    if (sehrKritisch) {
+      finalScore = Math.min(finalScore, 55);
+    } else if (kritisch) {
+      finalScore = Math.min(finalScore, 70);
+    }
+
+    /* ===== HAFTPFLICHT-MINIMUM ===== */
+
+    if (answers.haftpflicht === "nein") {
+      finalScore = Math.min(finalScore, 60);
+    }
+
+    /* ===== HARTE EXISTENZ-LOGIK ===== */
+
+    const hatBU =
+      answers.bu === "ja" ||
+      answers.du === "ja";
+
+    const hatRuecklagen =
+      answers.ruecklagen === "ja";
+
+    if (!hatBU && !hatRuecklagen) {
+      finalScore = Math.min(finalScore, 50);
+    }
+
+    /* ===== IMMOBILIEN-RISIKO LOGIK ===== */
+
+    const hatHaus = baseData.wohnen === "Eigentum Haus";
+
+    const hatFamilie =
+      baseData.beziehungsstatus === "Verheiratet" ||
+      baseData.kinder === "Ja";
+
+    const hatRisikoLV = answers.risiko_lv === "ja";
+
+    if (hatHaus && !hatRisikoLV) {
+
+      if (hatFamilie) {
+        finalScore = Math.min(finalScore, 65);
+      } else {
+        finalScore = Math.min(finalScore, 75);
+      }
+
+    }
+
+    /* ===== MEHRERE KINDER + KEINE RÜCKLAGEN ===== */
+
+    const kinderAnzahl = Number(baseData.kinderAnzahl) || 0;
+
+    if (kinderAnzahl >= 2 && !hatRuecklagen) {
+      finalScore = Math.min(finalScore, 60);
+    }
+
+    /* ===== HOHES EINKOMMEN + KEINE BU ===== */
+
+    const income = Number(baseData.gehalt);
+
+    if (income >= 4000 && !hatBU) {
+
+      if (hatFamilie) {
+        finalScore = Math.min(finalScore, 60);
+      } else {
+        finalScore = Math.min(finalScore, 65);
+      }
+
+      /* ===== NICHT-LINEARE PROGRESSION ===== */
+
+      if (finalScore > 80) {
+        finalScore = 80 + (finalScore - 80) * 0.5;
+      }
+
+      if (finalScore > 95) {
+        finalScore = 95 + (finalScore - 95) * 0.3;
+      }
+
+      finalScore = Math.round(finalScore);
+
+    }
+
+    return finalScore;
+
+
+  }, [categoryScores, baseData, answers]);
+
+  const hasValidScoreData = useMemo(() => {
+
+    const answeredRelevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
+
+      if (q.condition && !q.condition(baseData)) return false;
+      if (answers[id] === undefined) return false;
+
+      const score = getScore(id);
+      return score !== null;
+    });
+
+    return answeredRelevantQuestions.length >= 6;
+
+  }, [answers, baseData]);
 
   /* ===== SCORE ANIMATION ===== */
 
   useEffect(() => {
+
     if (step !== "dashboard") return;
 
-    let current = 0; // immer neu starten
+    // Wenn keine validen Daten existieren → keine Animation
+    if (!hasValidScoreData) {
+      setAnimatedScore(0);
+      return;
+    }
+
+    let current = 0;
     setAnimatedScore(0);
 
     const interval = setInterval(() => {
@@ -1170,7 +1385,9 @@ export default function App() {
     }, 8);
 
     return () => clearInterval(interval);
-  }, [totalScore, step]);
+
+  }, [totalScore, step, hasValidScoreData]);
+
 
   /* ===== OVERLAY SCROLL LOCK ===== */
 
@@ -1244,27 +1461,87 @@ export default function App() {
         const text = getStrategicRecommendation(id);
         if (!text) return false;
 
-        return true;
+        /* ===== HARTE EXISTENZ-SPERRE ===== */
 
+        const existenzScore = categoryScores["existenz"];
+
+        const komfortProdukte = [
+          "kasko",
+          "krankenzusatz",
+          "hausrat"
+        ];
+
+        if (
+          existenzScore !== null &&
+          existenzScore < 50 &&
+          komfortProdukte.includes(id)
+        ) {
+          return false;
+        }
+
+        return true;
       })
+
+
       .map((id) => {
 
         let dynamicPriority = PRIORITY_MAP[id] || 1;
+
         const score = getScore(id);
         const text = getStrategicRecommendation(id);
 
-        /* ================= SCORE-SCHWEREGRAD ================= */
-        // Große Lücke stärker gewichten
-        if (score <= 20) dynamicPriority += 2;
-        else if (score <= 40) dynamicPriority += 1;
+        if (score === null || score === undefined) return null;
+        if (!text) return null;
 
-        /* ================= EXISTENZ VOR KOMFORT ================= */
+        const existenzScore = categoryScores["existenz"];
+
+        const hatBU = answers.bu === "ja" || answers.du === "ja";
+        const hatRuecklagen = answers.ruecklagen === "ja";
+        const hatHaftpflicht = answers.haftpflicht === "ja";
+        const hatRisikoLV = answers.risiko_lv === "ja";
+
+        const hatHaus = baseData.wohnen === "Eigentum Haus";
+        const hatFamilie =
+          baseData.beziehungsstatus === "Verheiratet" ||
+          baseData.kinder === "Ja";
+
+        /* ================= SCORE-SCHWEREGRAD ================= */
+
+        if (score <= 20) {
+          dynamicPriority += 2;
+        } else if (score <= 40) {
+          dynamicPriority += 1;
+        }
+
+        /* ================= EXISTENZ VOR KOMFORT (dein Original) ================= */
 
         if (existenzProdukte.includes(id)) {
           dynamicPriority += 2;
         }
 
-        /* ================= FAMILIEN-BOOST ================= */
+        /* ================= HARTE EXISTENZ-LOGIK ================= */
+
+        if (!hatBU && !hatRuecklagen) {
+          if (["bu", "du", "ruecklagen"].includes(id)) {
+            dynamicPriority += 4;
+          }
+        }
+
+        /* ================= HAFTPFLICHT KRITISCH ================= */
+
+        if (!hatHaftpflicht && id === "haftpflicht") {
+          dynamicPriority += 4;
+        }
+
+        /* ================= EXISTENZ SCORE < 40 ================= */
+
+        if (existenzScore !== null && existenzScore < 40) {
+          if (["bu", "du", "ruecklagen", "risiko_lv"].includes(id)) {
+            dynamicPriority += 2;
+          }
+        }
+
+        /* ================= FAMILIEN-BOOST (dein Original) ================= */
 
         if (hatKinder || verheiratet) {
 
@@ -1277,16 +1554,20 @@ export default function App() {
           }
         }
 
-        /* ================= IMMOBILIEN-BOOST ================= */
+        /* ================= IMMOBILIEN-BOOST (verstärkt) ================= */
 
         if (hatHaus) {
 
           if (["gebaeude", "risiko_lv", "ruecklagen"].includes(id)) {
             dynamicPriority += 2;
           }
+
+          if (!hatRisikoLV && id === "risiko_lv") {
+            dynamicPriority += hatFamilie ? 3 : 2;
+          }
         }
 
-        /* ================= EINKOMMENS-HEBEL ================= */
+        /* ================= EINKOMMENS-HEBEL (dein Original) ================= */
 
         if (income >= 4000) {
 
@@ -1295,7 +1576,7 @@ export default function App() {
           }
         }
 
-        /* ================= ALTER-LOGIK ================= */
+        /* ================= ALTER-LOGIK (dein Original) ================= */
 
         if (age < 30) {
 
@@ -1312,7 +1593,6 @@ export default function App() {
         }
 
         /* ================= KOMFORT DECKEL ================= */
-        // Komfortprodukte können nie höher als Priorität 4 steigen
 
         if (komfortProdukte.includes(id)) {
           dynamicPriority = Math.min(dynamicPriority, 4);
@@ -1325,20 +1605,19 @@ export default function App() {
           score
         };
 
+      })
+      .filter(Boolean)
+      .sort((a, b) => {
+
+        if (b.priority !== a.priority) {
+          return b.priority - a.priority;
+        }
+
+        return a.score - b.score;
       });
-
-    allRecommendations.sort((a, b) => {
-
-      if (b.priority !== a.priority) {
-        return b.priority - a.priority;
-      }
-
-      return a.score - b.score;
-    });
-
     return allRecommendations.slice(0, 3);
 
-  }, [answers, baseData, step]);
+  }, [answers, baseData, step, categoryScores])
 
   /* ================= PRODUKTSEITE ================= */
 
@@ -3327,18 +3606,20 @@ export default function App() {
             return (
               <>
                 {/* WEICHER OUTER GLOW */}
-                <div
-                  className="ringGlow"
-                  style={{
-                    background: `radial-gradient(circle,
-  rgba(139,124,246,0) 0%,
-  rgba(139,124,246,${glowStrength * 0.35}) 40%,
-  rgba(139,124,246,${glowStrength * 0.7}) 60%,
-  rgba(139,124,246,${glowStrength * 0.35}) 75%,
-  rgba(139,124,246,${glowStrength * 0.1}) 88%,
-  transparent 100%)`
-                  }}
-                />
+                {hasValidScoreData && (
+                  <div
+                    className="ringGlow"
+                    style={{
+                      background: `radial-gradient(circle,
+        rgba(139,124,246,0) 0%,
+        rgba(139,124,246,${glowStrength * 0.35}) 40%,
+        rgba(139,124,246,${glowStrength * 0.7}) 60%,
+        rgba(139,124,246,${glowStrength * 0.35}) 75%,
+        rgba(139,124,246,${glowStrength * 0.1}) 88%,
+        transparent 100%)`
+                    }}
+                  />
+                )}
 
                 <svg width="260" height="260" viewBox="0 0 260 260">
 
@@ -3360,30 +3641,53 @@ export default function App() {
                   />
 
                   {/* Aktiver Ring */}
-                  <circle
-                    cx="130"
-                    cy="130"
-                    r="95"
-                    stroke="url(#scoreGrad)"
-                    strokeWidth="18"
-                    fill="none"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={dashOffset}
-                    strokeLinecap={normalizedScore === 100 ? "butt" : "round"}
-                    transform="rotate(-90 130 130)"
-                    style={{
-                      filter: `drop-shadow(0 0 10px rgba(139,124,246,${glowStrength}))`,
-                      transition: "0.9s ease"
-                    }}
-                  />
+                  {hasValidScoreData ? (
+                    <circle
+                      cx="130"
+                      cy="130"
+                      r="95"
+                      stroke="url(#scoreGrad)"
+                      strokeWidth="18"
+                      fill="none"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={dashOffset}
+                      strokeLinecap={normalizedScore === 100 ? "butt" : "round"}
+                      transform="rotate(-90 130 130)"
+                      style={{
+                        filter: `drop-shadow(0 0 10px rgba(139,124,246,${glowStrength}))`,
+                        transition: "0.9s ease"
+                      }}
+                    />
+                  ) : null}
 
                 </svg>
 
                 <div className="ringCenter">
-                  <div className="ringScore">{animatedScore}%</div>
-                  <div className="ringStatus">{statusLabel}</div>
+                  {hasValidScoreData ? (
+                    <>
+                      <div className="ringScore">{animatedScore}%</div>
+                      <div className="ringStatus">
+                        {animatedScore === 100
+                          ? "Sehr solide"
+                          : animatedScore >= 80
+                            ? "Sehr solide"
+                            : animatedScore >= 60
+                              ? "Gute Basis"
+                              : "Handlungsbedarf"}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="ringScore">–</div>
+                      <div
+                        className="ringStatus"
+                        style={{ color: "rgba(255,255,255,0.5)" }}
+                      >
+                        Beantworte weitere Fragen für dein Ergebnis
+                      </div>
+                    </>
+                  )}
                 </div>
-
               </>
             );
           })()}
