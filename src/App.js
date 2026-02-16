@@ -14,14 +14,15 @@ const CATEGORY_WEIGHTS = {
 };
 
 const CATEGORY_LABELS = {
-  existenz: "Existenz",
-  haftung: "Haftung",
-  gesundheit: "Gesundheit",
-  wohnen: "Wohnen",
+  existenz: "Existenzabsicherung",
+  haftung: "Haftungsrisiken",
+  gesundheit: "Gesundheitsabsicherung",
+  wohnen: "Wohnen & Eigentum",
   mobilitaet: "Mobilität",
-  vorsorge: "Vorsorge",
-  kinder: "Kinder",
+  vorsorge: "Altersvorsorge",
+  kinder: "Absicherung der Kinder"
 };
+
 
 /* ================= PRIORITY MAP ================= */
 
@@ -4190,6 +4191,7 @@ export default function App() {
             baseData={baseData}
             pdfData={pdfData}
             buIncome={buIncome}
+            answers={answers}
           />
         )}
 
@@ -4611,12 +4613,28 @@ function PdfOverlayComponent({
           }}
           onClick={() => {
             if (!isValid) return;
+
+            const autoBU =
+              buIncome
+                ? Math.round(Number(buIncome) * 0.8)
+                : baseData.gehalt
+                  ? Math.round(Number(baseData.gehalt) * 0.8)
+                  : "";
+
+            if (!pdfData.buEmpfehlung && autoBU) {
+              setPdfData(prev => ({
+                ...prev,
+                buEmpfehlung: autoBU
+              }));
+            }
+
             setPdfOverlay(false);
             setPdfPreview(true);
           }}
         >
           Vorschau anzeigen
         </button>
+
 
       </div>
     </div>
@@ -4632,7 +4650,8 @@ function PdfPreviewComponent({
   categoryScores,
   baseData,
   pdfData,
-  buIncome
+  buIncome,
+  answers
 }) {
 
   if (!pdfPreview) return null;
@@ -4645,6 +4664,31 @@ function PdfPreviewComponent({
         : baseData.gehalt
           ? Math.round(Number(baseData.gehalt) * 0.8)
           : "";
+  const groupedAnswers = Object.entries(answers || {}).reduce((acc, [key, value]) => {
+
+    if (
+      value === false ||
+      value === null ||
+      value === "" ||
+      value === undefined
+    ) return acc;
+
+    const parts = key.split("_");
+
+    const category = parts[0]; // Existenz / Haftung etc.
+    const label = parts.slice(1).join(" ");
+
+    if (!acc[category]) acc[category] = [];
+
+    acc[category].push({
+      label: label || key,
+      value
+    });
+
+    return acc;
+
+  }, {});
+
 
   return (
     <div
@@ -4710,11 +4754,48 @@ function PdfPreviewComponent({
               <p>Keine unmittelbaren Optimierungsfelder.</p>
             )}
 
-            {topRecommendations.map((item) => (
+            {topRecommendations.slice(0, 3).map((item, index) => (
               <div key={item.id} className="pdfRecommendation">
-                <strong>{item.text}</strong>
+                <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                  #{index + 1} Priorität
+                </div>
+                <div>{item.text}</div>
               </div>
             ))}
+
+          </div>
+
+          <hr style={{ margin: "30px 0" }} />
+
+          <div className="pdfSection">
+            <h3>Deine Angaben im Detail</h3>
+
+            {Object.keys(groupedAnswers)
+              .filter(category => groupedAnswers[category].length > 0)
+              .map((category) => (
+
+                <div key={category} style={{ marginBottom: 16 }}>
+
+                  <strong style={{ textTransform: "none" }}>
+                    {CATEGORY_LABELS[category] || category}
+                  </strong>
+
+
+                  {groupedAnswers[category].map((item, i) => (
+                    <div key={i} className="pdfCategoryRow">
+                      {item.label}:{" "}
+                      {item.value === true
+                        ? "✓"
+                        : item.value === "ja"
+                          ? "Ja"
+                          : item.value === "nein"
+                            ? "Nein"
+                            : item.value}
+                    </div>
+                  ))}
+
+                </div>
+              ))}
           </div>
 
           <hr style={{ margin: "30px 0" }} />

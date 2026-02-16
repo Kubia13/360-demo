@@ -1988,3 +1988,81 @@ svg {
   max-width: 560px;
   padding: 36px;
 }
+@media print {
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .pdfPreviewWrapper,
+  .pdfPreviewWrapper * {
+    visibility: visible !important;
+  }
+
+  .pdfPreviewWrapper {
+    position: absolute;
+    inset: 0;
+    background: white !important;
+    z-index: 99999;
+  }
+
+.pdfActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  justify-content: space-between;
+}
+
+.pdfActions button {
+  flex: 1;
+}
+.pdfActions .secondaryBtn {
+  background: rgba(0,0,0,0.05);
+  border: 1px solid #ccc;
+}
+
+}
+.pdfPreview {
+  background: #ffffff;
+  padding: 60px;
+  border-radius: 16px;
+  font-family: "Inter", sans-serif;
+  color: #111;
+  line-height: 1.7;
+}
+
+.pdfHeader h1 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.pdfScoreValue {
+  font-size: 64px;
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+.pdfSection {
+  margin-top: 40px;
+}
+
+.pdfSection h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #111;
+  padding-bottom: 6px;
+}
+
+.pdfCategoryRow {
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.pdfRecommendation {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  background: #f6f6f8;
+  border-radius: 10px;
+}
