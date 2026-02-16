@@ -1223,6 +1223,8 @@ export default function App() {
     }, 0);
 
     let finalScore = Math.round(weightedScore / totalWeight);
+    const existenzScore = categoryScores["existenz"];
+
 
     /* ===== KOMFORT-DECKELUNG ===== */
 
@@ -1239,19 +1241,22 @@ export default function App() {
       }
     });
 
-    // maximal 5 Punkte dürfen aus Komfort stammen
-    if (komfortBoost > 5) {
-      const reduzierung = komfortBoost - 5;
-      finalScore = Math.max(finalScore - reduzierung, 0);
-    }
+    /* ===== KOMFORT-DECKEL (HYBRID) ===== */
 
+    if (existenzScore !== null && existenzScore < 90) {
+
+      if (komfortBoost > 5) {
+        const reduzierung = Math.min(komfortBoost - 5, 3);
+        finalScore = Math.max(finalScore - reduzierung, 0);
+      }
+
+    }
 
     /* ===== EXISTENZIELLE DECKELUNG ===== */
 
     let kritisch = false;
     let sehrKritisch = false;
 
-    const existenzScore = categoryScores["existenz"];
 
     if (existenzScore !== null && existenzScore !== undefined) {
       if (existenzScore < 25) sehrKritisch = true;
@@ -1323,17 +1328,71 @@ export default function App() {
         finalScore = Math.min(finalScore, 65);
       }
 
-      /* ===== NICHT-LINEARE PROGRESSION ===== */
+      /* ===== NICHT-LINEARE PROGRESSION (HYBRID) ===== */
 
-      if (finalScore > 80) {
-        finalScore = 80 + (finalScore - 80) * 0.5;
+      if (finalScore > 90) {
+        finalScore = 90 + (finalScore - 90) * 0.7;
       }
 
-      if (finalScore > 95) {
-        finalScore = 95 + (finalScore - 95) * 0.3;
+      if (finalScore > 98) {
+        finalScore = 98 + (finalScore - 98) * 0.4;
       }
 
       finalScore = Math.round(finalScore);
+
+    }
+
+    /* ===== NICHT-LINEARE PROGRESSION (HYBRID FIX) ===== */
+
+    if (finalScore > 92) {
+      finalScore = 92 + (finalScore - 92) * 0.85;
+    }
+
+    if (finalScore > 99) {
+      finalScore = 99 + (finalScore - 99) * 0.6;
+    }
+
+    finalScore = Math.round(finalScore);
+
+
+    /* ===== 100%-REGEL (HYBRID) ===== */
+
+    if (finalScore >= 100) {
+
+      const haftungScore = categoryScores["haftung"];
+      const aktiveKategorien = Object.values(categoryScores)
+        .filter(v => v !== null).length;
+
+      const hatBU = answers.bu === "ja" || answers.du === "ja";
+      const hatRuecklagen = answers.ruecklagen === "ja";
+
+      const komplexeLebenslage =
+        baseData.beziehungsstatus === "Verheiratet" ||
+        baseData.kinder === "Ja" ||
+        baseData.wohnen === "Eigentum Haus";
+
+      if (komplexeLebenslage) {
+        if (
+          !existenzScore || existenzScore < 90 ||
+          !haftungScore || haftungScore < 85 ||
+          (!hatBU && !hatRuecklagen)
+        ) {
+          finalScore = 97;
+        }
+      } else {
+        if (!existenzScore || existenzScore < 85) {
+          finalScore = 97;
+        }
+      }
+
+      // Mindeststruktur: mindestens 3 aktive Kategorien
+      if (aktiveKategorien < 3) {
+        finalScore = 97;
+      }
+
+      console.log("Weighted:", weightedScore / totalWeight);
+      console.log("Final:", finalScore);
+      console.log("CategoryScores:", categoryScores);
 
     }
 
@@ -1354,9 +1413,18 @@ export default function App() {
       return score !== null;
     });
 
-    return answeredRelevantQuestions.length >= 6;
+    let minimumRequired = 5;
+
+    if (baseData.beziehungsstatus === "Verheiratet") minimumRequired++;
+    if (baseData.kinder === "Ja") minimumRequired++;
+    if (baseData.wohnen === "Eigentum Haus") minimumRequired++;
+    if (baseData.beruf === "Selbstständig") minimumRequired++;
+    if (Number(baseData.gehalt) > 4000) minimumRequired++;
+
+    return answeredRelevantQuestions.length >= minimumRequired;
 
   }, [answers, baseData]);
+
 
   /* ===== SCORE ANIMATION ===== */
 
@@ -3699,13 +3767,16 @@ export default function App() {
         <div className="scoreLabel" style={{ textAlign: "center" }}>
           <p>
             {animatedScore === 100
-              ? "Exzellent abgesichert"
-              : animatedScore >= 80
-                ? "Sehr gut abgesichert"
-                : animatedScore >= 60
-                  ? "Solide Basis"
-                  : "Optimierung sinnvoll"}
+              ? "Makellos strukturiert"
+              : animatedScore >= 95
+                ? "Nahezu optimal abgesichert"
+                : animatedScore >= 80
+                  ? "Sehr gut abgesichert"
+                  : animatedScore >= 60
+                    ? "Solide Basis"
+                    : "Optimierung sinnvoll"}
           </p>
+
 
           <p
             style={{
@@ -3765,8 +3836,11 @@ export default function App() {
                 ? "Hier sollten wir gezielt nachschärfen"
                 : animatedScore < 80
                   ? "Hier steckt noch Potenzial"
-                  : "Sehr gute Basis – jetzt geht es um Feinschliff"}
+                  : animatedScore < 95
+                    ? "Sehr gute Basis – jetzt geht es um Feinschliff"
+                    : "Exzellent aufgestellt – strategische Perfektionierung"}
             </h3>
+
 
             {topRecommendations.map((item) => {
 
