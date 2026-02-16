@@ -668,6 +668,7 @@ export default function App() {
   const [answers, setAnswers] = useState({});
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
+
   const [baseData, setBaseData] = useState({
     anrede: "",
     vorname: "",
@@ -778,6 +779,33 @@ export default function App() {
   }, [baseData.gehalt]);
 
 
+  /* ================= PDF DATA ================= */
+
+  const [pdfOverlay, setPdfOverlay] = useState(false);
+  const [pdfPreview, setPdfPreview] = useState(false); // ← DAS FEHLT
+
+  console.log("pdfPreview:", pdfPreview);
+
+  console.log({
+    legalOverlay,
+    contactOverlay,
+    showResetConfirm,
+    actionOverlay,
+    pdfOverlay,
+    calculatorOverlay,
+    pdfPreview
+  });
+  const [pdfData, setPdfData] = useState({
+    adresse: "",
+    plz: "",
+    ort: "",
+    email: "",
+    telefon: "",
+    handy: "",
+    rentenluecke: "",
+    ktgEmpfehlung: "",
+    buEmpfehlung: ""   // <-- NEU
+  });
 
   /* ================= BASE FORM REFS ================= */
 
@@ -898,10 +926,20 @@ export default function App() {
     setAnimatedScore(0);
     setExpandedCategory(null);
     setLegalOverlay(null);
+    setDisclaimerAccepted(false);
 
-    setDisclaimerAccepted(false); // <-- DAS HIER HINZUFÜGEN
+    // 🔥 DAS MUSS HIER REIN
+    setPdfData({
+      adresse: "",
+      plz: "",
+      ort: "",
+      email: "",
+      telefon: "",
+      handy: "",
+      rentenluecke: "",
+      ktgEmpfehlung: "",
+    });
   }
-
 
   /* ================= ANSWER ================= */
 
@@ -1425,6 +1463,26 @@ export default function App() {
 
   }, [answers, baseData]);
 
+  const isPdfValid = useMemo(() => {
+
+    const hatAdresse =
+      pdfData.adresse?.trim() &&
+      pdfData.plz?.trim() &&
+      pdfData.ort?.trim();
+
+    const hatEmail =
+      pdfData.email?.trim() &&
+      pdfData.email.includes("@");
+
+    const hatTelefon =
+      pdfData.telefon?.trim() ||
+      pdfData.handy?.trim();
+
+    return Boolean(hatAdresse && hatEmail && hatTelefon);
+
+  }, [pdfData]);
+
+
 
   /* ===== SCORE ANIMATION ===== */
 
@@ -1460,20 +1518,30 @@ export default function App() {
   /* ===== OVERLAY SCROLL LOCK ===== */
 
   useEffect(() => {
-    if (legalOverlay || contactOverlay || showResetConfirm || actionOverlay) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    const overlayOpen =
+      legalOverlay !== null ||
+      contactOverlay === true ||
+      showResetConfirm === true ||
+      actionOverlay !== null ||
+      pdfOverlay === true ||
+      calculatorOverlay === true ||
+      pdfPreview === true;
+
+    document.body.style.overflow = overlayOpen ? "hidden" : "auto";
 
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [legalOverlay, contactOverlay, showResetConfirm, actionOverlay]);
+  }, [
+    legalOverlay,
+    contactOverlay,
+    showResetConfirm,
+    actionOverlay,
+    pdfOverlay,
+    calculatorOverlay,
+    pdfPreview
+  ]);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [step]);
 
 
   /* ================= TOP 3 HANDLUNGSFELDER ================= */
@@ -4031,10 +4099,14 @@ export default function App() {
             </button>
 
             <button
-              className="secondaryMiniBtn disabled"
-              disabled
+              className="secondaryMiniBtn"
+              onClick={() => {
+                setShowResetConfirm(false);
+                setPdfPreview(false);
+                setPdfOverlay(true);
+              }}
             >
-              PDF-Auswertung herunterladen
+              PDF-Auswertung erstellen
             </button>
 
           </div>
@@ -4070,20 +4142,60 @@ export default function App() {
 
 
         <ContactButton
-          onReset={() => setShowResetConfirm(true)}
-          onContact={() => setContactOverlay(true)}
+          onReset={() => {
+            setContactOverlay(false);
+            setLegalOverlay(null);
+            setPdfOverlay(false);
+            setCalculatorOverlay(false);
+            setPdfPreview(false);
+            setActionOverlay(null);
+            setShowResetConfirm(true);
+          }}
+          onContact={() => {
+            setShowResetConfirm(false);
+            setLegalOverlay(null);
+            setPdfOverlay(false);
+            setCalculatorOverlay(false);
+            setPdfPreview(false);
+            setActionOverlay(null);
+            setContactOverlay(true);
+          }}
         />
 
-        <ResetOverlayComponent />
-        <ActionOverlayComponent />
-        <LegalOverlayComponent />
-        <ContactOverlayComponent />
         <CalculatorOverlayComponent
           calculatorOverlay={calculatorOverlay}
           setCalculatorOverlay={setCalculatorOverlay}
           buIncome={buIncome}
           setBuIncome={setBuIncome}
         />
+
+        <PdfOverlayComponent
+          pdfOverlay={pdfOverlay}
+          setPdfOverlay={setPdfOverlay}
+          pdfData={pdfData}
+          setPdfData={setPdfData}
+          isPdfValid={isPdfValid}
+          baseData={baseData}
+          buIncome={buIncome}
+          setPdfPreview={setPdfPreview}
+        />
+
+        {pdfPreview && (
+          <PdfPreviewComponent
+            pdfPreview={pdfPreview}
+            setPdfPreview={setPdfPreview}
+            totalScore={totalScore}
+            topRecommendations={topRecommendations}
+            categoryScores={categoryScores}
+            baseData={baseData}
+            pdfData={pdfData}
+            buIncome={buIncome}
+          />
+        )}
+
+        <ResetOverlayComponent />
+        <LegalOverlayComponent />
+        <ContactOverlayComponent />
 
       </div>
     );
@@ -4315,6 +4427,8 @@ const CalculatorOverlayComponent = React.memo(function CalculatorOverlayComponen
 
         <hr style={{ margin: "20px 0", opacity: 0.15 }} />
 
+
+
         {/* BU RECHNER */}
 
         <h4 style={{ marginBottom: 14 }}>
@@ -4355,3 +4469,302 @@ const CalculatorOverlayComponent = React.memo(function CalculatorOverlayComponen
     </div>
   );
 });
+
+/* ================= PDF OVERLAY COMPONENT ================= */
+
+function PdfOverlayComponent({
+  pdfOverlay,
+  setPdfOverlay,
+  pdfData,
+  setPdfData,
+  baseData,
+  buIncome,
+  setPdfPreview
+}) {
+
+  if (!pdfOverlay) return null;
+
+  const autoBU =
+    buIncome
+      ? Math.round(Number(buIncome) * 0.8)
+      : baseData.gehalt
+        ? Math.round(Number(baseData.gehalt) * 0.8)
+        : "";
+
+  const isValid =
+    pdfData.adresse.trim() !== "" &&
+    pdfData.email.trim() !== "" &&
+    (
+      pdfData.telefon.trim() !== "" ||
+      pdfData.handy.trim() !== ""
+    );
+
+  return (
+    <div
+      className="infoOverlay"
+      onClick={() => setPdfOverlay(false)}
+    >
+      <div
+        className="infoBox pdfBox"
+        onClick={(e) => e.stopPropagation()}
+      >
+
+        <button
+          className="overlayClose"
+          onClick={() => setPdfOverlay(false)}
+        >
+          ×
+        </button>
+
+        <h3 style={{ marginBottom: 20 }}>
+          PDF-Auswertung vorbereiten
+        </h3>
+
+        {/* Pflichtfelder */}
+
+        <Input
+          label="Straße & Hausnummer "
+          value={pdfData.adresse}
+          onChange={(v) =>
+            setPdfData({ ...pdfData, adresse: v })
+          }
+        />
+
+        <Input
+          label="PLZ"
+          value={pdfData.plz}
+          onChange={(v) =>
+            setPdfData({ ...pdfData, plz: v })
+          }
+        />
+
+        <Input
+          label="Ort"
+          value={pdfData.ort}
+          onChange={(v) =>
+            setPdfData({ ...pdfData, ort: v })
+          }
+        />
+
+        <Input
+          label="E-Mail *"
+          value={pdfData.email}
+          onChange={(v) =>
+            setPdfData({ ...pdfData, email: v })
+          }
+        />
+
+        <Input
+          label="Telefon"
+          value={pdfData.telefon}
+          onChange={(v) =>
+            setPdfData({ ...pdfData, telefon: v })
+          }
+        />
+
+        <Input
+          label="Handy"
+          value={pdfData.handy}
+          onChange={(v) =>
+            setPdfData({ ...pdfData, handy: v })
+          }
+        />
+
+        <hr style={{ margin: "20px 0", opacity: 0.2 }} />
+
+        {/* BU direkt übernommen */}
+
+        <Input
+          label="Empfohlene BU-Rente (€)"
+          value={
+            pdfData.buEmpfehlung !== ""
+              ? pdfData.buEmpfehlung
+              : autoBU
+          }
+          onChange={(v) =>
+            setPdfData({ ...pdfData, buEmpfehlung: v })
+          }
+        />
+
+        <Input
+          label="Rentenlücke"
+          value={pdfData.rentenluecke}
+          onChange={(v) =>
+            setPdfData({ ...pdfData, rentenluecke: v })
+          }
+        />
+
+        <Input
+          label="Empfohlenes Krankentagegeld"
+          value={pdfData.ktgEmpfehlung}
+          onChange={(v) =>
+            setPdfData({ ...pdfData, ktgEmpfehlung: v })
+          }
+        />
+
+        <button
+          className="primaryBtn big"
+          disabled={!isValid}
+          style={{
+            marginTop: 20,
+            opacity: isValid ? 1 : 0.5
+          }}
+          onClick={() => {
+            if (!isValid) return;
+            setPdfOverlay(false);
+            setPdfPreview(true);
+          }}
+        >
+          Vorschau anzeigen
+        </button>
+
+      </div>
+    </div>
+  );
+}
+/* ================= PDF PREVIEW COMPONENT ================= */
+
+function PdfPreviewComponent({
+  pdfPreview,
+  setPdfPreview,
+  totalScore,
+  topRecommendations,
+  categoryScores,
+  baseData,
+  pdfData,
+  buIncome
+}) {
+
+  if (!pdfPreview) return null;
+
+  const finalBU =
+    pdfData.buEmpfehlung !== ""
+      ? pdfData.buEmpfehlung
+      : buIncome
+        ? Math.round(Number(buIncome) * 0.8)
+        : baseData.gehalt
+          ? Math.round(Number(baseData.gehalt) * 0.8)
+          : "";
+
+  return (
+    <div
+      className="infoOverlay"
+      onClick={() => setPdfPreview(false)}
+    >
+      <div
+        className="pdfPreviewWrapper"
+        onClick={(e) => e.stopPropagation()}
+      >
+
+        <button
+          className="overlayClose"
+          onClick={() => setPdfPreview(false)}
+        >
+          ×
+        </button>
+
+        <div className="pdfPreview">
+
+          <div className="pdfHeader">
+            <h1>360° Absicherungsanalyse</h1>
+            <div className="pdfScoreValue">
+              {totalScore}%
+            </div>
+            <div className="pdfScoreLabel">
+              Gesamt-Absicherungsstatus
+            </div>
+          </div>
+
+          <hr style={{ margin: "30px 0" }} />
+
+          <div className="pdfSection">
+            <h3>Persönliche Angaben</h3>
+
+            <div className="pdfCategoryRow">
+              {baseData.vorname} {baseData.nachname}<br />
+              {pdfData.adresse}<br />
+              {pdfData.plz} {pdfData.ort}<br />
+              {pdfData.email}<br />
+              {pdfData.telefon || pdfData.handy}
+            </div>
+          </div>
+
+          <hr style={{ margin: "30px 0" }} />
+
+          <div className="pdfSection">
+            <h3>Kategorieübersicht</h3>
+
+            {Object.keys(categoryScores).map((cat) => (
+              <div key={cat} className="pdfCategoryRow">
+                {cat.toUpperCase()} – {categoryScores[cat] ?? 0}%
+              </div>
+            ))}
+          </div>
+
+          <hr style={{ margin: "30px 0" }} />
+
+          <div className="pdfSection">
+            <h3>Priorisierte Handlungsfelder</h3>
+
+            {topRecommendations.length === 0 && (
+              <p>Keine unmittelbaren Optimierungsfelder.</p>
+            )}
+
+            {topRecommendations.map((item) => (
+              <div key={item.id} className="pdfRecommendation">
+                <strong>{item.text}</strong>
+              </div>
+            ))}
+          </div>
+
+          <hr style={{ margin: "30px 0" }} />
+
+          <div className="pdfSection">
+            <h3>Ergänzende Werte</h3>
+
+            {finalBU && (
+              <div className="pdfCategoryRow">
+                Empfohlene BU-Rente: {finalBU} €
+              </div>
+            )}
+
+            {pdfData.rentenluecke && (
+              <div className="pdfCategoryRow">
+                Rentenlücke: {pdfData.rentenluecke}
+              </div>
+            )}
+
+            {pdfData.ktgEmpfehlung && (
+              <div className="pdfCategoryRow">
+                Empfohlenes Krankentagegeld: {pdfData.ktgEmpfehlung}
+              </div>
+            )}
+          </div>
+
+          <div className="pdfFooter">
+            Diese Analyse basiert auf deinen eigenen Angaben und stellt keine
+            individuelle Beratung im Sinne des VVG dar.
+          </div>
+
+        </div>
+
+        <div className="pdfActions">
+          <button
+            className="primaryBtn"
+            onClick={() => window.print()}
+          >
+            Drucken / Als PDF speichern
+          </button>
+
+          <button
+            className="secondaryBtn"
+            onClick={() => setPdfPreview(false)}
+          >
+            Schließen
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}

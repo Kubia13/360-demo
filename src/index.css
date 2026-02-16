@@ -421,37 +421,6 @@ body {
 }
 
 
-/* ================= CLOSE BUTTON ================= */
-
-.overlayClose {
-  width: 34px;
-  height: 34px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 10px;
-  border: 1px solid rgba(139, 124, 246, 0.4);
-
-  background: rgba(20, 30, 45, 0.6);
-  color: #ffffff;
-
-  font-size: 16px;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.overlayClose:hover {
-  background: rgba(139, 124, 246, 0.2);
-  transform: translateY(-1px);
-}
-
-.overlayClose:active {
-  transform: scale(0.95);
-}
 
 
 /* ================= SCROLLBAR CLEAN ================= */
@@ -498,26 +467,20 @@ body {
 
 .overlayBtn {
   flex: 1;
-
   height: 56px;
   min-height: 56px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 15px;
   font-weight: 600;
-
   border-radius: 18px;
   border: 1px solid transparent;
-
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-/* Primär (lila Verlauf) */
-
+/* PRIMARY */
 .overlayBtn.primary {
   background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
   color: white;
@@ -526,46 +489,25 @@ body {
 .overlayBtn.primary:hover {
   box-shadow: 0 0 18px rgba(139, 124, 246, 0.6);
   transform: translateY(-2px);
+  filter: brightness(1.1);
 }
 
-/* Sekundär (Glas Look) */
-
-.overlayBtn.secondary {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(139, 124, 246, 0.4);
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.overlayBtn.secondary:hover {
-  background: rgba(139, 124, 246, 0.15);
-  transform: translateY(-2px);
-}
-
-
-/* Ja */
-.overlayBtn.primary {
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-}
-
-/* Nein */
+/* SECONDARY */
 .overlayBtn.secondary {
   background: #1a2a36;
   color: white;
   border: 1px solid #5E4AE3;
 }
 
-.overlayBtn.primary:hover {
-  filter: brightness(1.1);
-}
-
 .overlayBtn.secondary:hover {
   background: #223445;
+  transform: translateY(-2px);
 }
 
 .overlayBtn:active {
   transform: scale(0.97);
 }
+
 
 
 /* ================= INLINE LINK ================= */
@@ -823,24 +765,6 @@ body::before {
     0 3px 10px rgba(0, 0, 0, 0.45);
 }
 
-
-/* ================= CATEGORY EXPAND ================= */
-
-.categoryDetails {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.35s ease, opacity 0.25s ease;
-  opacity: 0;
-  padding: 0 6px;
-}
-
-.categoryDetails.open {
-  max-height: 900px;
-  opacity: 1;
-  padding-top: 8px;
-}
-
-
 /* ================= EMPFEHLUNGS-KARTE ================= */
 
 .recommendationItem {
@@ -953,37 +877,6 @@ body::before {
   text-decoration: underline;
 }
 
-.productButton {
-  width: 130px;
-  height: 38px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 10px;
-  border: none;
-
-  font-weight: 600;
-  font-size: 14px;
-
-  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
-  color: white;
-  text-decoration: none;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.productButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 12px rgba(139, 124, 246, 0.5);
-}
-
-.productButton:active {
-  transform: scale(0.97);
-}
-
 .productRow {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -1063,7 +956,7 @@ body::before {
   max-height: 1000px;
   opacity: 1;
 
-  padding-top: 12px;
+  padding-top: 06px;
   /* ← DAS IST DER WICHTIGE TEIL */
 }
 
@@ -1163,51 +1056,6 @@ svg {
 /* Mehr visuelle Ruhe */
 .questionCard.dark {
   padding: 20px 20px 22px 20px;
-}
-
-
-/* ================= INFO ICON – CLEAN FINAL ================= */
-
-.floatingInfoSquare {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-
-  width: 30px;
-  height: 30px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 8px;
-
-  background: rgba(20, 30, 45, 0.6);
-  border: 1px solid rgba(139, 124, 246, 0.6);
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.infoIconSvg {
-  width: 25px;
-  /* 16px → +20% ≈ 19px */
-  height: 25px;
-
-  stroke: #8B7CF6;
-  stroke-width: 2.2;
-  /* nicht erhöhen! sonst wird es klobig */
-  fill: none;
-}
-
-
-.floatingInfoSquare:hover {
-  background: rgba(139, 124, 246, 0.15);
-  transform: translateY(-1px);
-}
-
-.floatingInfoSquare:active {
-  transform: scale(0.95);
 }
 
 
@@ -1634,11 +1482,6 @@ svg {
   gap: 8px;
 }
 
-/* Accordion weniger Luft */
-.categoryDetails.open {
-  padding-top: 6px;
-}
-
 /* Empfehlungskarte enger */
 .recommendationItem {
   padding: 10px 12px;
@@ -1738,6 +1581,10 @@ svg {
 .overlayClose:hover {
   color: #ffffff;
   transform: scale(1.1);
+}
+
+.overlayClose:active {
+  transform: scale(0.95);
 }
 
 /* ================= MOBILE FINAL COMPACT FIX ================= */
@@ -2055,10 +1902,89 @@ svg {
   border: none;         /* sicherstellen */
   background: none;     /* kein Hintergrund */
 }
+.contactFixed {
+  z-index: 99999 !important;
+  position: fixed;
+}
 
-.secondaryMiniBtn.disabled,
-.secondaryMiniBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
+/* ================= PDF FORM PREMIUM BOOST ================= */
+
+.pdfBox h3 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  margin-bottom: 28px;
+}
+
+/* Feld-Abstand größer */
+.pdfBox .field {
+  margin-bottom: 22px;
+}
+
+/* Labels größer + klarer */
+.pdfBox .field label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.75;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Inputs moderner */
+.pdfBox input {
+  height: 56px;
+  padding: 0 18px;
+
+  border-radius: 16px;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  border: 1px solid rgba(139,124,246,0.25);
+  background: rgba(15, 25, 40, 0.75);
+
+  transition: all 0.2s ease;
+}
+
+/* Fokus-Effekt */
+.pdfBox input:focus {
+  outline: none;
+  border-color: #8B7CF6;
+  box-shadow: 0 0 0 3px rgba(139,124,246,0.2);
+  background: rgba(15, 25, 40, 0.95);
+}
+
+/* BU Bereich optisch hervorheben */
+.pdfBox hr {
+  margin: 30px 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139,124,246,0.4),
+    transparent
+  );
+}
+
+/* Button hochwertiger */
+.pdfBox .primaryBtn.big {
+  height: 58px;
+  font-size: 17px;
+  letter-spacing: 0.3px;
+
+  border-radius: 18px;
+
+  box-shadow: 0 10px 30px rgba(94,74,227,0.35);
+}
+
+.pdfBox .primaryBtn.big:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(94,74,227,0.45);
+}
+
+/* Overlay selbst etwas eleganter */
+.pdfBox {
+  max-width: 560px;
+  padding: 36px;
 }
