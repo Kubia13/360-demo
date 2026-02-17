@@ -800,6 +800,7 @@ export default function App() {
     adresse: "",
     plz: "",
     ort: "",
+    geburtsdatum: "",
     email: "",
     telefon: "",
     handy: "",
@@ -934,6 +935,7 @@ export default function App() {
       adresse: "",
       plz: "",
       ort: "",
+      geburtsdatum: "",
       email: "",
       telefon: "",
       handy: "",
@@ -1471,6 +1473,9 @@ export default function App() {
       pdfData.plz?.trim() &&
       pdfData.ort?.trim();
 
+    const hatGeburtsdatum =
+      pdfData.geburtsdatum?.trim();
+
     const hatEmail =
       pdfData.email?.trim() &&
       pdfData.email.includes("@");
@@ -1479,7 +1484,12 @@ export default function App() {
       pdfData.telefon?.trim() ||
       pdfData.handy?.trim();
 
-    return Boolean(hatAdresse && hatEmail && hatTelefon);
+    return Boolean(
+      hatAdresse &&
+      hatGeburtsdatum &&
+      hatEmail &&
+      hatTelefon
+    );
 
   }, [pdfData]);
 
@@ -4539,12 +4549,20 @@ function PdfOverlayComponent({
             setPdfData({ ...pdfData, plz: v })
           }
         />
-
-        <Input
+  <Input
           label="Ort"
           value={pdfData.ort}
           onChange={(v) =>
             setPdfData({ ...pdfData, ort: v })
+          }
+        />
+
+        <Input
+          label="Geburtsdatum *"
+          type="date"
+          value={pdfData.geburtsdatum || ""}
+          onChange={(v) =>
+            setPdfData({ ...pdfData, geburtsdatum: v })
           }
         />
 
@@ -4738,10 +4756,12 @@ function PdfPreviewComponent({
 
 
   /* ================= DOKUMENT-INHALT ================= */
+
   const pdfDocument = (
     <div className="printArea">
       <div className="pdfPreview">
 
+        {/* ================= HEADER ================= */}
         <div className="pdfHeader">
           <h1>360° Absicherungsanalyse</h1>
           <div className="pdfScoreValue">
@@ -4754,22 +4774,100 @@ function PdfPreviewComponent({
 
         <hr style={{ margin: "30px 0" }} />
 
+        {/* ================= PERSÖNLICHE ANGABEN ================= */}
+
         <div className="pdfSection">
           <h3>Persönliche Angaben</h3>
+
           <div className="pdfCategoryRow">
-            {stableData.baseData.vorname} {stableData.baseData.nachname}<br />
-            {stableData.pdfData.adresse}<br />
-            {stableData.pdfData.plz} {stableData.pdfData.ort}<br />
-            {stableData.pdfData.email}<br />
-            {stableData.pdfData.telefon || stableData.pdfData.handy}
+            <strong>Anrede:</strong> {stableData.baseData?.anrede || "-"}
           </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Vorname:</strong> {stableData.baseData?.vorname || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Nachname:</strong> {stableData.baseData?.nachname || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Familienstand:</strong> {stableData.baseData?.beziehungsstatus || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Alter:</strong> {stableData.baseData?.alter || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Berufliche Situation:</strong> {stableData.baseData?.beruf || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Krankenversicherung:</strong> {stableData.baseData?.krankenversicherung || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Monatliches Netto-Gehalt:</strong> {stableData.baseData?.gehalt || "-"} €
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Kinder vorhanden:</strong> {stableData.baseData?.kinder || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Kinder krankenversichert:</strong> {stableData.baseData?.kinderKrankenversicherung || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Anzahl Kinder:</strong> {stableData.baseData?.kinderAnzahl || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Haustiere:</strong> {stableData.baseData?.tiere || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Wohnsituation:</strong> {stableData.baseData?.wohnen || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Fahrzeug vorhanden:</strong> {stableData.baseData?.kfz || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Anzahl Fahrzeuge:</strong> {stableData.baseData?.kfzAnzahl || "-"}
+          </div>
+
+          <hr style={{ margin: "20px 0" }} />
+
+          {/* ================= ADRESSE & KONTAKT ================= */}
+
+          <div className="pdfCategoryRow">
+            <strong>Adresse:</strong> {stableData.pdfData?.adresse || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>PLZ / Ort:</strong> {stableData.pdfData?.plz || "-"} {stableData.pdfData?.ort || ""}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>E-Mail:</strong> {stableData.pdfData?.email || "-"}
+          </div>
+
+          <div className="pdfCategoryRow">
+            <strong>Telefon:</strong> {stableData.pdfData?.telefon || stableData.pdfData?.handy || "-"}
+          </div>
+
         </div>
 
         <hr style={{ margin: "30px 0" }} />
 
+        {/* ================= KATEGORIEÜBERSICHT ================= */}
+
         <div className="pdfSection">
           <h3>Kategorieübersicht</h3>
-          {Object.keys(stableData.categoryScores).map((cat) => (
+          {Object.keys(stableData.categoryScores || {}).map((cat) => (
             <div key={cat} className="pdfCategoryRow">
               {CATEGORY_LABELS[cat] || cat} – {stableData.categoryScores[cat] ?? 0}%
             </div>
@@ -4778,14 +4876,16 @@ function PdfPreviewComponent({
 
         <hr style={{ margin: "30px 0" }} />
 
+        {/* ================= HANDLUNGSFELDER ================= */}
+
         <div className="pdfSection">
           <h3>Priorisierte Handlungsfelder</h3>
 
-          {stableData.topRecommendations.length === 0 && (
+          {stableData.topRecommendations?.length === 0 && (
             <p>Keine unmittelbaren Optimierungsfelder.</p>
           )}
 
-          {stableData.topRecommendations.slice(0, 3).map((item, index) => (
+          {stableData.topRecommendations?.slice(0, 3).map((item, index) => (
             <div key={item.id} className="pdfRecommendation">
               <div style={{ fontWeight: 600, marginBottom: 4 }}>
                 #{index + 1} Priorität
@@ -4793,18 +4893,18 @@ function PdfPreviewComponent({
               <div>{item.text}</div>
             </div>
           ))}
-
         </div>
 
         <hr style={{ margin: "30px 0" }} />
 
+        {/* ================= DETAILS ================= */}
+
         <div className="pdfSection">
           <h3>Deine Angaben im Detail</h3>
 
-          {Object.keys(groupedAnswers)
+          {Object.keys(groupedAnswers || {})
             .filter(category => groupedAnswers[category].length > 0)
             .map((category) => (
-
               <div key={category} style={{ marginBottom: 16 }}>
                 <strong>
                   {CATEGORY_LABELS[category] || category}
@@ -4822,31 +4922,32 @@ function PdfPreviewComponent({
                           : item.value}
                   </div>
                 ))}
-
               </div>
             ))}
         </div>
 
         <hr style={{ margin: "30px 0" }} />
 
+        {/* ================= ERGÄNZENDE WERTE ================= */}
+
         <div className="pdfSection">
           <h3>Ergänzende Werte</h3>
 
           {finalBU && (
             <div className="pdfCategoryRow">
-              Empfohlene BU-Rente: {finalBU} €
+              <strong>Empfohlene BU-Rente:</strong> {finalBU} €
             </div>
           )}
 
-          {stableData.pdfData.rentenluecke && (
+          {stableData.pdfData?.rentenluecke && (
             <div className="pdfCategoryRow">
-              Rentenlücke: {stableData.pdfData.rentenluecke}
+              <strong>Rentenlücke:</strong> {stableData.pdfData.rentenluecke}
             </div>
           )}
 
-          {stableData.pdfData.ktgEmpfehlung && (
+          {stableData.pdfData?.ktgEmpfehlung && (
             <div className="pdfCategoryRow">
-              Empfohlenes Krankentagegeld: {stableData.pdfData.ktgEmpfehlung}
+              <strong>Krankentagegeld:</strong> {stableData.pdfData.ktgEmpfehlung}
             </div>
           )}
         </div>
