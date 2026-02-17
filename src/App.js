@@ -1526,6 +1526,18 @@ export default function App() {
   }, [totalScore, step, hasValidScoreData]);
 
 
+
+  /* ===== CATEGORY SCROLL FIX – STABIL (OHNE SMOOTH) ===== */
+
+  useEffect(() => {
+
+    if (step !== "category") return;
+
+    // Sofortiger Scroll ohne Animation
+    window.scrollTo(0, 0);
+
+  }, [currentCategoryIndex, step]);
+
   /* ===== OVERLAY SCROLL LOCK ===== */
 
   useEffect(() => {
@@ -1773,7 +1785,7 @@ export default function App() {
       <div className="screen">
         <Header
           goBase={goToBaseWithoutReset}
-          back={() => setStep("category")}
+          back={() => setStep("dashboard")}
         />
 
 
@@ -3583,20 +3595,26 @@ export default function App() {
           );
         })}
 
-        <button
-          className="primaryBtn"
-          onClick={() => {
-            if (currentCategoryIndex < categories.length - 1) {
-              setCurrentCategoryIndex((prev) => prev + 1);
-            } else {
-              setStep("dashboard");
-            }
-          }}
-        >
-          {currentCategoryIndex < categories.length - 1
-            ? "Weiter"
-            : "Auswertung"}
-        </button>
+{/* ===== NAVIGATION BUTTON ===== */}
+
+<button
+  type="button"
+  className="primaryBtn big"
+  onClick={() => {
+    if (currentCategoryIndex < categories.length - 1) {
+      setCurrentCategoryIndex((prev) => prev + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      setStep("dashboard");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }}
+>
+  {currentCategoryIndex < categories.length - 1
+    ? "Weiter"
+    : "Auswertung"}
+</button>
+
 
         {showInfo && (
           <div
@@ -4549,7 +4567,7 @@ function PdfOverlayComponent({
             setPdfData({ ...pdfData, plz: v })
           }
         />
-  <Input
+        <Input
           label="Ort"
           value={pdfData.ort}
           onChange={(v) =>
@@ -4695,14 +4713,20 @@ function PdfPreviewComponent({
     answers
   ]);
 
-  const finalBU =
-    stableData.pdfData.buEmpfehlung !== ""
-      ? stableData.pdfData.buEmpfehlung
-      : stableData.buIncome
-        ? Math.round(Number(stableData.buIncome) * 0.8)
-        : stableData.baseData.gehalt
-          ? Math.round(Number(stableData.baseData.gehalt) * 0.8)
-          : "";
+  const finalBU = React.useMemo(() => {
+    if (stableData.pdfData?.buEmpfehlung) {
+      return stableData.pdfData.buEmpfehlung;
+    }
+
+    const income =
+      stableData.buIncome ||
+      stableData.baseData?.gehalt;
+
+    if (!income) return "";
+
+    return Math.round(Number(income) * 0.8);
+  }, [stableData]);
+
 
   const groupedAnswers = Object.entries(stableData.answers || {}).reduce((acc, [key, value]) => {
 
@@ -4744,13 +4768,71 @@ function PdfPreviewComponent({
 
 
   const handlePrint = () => {
-    const originalTitle = document.title;
-    document.title = "360° Absicherungsanalyse";
 
-    window.print();
+    const printContent = document.querySelector(".printArea").innerHTML;
+
+    const printWindow = window.open("", "_blank");
+
+    printWindow.document.write(`
+    <html>
+      <head>
+        <title>360° Absicherungsanalyse</title>
+        <style>
+
+          body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #000;
+          }
+
+          h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+          }
+
+          h3 {
+            margin-top: 30px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 4px;
+          }
+
+          .pdfSection {
+            margin-bottom: 20px;
+          }
+
+          .pdfCategoryRow {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+          }
+
+          .pdfRecommendation {
+            margin-bottom: 8px;
+            padding-left: 10px;
+            border-left: 3px solid #000;
+          }
+
+          .pdfFooter {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #555;
+          }
+
+        </style>
+      </head>
+      <body>
+        ${printContent}
+      </body>
+    </html>
+  `);
+
+    printWindow.document.close();
+    printWindow.focus();
 
     setTimeout(() => {
-      document.title = originalTitle;
+      printWindow.print();
+      printWindow.close();
     }, 500);
   };
 
@@ -4941,13 +5023,13 @@ function PdfPreviewComponent({
 
           {stableData.pdfData?.rentenluecke && (
             <div className="pdfCategoryRow">
-              <strong>Rentenlücke:</strong> {stableData.pdfData.rentenluecke}
+              <strong>Rentenlücke:</strong> {stableData.pdfData.rentenluecke} €
             </div>
           )}
 
           {stableData.pdfData?.ktgEmpfehlung && (
             <div className="pdfCategoryRow">
-              <strong>Krankentagegeld:</strong> {stableData.pdfData.ktgEmpfehlung}
+              <strong>Krankentagegeld:</strong> {stableData.pdfData.ktgEmpfehlung} €
             </div>
           )}
         </div>
