@@ -2074,3 +2074,61 @@ svg {
   display: flex;
   flex-direction: column;
 }
+/* ================= PDF LAYOUT PREMIUM ================= */
+
+.pdfPreview {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+/* Abschnitt */
+.pdfSection {
+  margin-bottom: 36px;
+}
+
+/* Titel */
+.pdfSection h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ccc;
+  letter-spacing: 0.3px;
+}
+
+/* Zeile */
+.pdfCategoryRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 4px 0;
+}
+
+/* Label */
+.pdfCategoryRow strong {
+  font-weight: 600;
+  color: #ffffff;
+  min-width: 200px;
+}
+
+/* Wert */
+.pdfCategoryRow span {
+  text-align: right;
+  flex: 1;
+}
+
+/* Empfehlungen */
+.pdfRecommendation {
+  margin-bottom: 14px;
+  padding-left: 12px;
+  border-left: 3px solid #8B7CF6;
+}
+
+/* Footer */
+.pdfFooter {
+  margin-top: 40px;
+  font-size: 12px;
+  color: #a7a7a7;
+}
