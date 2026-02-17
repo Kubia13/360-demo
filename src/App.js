@@ -4640,6 +4640,7 @@ function PdfOverlayComponent({
     </div>
   );
 }
+
 /* ================= PDF PREVIEW COMPONENT ================= */
 
 function PdfPreviewComponent({
@@ -4656,15 +4657,36 @@ function PdfPreviewComponent({
 
   if (!pdfPreview) return null;
 
+  /* ================= DATEN EINFRIEREN ================= */
+
+  const stableData = React.useMemo(() => ({
+    totalScore,
+    topRecommendations,
+    categoryScores,
+    baseData,
+    pdfData,
+    buIncome,
+    answers
+  }), [
+    totalScore,
+    topRecommendations,
+    categoryScores,
+    baseData,
+    pdfData,
+    buIncome,
+    answers
+  ]);
+
   const finalBU =
-    pdfData.buEmpfehlung !== ""
-      ? pdfData.buEmpfehlung
-      : buIncome
-        ? Math.round(Number(buIncome) * 0.8)
-        : baseData.gehalt
-          ? Math.round(Number(baseData.gehalt) * 0.8)
+    stableData.pdfData.buEmpfehlung !== ""
+      ? stableData.pdfData.buEmpfehlung
+      : stableData.buIncome
+        ? Math.round(Number(stableData.buIncome) * 0.8)
+        : stableData.baseData.gehalt
+          ? Math.round(Number(stableData.baseData.gehalt) * 0.8)
           : "";
-  const groupedAnswers = Object.entries(answers || {}).reduce((acc, [key, value]) => {
+
+  const groupedAnswers = Object.entries(stableData.answers || {}).reduce((acc, [key, value]) => {
 
     if (
       value === false ||
@@ -4673,15 +4695,28 @@ function PdfPreviewComponent({
       value === undefined
     ) return acc;
 
-    const parts = key.split("_");
+    let question = QUESTIONS[key];
+    let category = null;
+    let label = null;
 
-    const category = parts[0]; // Existenz / Haftung etc.
-    const label = parts.slice(1).join(" ");
+    if (question) {
+      category = question.category;
+      label = question.label;
+    } else {
+      // Suboptionen erkennen (z.B. rechtsschutz_Privat)
+      const mainKey = key.split("_")[0];
+      const mainQuestion = QUESTIONS[mainKey];
+
+      if (!mainQuestion) return acc;
+
+      category = mainQuestion.category;
+      label = key.replace(mainKey + "_", mainQuestion.label + " – ");
+    }
 
     if (!acc[category]) acc[category] = [];
 
     acc[category].push({
-      label: label || key,
+      label,
       value
     });
 
@@ -4689,6 +4724,141 @@ function PdfPreviewComponent({
 
   }, {});
 
+
+  const handlePrint = () => {
+    const originalTitle = document.title;
+    document.title = "360° Absicherungsanalyse";
+
+    window.print();
+
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 500);
+  };
+
+
+  /* ================= DOKUMENT-INHALT ================= */
+  const pdfDocument = (
+    <div className="printArea">
+      <div className="pdfPreview">
+
+        <div className="pdfHeader">
+          <h1>360° Absicherungsanalyse</h1>
+          <div className="pdfScoreValue">
+            {stableData.totalScore}%
+          </div>
+          <div className="pdfScoreLabel">
+            Gesamt-Absicherungsstatus
+          </div>
+        </div>
+
+        <hr style={{ margin: "30px 0" }} />
+
+        <div className="pdfSection">
+          <h3>Persönliche Angaben</h3>
+          <div className="pdfCategoryRow">
+            {stableData.baseData.vorname} {stableData.baseData.nachname}<br />
+            {stableData.pdfData.adresse}<br />
+            {stableData.pdfData.plz} {stableData.pdfData.ort}<br />
+            {stableData.pdfData.email}<br />
+            {stableData.pdfData.telefon || stableData.pdfData.handy}
+          </div>
+        </div>
+
+        <hr style={{ margin: "30px 0" }} />
+
+        <div className="pdfSection">
+          <h3>Kategorieübersicht</h3>
+          {Object.keys(stableData.categoryScores).map((cat) => (
+            <div key={cat} className="pdfCategoryRow">
+              {CATEGORY_LABELS[cat] || cat} – {stableData.categoryScores[cat] ?? 0}%
+            </div>
+          ))}
+        </div>
+
+        <hr style={{ margin: "30px 0" }} />
+
+        <div className="pdfSection">
+          <h3>Priorisierte Handlungsfelder</h3>
+
+          {stableData.topRecommendations.length === 0 && (
+            <p>Keine unmittelbaren Optimierungsfelder.</p>
+          )}
+
+          {stableData.topRecommendations.slice(0, 3).map((item, index) => (
+            <div key={item.id} className="pdfRecommendation">
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                #{index + 1} Priorität
+              </div>
+              <div>{item.text}</div>
+            </div>
+          ))}
+
+        </div>
+
+        <hr style={{ margin: "30px 0" }} />
+
+        <div className="pdfSection">
+          <h3>Deine Angaben im Detail</h3>
+
+          {Object.keys(groupedAnswers)
+            .filter(category => groupedAnswers[category].length > 0)
+            .map((category) => (
+
+              <div key={category} style={{ marginBottom: 16 }}>
+                <strong>
+                  {CATEGORY_LABELS[category] || category}
+                </strong>
+
+                {groupedAnswers[category].map((item, i) => (
+                  <div key={i} className="pdfCategoryRow">
+                    {item.label}:{" "}
+                    {item.value === true
+                      ? "✓"
+                      : item.value === "ja"
+                        ? "Ja"
+                        : item.value === "nein"
+                          ? "Nein"
+                          : item.value}
+                  </div>
+                ))}
+
+              </div>
+            ))}
+        </div>
+
+        <hr style={{ margin: "30px 0" }} />
+
+        <div className="pdfSection">
+          <h3>Ergänzende Werte</h3>
+
+          {finalBU && (
+            <div className="pdfCategoryRow">
+              Empfohlene BU-Rente: {finalBU} €
+            </div>
+          )}
+
+          {stableData.pdfData.rentenluecke && (
+            <div className="pdfCategoryRow">
+              Rentenlücke: {stableData.pdfData.rentenluecke}
+            </div>
+          )}
+
+          {stableData.pdfData.ktgEmpfehlung && (
+            <div className="pdfCategoryRow">
+              Empfohlenes Krankentagegeld: {stableData.pdfData.ktgEmpfehlung}
+            </div>
+          )}
+        </div>
+
+        <div className="pdfFooter">
+          Diese Analyse basiert auf deinen eigenen Angaben und stellt keine
+          individuelle Beratung im Sinne des VVG dar.
+        </div>
+
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -4707,132 +4877,12 @@ function PdfPreviewComponent({
           ×
         </button>
 
-        <div className="pdfPreview">
-
-          <div className="pdfHeader">
-            <h1>360° Absicherungsanalyse</h1>
-            <div className="pdfScoreValue">
-              {totalScore}%
-            </div>
-            <div className="pdfScoreLabel">
-              Gesamt-Absicherungsstatus
-            </div>
-          </div>
-
-          <hr style={{ margin: "30px 0" }} />
-
-          <div className="pdfSection">
-            <h3>Persönliche Angaben</h3>
-
-            <div className="pdfCategoryRow">
-              {baseData.vorname} {baseData.nachname}<br />
-              {pdfData.adresse}<br />
-              {pdfData.plz} {pdfData.ort}<br />
-              {pdfData.email}<br />
-              {pdfData.telefon || pdfData.handy}
-            </div>
-          </div>
-
-          <hr style={{ margin: "30px 0" }} />
-
-          <div className="pdfSection">
-            <h3>Kategorieübersicht</h3>
-
-            {Object.keys(categoryScores).map((cat) => (
-              <div key={cat} className="pdfCategoryRow">
-                {cat.toUpperCase()} – {categoryScores[cat] ?? 0}%
-              </div>
-            ))}
-          </div>
-
-          <hr style={{ margin: "30px 0" }} />
-
-          <div className="pdfSection">
-            <h3>Priorisierte Handlungsfelder</h3>
-
-            {topRecommendations.length === 0 && (
-              <p>Keine unmittelbaren Optimierungsfelder.</p>
-            )}
-
-            {topRecommendations.slice(0, 3).map((item, index) => (
-              <div key={item.id} className="pdfRecommendation">
-                <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                  #{index + 1} Priorität
-                </div>
-                <div>{item.text}</div>
-              </div>
-            ))}
-
-          </div>
-
-          <hr style={{ margin: "30px 0" }} />
-
-          <div className="pdfSection">
-            <h3>Deine Angaben im Detail</h3>
-
-            {Object.keys(groupedAnswers)
-              .filter(category => groupedAnswers[category].length > 0)
-              .map((category) => (
-
-                <div key={category} style={{ marginBottom: 16 }}>
-
-                  <strong style={{ textTransform: "none" }}>
-                    {CATEGORY_LABELS[category] || category}
-                  </strong>
-
-
-                  {groupedAnswers[category].map((item, i) => (
-                    <div key={i} className="pdfCategoryRow">
-                      {item.label}:{" "}
-                      {item.value === true
-                        ? "✓"
-                        : item.value === "ja"
-                          ? "Ja"
-                          : item.value === "nein"
-                            ? "Nein"
-                            : item.value}
-                    </div>
-                  ))}
-
-                </div>
-              ))}
-          </div>
-
-          <hr style={{ margin: "30px 0" }} />
-
-          <div className="pdfSection">
-            <h3>Ergänzende Werte</h3>
-
-            {finalBU && (
-              <div className="pdfCategoryRow">
-                Empfohlene BU-Rente: {finalBU} €
-              </div>
-            )}
-
-            {pdfData.rentenluecke && (
-              <div className="pdfCategoryRow">
-                Rentenlücke: {pdfData.rentenluecke}
-              </div>
-            )}
-
-            {pdfData.ktgEmpfehlung && (
-              <div className="pdfCategoryRow">
-                Empfohlenes Krankentagegeld: {pdfData.ktgEmpfehlung}
-              </div>
-            )}
-          </div>
-
-          <div className="pdfFooter">
-            Diese Analyse basiert auf deinen eigenen Angaben und stellt keine
-            individuelle Beratung im Sinne des VVG dar.
-          </div>
-
-        </div>
+        {pdfDocument}
 
         <div className="pdfActions">
           <button
             className="primaryBtn"
-            onClick={() => window.print()}
+            onClick={handlePrint}
           >
             Drucken / Als PDF speichern
           </button>
