@@ -299,19 +299,34 @@ body {
 
 /* ================= FIXED CONTACT AREA ================= */
 
+/* ================= FINAL CONTACT FIX – CRISP ================= */
+
 .contactFixed {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: #071018;
+
+  background: #071018;   /* KEIN rgba */
   padding: 14px;
 
   display: flex;
   align-items: stretch;
   justify-content: center;
   gap: 10px;
+
+  border-top: 1px solid rgba(139,124,246,0.15);
+
+  box-shadow: 0 -6px 18px rgba(0,0,0,0.55);
+
+  z-index: 1000;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  transform: translateZ(0);
 }
+
 
 /* Basis Button */
 .contactBtn {
@@ -367,47 +382,47 @@ body {
 
 
 /* ================= OVERLAY FIX – NO CLIPPING ================= */
-
 .infoOverlay {
   position: fixed;
   inset: 0;
 
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.75); /* KEIN blur */
 
   display: flex;
   justify-content: center;
-  align-items: flex-start;   /* WICHTIG */
+  align-items: flex-start;
 
-  padding: 60px 20px;        /* oben Luft geben */
+  padding: 60px 20px;
 
   overflow-y: auto;
   z-index: 1000;
 }
 
 
-/* ================= OVERLAY BOX ================= */
+/* ================= OVERLAY FINAL CRISP FIX ================= */
 
 .infoBox,
 .legalBox,
 .contactBox {
   position: relative;
-  /* ← DAS IST DER WICHTIGE TEIL */
 
   width: 100%;
   max-width: 600px;
-
   max-height: 85vh;
   overflow-y: auto;
 
   padding: 28px;
   border-radius: 18px;
 
-  background: rgba(20, 28, 36, 0.97);
-  border: 1px solid rgba(139, 124, 246, 0.25);
+  background: #141c24; /* KEIN rgba */
+  border: 1px solid rgba(139,124,246,0.25);
 
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  transform: translateZ(0);
 }
 
 
@@ -730,29 +745,34 @@ body::before {
 
 /* ================= UI UPGRADE 5 – PREMIUM FOOTER ================= */
 
+/* ================= FINAL CONTACT FIX – CRISP ================= */
+
 .contactFixed {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
 
-  border-top: 1px solid rgba(139, 124, 246, 0.12);
+  background: #071018;   /* KEIN rgba */
+  padding: 14px;
 
-  box-shadow:
-    0 -6px 22px rgba(0, 0, 0, 0.55),
-    0 -1px 0 rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+
+  border-top: 1px solid rgba(139,124,246,0.15);
+
+  box-shadow: 0 -6px 18px rgba(0,0,0,0.55);
+
+  z-index: 1000;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  transform: translateZ(0);
 }
 
-.contactFixed::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 15%;
-  width: 70%;
-  height: 1px;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(139, 124, 246, 0.35),
-      transparent);
-}
 
 .contactBtn {
   box-shadow:
@@ -1901,10 +1921,34 @@ svg {
   border: none;         /* sicherstellen */
   background: none;     /* kein Hintergrund */
 }
+/* ================= FINAL CONTACT FIX – CRISP ================= */
+
 .contactFixed {
-  z-index: 99999 !important;
   position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background: #071018;   /* KEIN rgba */
+  padding: 14px;
+
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+
+  border-top: 1px solid rgba(139,124,246,0.15);
+
+  box-shadow: 0 -6px 18px rgba(0,0,0,0.55);
+
+  z-index: 1000;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  transform: translateZ(0);
 }
+
 
 /* ================= PDF FORM PREMIUM BOOST ================= */
 
@@ -2019,61 +2063,135 @@ svg {
   display: flex;
   flex-direction: column;
 }
-/* ================= PDF LAYOUT PREMIUM ================= */
+
+/* ================= PDF LAYOUT PREMIUM CLEAN ================= */
 
 .pdfPreview {
-  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
   font-size: 15px;
-  line-height: 1.6;
-  color: #ffffff;
+  line-height: 1.65;
+  color: #f4f6fa;
 }
 
-/* Abschnitt */
+/* ================= SECTION ================= */
+
 .pdfSection {
-  margin-bottom: 36px;
+  margin-bottom: 42px;
 }
 
-/* Titel */
+/* ================= SECTION TITLE ================= */
+
 .pdfSection h3 {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 18px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #ccc;
-  letter-spacing: 0.3px;
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  letter-spacing: 0.4px;
 }
 
-/* Zeile */
+/* ================= DATA ROW ================= */
+
 .pdfCategoryRow {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  padding: 4px 0;
+  align-items: flex-start;
+
+  gap: 24px;
+  padding: 6px 0;
+
+  border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
-/* Label */
+/* ================= LABEL ================= */
+
 .pdfCategoryRow strong {
-  font-weight: 600;
-  color: #ffffff;
-  min-width: 200px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  min-width: 220px;
 }
 
-/* Wert */
+/* ================= VALUE ================= */
+
 .pdfCategoryRow span {
   text-align: right;
   flex: 1;
+  color: #ffffff;
 }
 
-/* Empfehlungen */
+/* ================= RECOMMENDATIONS ================= */
+
 .pdfRecommendation {
-  margin-bottom: 14px;
-  padding-left: 12px;
+  margin-bottom: 18px;
+  padding-left: 14px;
+
   border-left: 3px solid #8B7CF6;
+  background: rgba(139,124,246,0.06);
+
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-radius: 6px;
 }
 
-/* Footer */
+/* ================= FOOTER ================= */
+
 .pdfFooter {
-  margin-top: 40px;
-  font-size: 12px;
-  color: #a7a7a7;
+  margin-top: 60px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
 }
+/* ================= PDF CONTACT PREMIUM ================= */
+
+.pdfContactBlock {
+  margin-top: 60px;
+  padding-top: 30px;
+
+  border-top: 1px solid rgba(255,255,255,0.12);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 60px;
+}
+
+.pdfContactLeft {
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.8);
+}
+
+.pdfContactTitle {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.pdfContactSpacer {
+  height: 10px;
+}
+
+.pdfContactRight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.pdfContactRight img {
+  width: 85px;
+  height: 85px;
+
+  border-radius: 10px;
+  background: white;
+  padding: 6px;
+}
+
+.pdfQrLabel {
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  color: rgba(255,255,255,0.6);
+}
+

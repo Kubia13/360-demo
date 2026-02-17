@@ -3106,9 +3106,7 @@ export default function App() {
       <div className="screen">
         <Header
           goBase={goToBaseWithoutReset}
-          back={() => setStep("category")}
         />
-
 
 
 
@@ -3595,25 +3593,25 @@ export default function App() {
           );
         })}
 
-{/* ===== NAVIGATION BUTTON ===== */}
+        {/* ===== NAVIGATION BUTTON ===== */}
 
-<button
-  type="button"
-  className="primaryBtn big"
-  onClick={() => {
-    if (currentCategoryIndex < categories.length - 1) {
-      setCurrentCategoryIndex((prev) => prev + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      setStep("dashboard");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }}
->
-  {currentCategoryIndex < categories.length - 1
-    ? "Weiter"
-    : "Auswertung"}
-</button>
+        <button
+          type="button"
+          className="primaryBtn big"
+          onClick={() => {
+            if (currentCategoryIndex < categories.length - 1) {
+              setCurrentCategoryIndex((prev) => prev + 1);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            } else {
+              setStep("dashboard");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+        >
+          {currentCategoryIndex < categories.length - 1
+            ? "Weiter"
+            : "Auswertung"}
+        </button>
 
 
         {showInfo && (
@@ -4245,9 +4243,12 @@ function Header({ back, goBase }) {
         onClick={goBase}
         alt="Logo"
       />
-      <button className="backBtn" onClick={back}>
-        <span className="arrowIcon"></span>
-      </button>
+
+      {back && (
+        <button className="backBtn" onClick={back}>
+          <span className="arrowIcon"></span>
+        </button>
+      )}
     </div>
   );
 }
@@ -4625,7 +4626,7 @@ function PdfOverlayComponent({
         />
 
         <Input
-          label="Rentenlücke"
+          label="Rentenlücke (€)"
           value={pdfData.rentenluecke}
           onChange={(v) =>
             setPdfData({ ...pdfData, rentenluecke: v })
@@ -4633,7 +4634,7 @@ function PdfOverlayComponent({
         />
 
         <Input
-          label="Empfohlenes Krankentagegeld"
+          label="Empfohlenes Krankentagegeld (€)"
           value={pdfData.ktgEmpfehlung}
           onChange={(v) =>
             setPdfData({ ...pdfData, ktgEmpfehlung: v })
@@ -4777,53 +4778,146 @@ function PdfPreviewComponent({
     <html>
       <head>
         <title>360° Absicherungsanalyse</title>
-        <style>
+<style>
 
-          body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            color: #000;
-          }
+  @page {
+    size: A4;
+    margin: 18mm;
+  }
 
-          h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-          }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: white;
+    color: black;
+  }
 
-          h3 {
-            margin-top: 30px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #000;
-            padding-bottom: 4px;
-          }
+  .printWrapper {
+    max-width: 190mm;
+    margin: 0 auto;
+  }
 
-          .pdfSection {
-            margin-bottom: 20px;
-          }
+  h1 {
+    font-size: 26px;
+    margin-bottom: 10px;
+  }
 
-          .pdfCategoryRow {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-          }
+  /* ===== TYPOGRAFIE ===== */
 
-          .pdfRecommendation {
-            margin-bottom: 8px;
-            padding-left: 10px;
-            border-left: 3px solid #000;
-          }
+  .pdfPreview {
+    font-size: 14px;
+    line-height: 1.5;
+  }
 
-          .pdfFooter {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #555;
-          }
+  .pdfSection {
+    margin-bottom: 24px;
+  }
 
-        </style>
+  .pdfSection h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #000;
+  }
+
+  .pdfCategoryRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+
+  .pdfCategoryRow strong {
+    font-weight: 600;
+  }
+
+  .pdfRecommendation {
+    margin-bottom: 10px;
+    padding-left: 12px;
+    border-left: 3px solid #000;
+  }
+
+  .pdfFooter {
+    margin-top: 40px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+  }
+
+  /* ===== SEITENUMBRUCH-STEUERUNG ===== */
+
+  /* Manuell steuerbar über className="pageBreak" im JSX */
+  .pageBreak {
+    page-break-before: always;
+  }
+
+  /* Kein Umbruch mitten im Block */
+  .pdfSection,
+  .pdfCategoryRow,
+  .pdfRecommendation {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .pdfSection h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* ===== FOOTER CONTACT BLOCK ===== */
+
+  .pdfContactBlock {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #000;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+  }
+
+  .pdfContactLeft {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .pdfContactTitle {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  /* ===== QR BLOCK ===== */
+
+  .pdfContactRight {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pdfContactRight img {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 6px;
+  }
+
+  .pdfQrLabel {
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+  }
+
+</style>
+
+
       </head>
-      <body>
-        ${printContent}
-      </body>
+<body>
+  <div class="printWrapper">
+    ${printContent}
+  </div>
+</body>
     </html>
   `);
 
@@ -4945,6 +5039,30 @@ function PdfPreviewComponent({
 
         <hr style={{ margin: "30px 0" }} />
 
+        {/* ================= ERGÄNZENDE WERTE ================= */}
+
+        <div className="pdfSection">
+          <h3>Ergänzende Werte</h3>
+
+          {finalBU && (
+            <div className="pdfCategoryRow">
+              <strong>Empfohlene BU-Rente:</strong> {finalBU} €
+            </div>
+          )}
+
+          {stableData.pdfData?.rentenluecke && (
+            <div className="pdfCategoryRow">
+              <strong>Rentenlücke:</strong> {stableData.pdfData.rentenluecke} €
+            </div>
+          )}
+
+          {stableData.pdfData?.ktgEmpfehlung && (
+            <div className="pdfCategoryRow">
+              <strong>Krankentagegeld:</strong> {stableData.pdfData.ktgEmpfehlung} €
+            </div>
+          )}
+        </div>
+
         {/* ================= KATEGORIEÜBERSICHT ================= */}
 
         <div className="pdfSection">
@@ -5010,28 +5128,34 @@ function PdfPreviewComponent({
 
         <hr style={{ margin: "30px 0" }} />
 
-        {/* ================= ERGÄNZENDE WERTE ================= */}
 
-        <div className="pdfSection">
-          <h3>Ergänzende Werte</h3>
 
-          {finalBU && (
-            <div className="pdfCategoryRow">
-              <strong>Empfohlene BU-Rente:</strong> {finalBU} €
+        <div className="pdfContactBlock">
+
+          <div className="pdfContactLeft">
+
+            <div className="pdfContactTitle">
+              BarmeniaGothaer – Florian Löffler
             </div>
-          )}
 
-          {stableData.pdfData?.rentenluecke && (
-            <div className="pdfCategoryRow">
-              <strong>Rentenlücke:</strong> {stableData.pdfData.rentenluecke} €
-            </div>
-          )}
+            <div>Breisacher Str. 145b</div>
+            <div>79110 Freiburg</div>
 
-          {stableData.pdfData?.ktgEmpfehlung && (
-            <div className="pdfCategoryRow">
-              <strong>Krankentagegeld:</strong> {stableData.pdfData.ktgEmpfehlung} €
-            </div>
-          )}
+            <div className="pdfContactSpacer" />
+
+            <div>Mail: florian.loeffler@barmenia.de</div>
+            <div>Tel.: 0761 2027423</div>
+
+          </div>
+
+          <div className="pdfContactRight">
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://agentur.barmenia.de/florian_loeffler"
+              alt="QR Code Website"
+            />
+            <div className="pdfQrLabel">Agentur online aufrufen</div>
+          </div>
+
         </div>
 
         <div className="pdfFooter">
