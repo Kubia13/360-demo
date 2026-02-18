@@ -4552,7 +4552,7 @@ const CalculatorOverlayComponent = React.memo(function CalculatorOverlayComponen
             rel="noopener noreferrer"
             className="calculatorItem"
           >
-            <strong>Rentenlücken-Rechner</strong>
+            <strong>Altersrentenlücken-Rechner</strong>
             <span>Berechnet deine voraussichtliche Versorgungslücke im Ruhestand.</span>
           </a>
 
@@ -4581,7 +4581,7 @@ const CalculatorOverlayComponent = React.memo(function CalculatorOverlayComponen
 
           <div className="buResult">
             <div className="buResultLabel">
-              Empfohlene BU-Rente (80%)
+              BU-Rente (80%)
             </div>
 
             <div className="buResultValue">
@@ -5202,13 +5202,13 @@ const scrollToBottom = () => {
 
           {finalBU && (
             <div className="pdfCategoryRow">
-              <strong>Empfohlene BU-Rente:</strong> {finalBU} €
+              <strong>BU-Rente:</strong> {finalBU} €
             </div>
           )}
 
           {stableData.pdfData?.rentenluecke && (
             <div className="pdfCategoryRow">
-              <strong>Rentenlücke:</strong> {stableData.pdfData.rentenluecke} €
+              <strong>Altersrententenlücke:</strong> {stableData.pdfData.rentenluecke} €
             </div>
           )}
 
