@@ -5198,7 +5198,7 @@ const scrollToBottom = () => {
         {/* ================= ERGÄNZENDE WERTE ================= */}
 
         <div className="pdfSection">
-          <h3>Ergänzende Werte</h3>
+          <h3>Ergänzende Werte/Lücken</h3>
 
           {finalBU && (
             <div className="pdfCategoryRow">
