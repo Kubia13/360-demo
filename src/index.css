@@ -2105,6 +2105,9 @@ svg {
 
   display: flex;
   flex-direction: column;
+
+  max-height: 90vh;      /* WICHTIG */
+  overflow-y: auto;      /* WICHTIG */
 }
 
 /* ================= PDF LAYOUT PREMIUM CLEAN ================= */
