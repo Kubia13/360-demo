@@ -1223,11 +1223,12 @@ export default function App() {
         .map((id) => getScore(id))
         .filter((score) => score !== null);
 
-      // Weniger als 2 beantwortete Fragen → keine Bewertung
-      if (scores.length < 2) {
-        acc[cat] = null;
-        return acc;
-      }
+   // Wenn keine bewertbaren Fragen existieren → null
+if (scores.length === 0) {
+  acc[cat] = null;
+  return acc;
+}
+
 
       const sum = scores.reduce((total, s) => total + s, 0);
       acc[cat] = Math.round(sum / scores.length);
@@ -1253,10 +1254,24 @@ export default function App() {
       return score !== null;
     });
 
-    // Mindestanzahl definieren (z.B. 3 relevante Antworten)
-    if (answeredRelevantQuestions.length < 6) {
-      return 0;
-    }
+ // Dynamische Mindestanzahl: mindestens 40% der relevanten Fragen beantwortet
+
+const totalRelevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+  const q = QUESTIONS[id];
+  if (q.condition && !q.condition(baseData)) return false;
+
+  const score = getScore(id);
+  return score !== null;
+}).length;
+
+if (totalRelevantQuestions === 0) return 0;
+
+const answeredCount = answeredRelevantQuestions.length;
+const minimumRequired = Math.ceil(totalRelevantQuestions * 0.4);
+
+if (answeredCount < minimumRequired) {
+  return 0;
+}
 
     const activeCategories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
 
@@ -4701,7 +4716,7 @@ function PdfOverlayComponent({
         {/* BU direkt übernommen */}
 
         <Input
-          label="Empfohlene BU-Rente (€)"
+          label="BU-Rente (€)"
           value={
             pdfData.buEmpfehlung !== ""
               ? pdfData.buEmpfehlung
@@ -4713,7 +4728,7 @@ function PdfOverlayComponent({
         />
 
         <Input
-          label="Rentenlücke (€)"
+          label="Altersrentenlücke (€)"
           value={pdfData.rentenluecke}
           onChange={(v) =>
             setPdfData({ ...pdfData, rentenluecke: v })
