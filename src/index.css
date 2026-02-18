@@ -1,3 +1,16 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden; /* verhindert Window-Scroll */
+  background: #071018;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10,15 +23,22 @@ body {
 }
 
 .screen {
-  padding: 20px;
+  position: relative;
+  z-index: 1;
+
+  height: 100vh;              /* statt min-height */
+  overflow-y: auto;           /* macht es zum Scroll-Container */
+
+  padding: 16px;
+  padding-bottom: 110px;
+
   max-width: 420px;
-  margin: auto;
-  padding-bottom: 140px;
+  margin: 0 auto;
 
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
+
 
 .center {
   text-align: center;
@@ -692,6 +712,18 @@ body::before {
 .screen {
   position: relative;
   z-index: 1;
+
+  height: 100vh;              /* statt min-height */
+  overflow-y: auto;           /* macht es zum Scroll-Container */
+
+  padding: 16px;
+  padding-bottom: 110px;
+
+  max-width: 420px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
 }
 
 /* ================= UI UPGRADE 2 – PREMIUM CARDS ================= */
@@ -1435,11 +1467,23 @@ svg {
 
 /* ================= GLOBAL COMPACT FIX ================= */
 
-/* Screen weniger vertikale Luft */
 .screen {
+  position: relative;
+  z-index: 1;
+
+  height: 100vh;              /* statt min-height */
+  overflow-y: auto;           /* macht es zum Scroll-Container */
+
   padding: 16px;
   padding-bottom: 110px;
+
+  max-width: 420px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
 }
+
 
 /* ================= DASHBOARD TITLE ================= */
 
@@ -1848,20 +1892,42 @@ svg {
 
 .outlineBtn {
   width: 100%;
-  height: 52px;
+  height: 55px;                 /* deutlich höher */
+
   margin-top: 18px;
-  border-radius: 18px;
-  border: 1px solid rgba(139,124,246,0.5);
-  background: transparent;
-  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 20px;          /* proportional größer */
+  border: 2px solid rgba(139,124,246,0.7);
+
+  background: rgba(139,124,246,0.14);
+  backdrop-filter: blur(8px);
+
+  color: #ffffff;
   font-weight: 600;
+  font-size: 15px;              /* unverändert */
+
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .outlineBtn:hover {
-  background: rgba(139,124,246,0.15);
+  background: rgba(139,124,246,0.22);
+  box-shadow: 0 10px 28px rgba(139,124,246,0.4);
+  transform: translateY(-2px);
 }
+
+.outlineBtn:active {
+  transform: scale(0.97);
+}
+.outlineBtn {
+  flex: none;        /* verhindert flex-scaling */
+}
+
+
 /* ================= CALCULATOR OVERLAY ================= */
 
 .calculatorBox h3 {
@@ -2277,4 +2343,25 @@ svg {
     transform 0.25s ease;
 
   z-index: 9999;
+}
+
+/* Scrollbar unsichtbar machen – Scroll bleibt aktiv */
+.screen {
+  scrollbar-width: none; /* Firefox */
+}
+
+.screen::-webkit-scrollbar {
+  display: none; /* Chrome, Edge, Safari */
+}
+.screen {
+  overflow-y: auto;
+}
+.screen {
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar {
+  display: none;
+}
+.screen {
+  overflow-y: auto;
 }

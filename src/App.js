@@ -668,6 +668,8 @@ export default function App() {
   const [step, setStep] = useState("welcome");
   const [answers, setAnswers] = useState({});
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const screenRef = React.useRef(null);
+
 
 
   const [baseData, setBaseData] = useState({
@@ -971,6 +973,17 @@ export default function App() {
     /* ========================================================= */
 
     if (key === "kinder_krankenzusatz" && !hatKinder) return null;
+
+    // Wenn Kinder privat versichert sind → Zusatz nicht relevant
+    if (
+      key === "kinder_krankenzusatz" &&
+      (
+        baseData.kinderKrankenversicherung === "Privat versichert (PKV)" ||
+        baseData.kinderKrankenversicherung === "Beihilfe + PKV"
+      )
+    ) return null;
+
+
     if ((key === "kasko" || key === "kfz_haftpflicht" || key === "schutzbrief") && baseData.kfz !== "Ja") return null;
     if ((key === "tierhaft" || key === "tier_op") && (!baseData.tiere || baseData.tiere === "Keine Tiere")) return null;
     if ((key === "hausrat" || key === "elementar") && baseData.wohnen === "Wohne bei Eltern") return null;
@@ -978,6 +991,15 @@ export default function App() {
     if (key === "ktg" && baseData.beruf === "Beamter") return null;
     if (key === "bu" && (baseData.beruf === "Beamter" || baseData.beruf === "Nicht berufstätig")) return null;
     if (key === "du" && baseData.beruf !== "Beamter") return null;
+    // Wenn Erwachsener privat versichert ist → Krankenzusatz nicht relevant
+    if (
+      key === "krankenzusatz" &&
+      (
+        baseData.krankenversicherung === "Privat versichert (PKV)" ||
+        baseData.krankenversicherung === "Heilfürsorge"
+      )
+    ) return null;
+
 
     /* ========================================================= */
     /* ===== RÜCKLAGEN ========================================= */
@@ -1533,9 +1555,12 @@ useEffect(() => {
 
   if (step !== "category") return;
 
-  window.scrollTo(0, 0);
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
+  if (screenRef.current) {
+    screenRef.current.scrollTo({
+      top: 0,
+      behavior: "auto"   // wichtig: kein smooth hier!
+    });
+  }
 
 }, [currentCategoryIndex, step]);
 
@@ -1578,33 +1603,33 @@ useEffect(() => {
 
   useEffect(() => {
 
-const handleFocus = (e) => {
+    const handleFocus = (e) => {
 
-  if (!e || !e.target) return;
+      if (!e || !e.target) return;
 
-  const el = e.target;
+      const el = e.target;
 
-  if (typeof el.scrollIntoView !== "function") return;
+      if (typeof el.scrollIntoView !== "function") return;
 
-  // 🔥 Nur reagieren wenn Overlay aktiv ist
-  const overlayOpen =
-    Boolean(legalOverlay) ||
-    Boolean(contactOverlay) ||
-    Boolean(showResetConfirm) ||
-    Boolean(actionOverlay) ||
-    Boolean(pdfOverlay) ||
-    Boolean(calculatorOverlay) ||
-    Boolean(pdfPreview);
+      // 🔥 Nur reagieren wenn Overlay aktiv ist
+      const overlayOpen =
+        Boolean(legalOverlay) ||
+        Boolean(contactOverlay) ||
+        Boolean(showResetConfirm) ||
+        Boolean(actionOverlay) ||
+        Boolean(pdfOverlay) ||
+        Boolean(calculatorOverlay) ||
+        Boolean(pdfPreview);
 
-  if (!overlayOpen) return;
+      if (!overlayOpen) return;
 
-  setTimeout(() => {
-    el.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
-  }, 120);
-};
+      setTimeout(() => {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 120);
+    };
 
 
     document.addEventListener("focusin", handleFocus);
@@ -1839,7 +1864,8 @@ const handleFocus = (e) => {
 
   if (step === "products") {
     return (
-      <div className="screen">
+      <div className="screen" ref={screenRef}>
+
         <Header
           goBase={goToBaseWithoutReset}
           back={() => setStep("dashboard")}
@@ -3388,7 +3414,8 @@ const handleFocus = (e) => {
     });
 
     return (
-      <div className="screen">
+      <div className="screen" ref={screenRef}>
+
         <Header
           back={() => {
             if (currentCategoryIndex > 0) {
@@ -3652,23 +3679,23 @@ const handleFocus = (e) => {
 
         {/* ===== NAVIGATION BUTTON ===== */}
 
-<button
-  type="button"
-  className="primaryBtn big"
-  onClick={() => {
+        <button
+          type="button"
+          className="primaryBtn big"
+          onClick={() => {
 
-    if (currentCategoryIndex < categories.length - 1) {
-      setCurrentCategoryIndex((prev) => prev + 1);
-    } else {
-      setStep("dashboard");
-    }
+            if (currentCategoryIndex < categories.length - 1) {
+              setCurrentCategoryIndex((prev) => prev + 1);
+            } else {
+              setStep("dashboard");
+            }
 
-  }}
->
-  {currentCategoryIndex < categories.length - 1
-    ? "Weiter"
-    : "Auswertung"}
-</button>
+          }}
+        >
+          {currentCategoryIndex < categories.length - 1
+            ? "Weiter"
+            : "Auswertung"}
+        </button>
 
 
 
@@ -3774,7 +3801,8 @@ const handleFocus = (e) => {
 
   if (step === "dashboard") {
     return (
-      <div className="screen">
+      <div className="screen" ref={screenRef}>
+
         <Header
           goBase={goToBaseWithoutReset}
           back={() => setStep("category")}
@@ -4755,14 +4783,21 @@ function PdfPreviewComponent({
   const actionsRef = React.useRef(null);
   const [showScrollButton, setShowScrollButton] = React.useState(true);
 
-  const scrollToBottom = () => {
-    if (!wrapperRef.current || !actionsRef.current) return;
+const scrollToBottom = () => {
+  if (!wrapperRef.current || !actionsRef.current) return;
 
-    actionsRef.current.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-  };
+  const wrapper = wrapperRef.current;
+  const target = actionsRef.current;
+
+  // Position relativ zum Wrapper berechnen
+  const targetPosition =
+    target.offsetTop - wrapper.offsetTop;
+
+  wrapper.scrollTo({
+    top: targetPosition,
+    behavior: "smooth"
+  });
+};
 
   /* ===== SCROLL BUTTON VISIBILITY (OVERLAY INTERN) ===== */
 
