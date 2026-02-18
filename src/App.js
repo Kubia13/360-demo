@@ -1534,7 +1534,10 @@ export default function App() {
     if (step !== "category") return;
 
     // Sofortiger Scroll ohne Animation
-    window.scrollTo(0, 0);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
 
   }, [currentCategoryIndex, step]);
 
@@ -1563,8 +1566,58 @@ export default function App() {
     pdfOverlay,
     calculatorOverlay,
     pdfPreview
+
   ]);
 
+  /* ===== GLOBAL FOCUS SMOOTH SCROLL ===== */
+
+  useEffect(() => {
+
+    const handleFocus = (e) => {
+
+      if (!e) return;
+      if (!e.target) return;
+
+      const el = e.target;
+
+      if (typeof el.scrollIntoView !== "function") return;
+
+      // Nur wenn kein Overlay offen ist
+      const overlayOpen =
+        legalOverlay !== null ||
+        contactOverlay === true ||
+        showResetConfirm === true ||
+        actionOverlay !== null ||
+        pdfOverlay === true ||
+        calculatorOverlay === true ||
+        pdfPreview === true;
+
+      if (overlayOpen) return;
+
+      setTimeout(() => {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 120);
+
+    };
+
+    document.addEventListener("focusin", handleFocus);
+
+    return () => {
+      document.removeEventListener("focusin", handleFocus);
+    };
+
+  }, [
+    legalOverlay,
+    contactOverlay,
+    showResetConfirm,
+    actionOverlay,
+    pdfOverlay,
+    calculatorOverlay,
+    pdfPreview
+  ]);
 
 
   /* ================= TOP 3 HANDLUNGSFELDER ================= */
@@ -4692,7 +4745,50 @@ function PdfPreviewComponent({
   answers
 }) {
 
+  const wrapperRef = React.useRef(null);
+  const actionsRef = React.useRef(null);
+  const [showScrollButton, setShowScrollButton] = React.useState(true);
+
+  const scrollToBottom = () => {
+    if (!wrapperRef.current || !actionsRef.current) return;
+
+    actionsRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  };
+
+  /* ===== SCROLL BUTTON VISIBILITY (OVERLAY INTERN) ===== */
+
+  React.useEffect(() => {
+
+    if (!pdfPreview) return;   // <-- hier absichern
+
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    const handleScroll = () => {
+
+      const scrollPosition = wrapper.scrollTop + wrapper.clientHeight;
+      const scrollHeight = wrapper.scrollHeight;
+
+      if (scrollPosition >= scrollHeight - 40) {
+        setShowScrollButton(false);
+      } else {
+        setShowScrollButton(true);
+      }
+    };
+
+    wrapper.addEventListener("scroll", handleScroll);
+
+    return () => {
+      wrapper.removeEventListener("scroll", handleScroll);
+    };
+
+  }, [pdfPreview]);
+
   if (!pdfPreview) return null;
+
 
   /* ================= DATEN EINFRIEREN ================= */
 
@@ -5173,10 +5269,11 @@ function PdfPreviewComponent({
       onClick={() => setPdfPreview(false)}
     >
       <div
+        ref={wrapperRef}
         className="pdfPreviewWrapper"
         onClick={(e) => e.stopPropagation()}
       >
-
+        
         <button
           className="overlayClose"
           onClick={() => setPdfPreview(false)}
@@ -5186,7 +5283,7 @@ function PdfPreviewComponent({
 
         {pdfDocument}
 
-        <div className="pdfActions">
+        <div className="pdfActions" ref={actionsRef}>
           <button
             className="primaryBtn"
             onClick={handlePrint}
@@ -5201,6 +5298,16 @@ function PdfPreviewComponent({
             Schließen
           </button>
         </div>
+
+        {showScrollButton && (
+          <button
+            className="scrollDownBtn"
+            onClick={scrollToBottom}
+          >
+            ↓
+          </button>
+        )}
+
 
       </div>
     </div>

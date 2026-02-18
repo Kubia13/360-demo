@@ -979,26 +979,6 @@ body::before {
   /* ← DAS IST DER WICHTIGE TEIL */
 }
 
-@media (max-width: 480px) {
-  .screen {
-    padding-bottom: 120px;
-  }
-
-  .legalFooter {
-    margin-bottom: 80px;
-  }
-}
-
-@media (max-width: 480px) {
-  .productRow {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .productButton {
-    width: 100%;
-  }
-}
 
 .recommendationBtn,
 .productButton,
@@ -1451,19 +1431,7 @@ svg {
   max-width: 95%;
 }
 
-@media (max-width: 480px) {
 
-  .recommendationItem p {
-    font-size: 13.5px;
-    line-height: 1.55;
-  }
-
-  .questionText {
-    font-size: 15.3px;
-    line-height: 1.4;
-  }
-
-}
 
 /* ================= GLOBAL COMPACT FIX ================= */
 
@@ -1606,32 +1574,107 @@ svg {
   transform: scale(0.95);
 }
 
-/* ================= MOBILE FINAL COMPACT FIX ================= */
+/* ================= MOBILE CLEAN OVERLAY OPTIMIZED ================= */
 
 @media (max-width: 480px) {
 
+  /* ===== GLOBAL SCREEN ===== */
+  .screen {
+    padding: 16px;
+    padding-bottom: 120px;
+  }
+
+  /* ===== QUESTION CARDS ===== */
   .questionCard.dark {
-    padding: 16px 16px 18px 16px !important;
-    margin-bottom: 14px !important;
+    padding: 16px;
+    margin-bottom: 14px;
   }
 
   .questionText {
-    font-size: 15px !important;
-    line-height: 1.32 !important;
-    margin-bottom: 8px !important;
+    font-size: 15px;
+    line-height: 1.4;
+    margin-bottom: 8px;
   }
 
   .buttonRow {
-    gap: 8px !important;
-    margin-top: 6px !important;
+    gap: 8px;
+    margin-top: 6px;
   }
 
   .answerBtn {
-    padding: 11px !important;
+    padding: 12px;
     font-size: 14px;
   }
 
+  /* ===== RECOMMENDATION CARDS ===== */
+  .recommendationItem {
+    padding: 12px;
+    margin-top: 8px;
+  }
+
+  .recommendationItem p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ===== PDF PREVIEW WRAPPER ===== */
+  .pdfPreviewWrapper {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .pdfSection {
+    margin-bottom: 24px;
+  }
+
+  /* ===== PDF ROW FIX (WICHTIG FÜR BU RENTEN BUG) ===== */
+  .pdfCategoryRow {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .pdfCategoryRow strong {
+    margin-bottom: 2px;
+  }
+
+  .pdfCategoryRow span {
+    text-align: left;
+  }
+
+  /* ===== FOOTER CONTACT BLOCK ===== */
+  .pdfContactBlock {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pdfContactRight {
+    align-items: flex-start;
+  }
+
+  /* ===== FIXED CONTACT BAR ===== */
+  .contactFixed {
+    padding: 12px;
+  }
+
+  .contactBtn {
+    height: 52px;
+    font-size: 14px;
+  }
+
+  /* ===== LEGAL FOOTER ===== */
+  .legalFooter {
+    margin-bottom: 80px;
+  }
+
 }
+
+@media (min-width: 769px) {
+  .scrollDownBtn {
+    display: none;
+  }
+}
+
 
 /* ================= CONVERSION BOX CLEAN ================= */
 
@@ -2194,4 +2237,41 @@ svg {
   letter-spacing: 0.4px;
   color: rgba(255,255,255,0.6);
 }
+/* ================= PDF SCROLL DOWN BUTTON – PREMIUM FIXED ================= */
 
+.scrollDownBtn {
+  position: fixed;
+  right: 22px;
+  bottom: 110px;
+
+  width: 52px;
+  height: 52px;
+
+  border-radius: 16px;
+  border: 1px solid rgba(139,124,246,0.4);
+
+  background: rgba(139,124,246,0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  color: #A99BFF;
+
+  font-size: 24px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 28px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.25s ease;
+
+  z-index: 9999;
+}
