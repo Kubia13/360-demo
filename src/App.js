@@ -1527,37 +1527,42 @@ export default function App() {
 
 
 
-  /* ===== CATEGORY SCROLL FIX – STABIL (OHNE SMOOTH) ===== */
+/* ===== CATEGORY SCROLL FIX – FINAL STABLE ===== */
+
+useEffect(() => {
+
+  if (step !== "category") return;
+
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+
+}, [currentCategoryIndex, step]);
+
+
+  /* ===== OVERLAY SCROLL LOCK (FIXED) ===== */
 
   useEffect(() => {
 
-    if (step !== "category") return;
-
-    // Sofortiger Scroll ohne Animation
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-
-  }, [currentCategoryIndex, step]);
-
-  /* ===== OVERLAY SCROLL LOCK ===== */
-
-  useEffect(() => {
     const overlayOpen =
-      legalOverlay !== null ||
-      contactOverlay === true ||
-      showResetConfirm === true ||
-      actionOverlay !== null ||
-      pdfOverlay === true ||
-      calculatorOverlay === true ||
-      pdfPreview === true;
+      Boolean(legalOverlay) ||
+      Boolean(contactOverlay) ||
+      Boolean(showResetConfirm) ||
+      Boolean(actionOverlay) ||
+      Boolean(pdfOverlay) ||
+      Boolean(calculatorOverlay) ||
+      Boolean(pdfPreview);
 
-    document.body.style.overflow = overlayOpen ? "hidden" : "auto";
+    if (overlayOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
 
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     };
+
   }, [
     legalOverlay,
     contactOverlay,
@@ -1566,42 +1571,41 @@ export default function App() {
     pdfOverlay,
     calculatorOverlay,
     pdfPreview
-
   ]);
+
 
   /* ===== GLOBAL FOCUS SMOOTH SCROLL ===== */
 
   useEffect(() => {
 
-    const handleFocus = (e) => {
+const handleFocus = (e) => {
 
-      if (!e) return;
-      if (!e.target) return;
+  if (!e || !e.target) return;
 
-      const el = e.target;
+  const el = e.target;
 
-      if (typeof el.scrollIntoView !== "function") return;
+  if (typeof el.scrollIntoView !== "function") return;
 
-      // Nur wenn kein Overlay offen ist
-      const overlayOpen =
-        legalOverlay !== null ||
-        contactOverlay === true ||
-        showResetConfirm === true ||
-        actionOverlay !== null ||
-        pdfOverlay === true ||
-        calculatorOverlay === true ||
-        pdfPreview === true;
+  // 🔥 Nur reagieren wenn Overlay aktiv ist
+  const overlayOpen =
+    Boolean(legalOverlay) ||
+    Boolean(contactOverlay) ||
+    Boolean(showResetConfirm) ||
+    Boolean(actionOverlay) ||
+    Boolean(pdfOverlay) ||
+    Boolean(calculatorOverlay) ||
+    Boolean(pdfPreview);
 
-      if (overlayOpen) return;
+  if (!overlayOpen) return;
 
-      setTimeout(() => {
-        el.scrollIntoView({
-          behavior: "smooth",
-          block: "center"
-        });
-      }, 120);
+  setTimeout(() => {
+    el.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }, 120);
+};
 
-    };
 
     document.addEventListener("focusin", handleFocus);
 
@@ -3648,23 +3652,24 @@ export default function App() {
 
         {/* ===== NAVIGATION BUTTON ===== */}
 
-        <button
-          type="button"
-          className="primaryBtn big"
-          onClick={() => {
-            if (currentCategoryIndex < categories.length - 1) {
-              setCurrentCategoryIndex((prev) => prev + 1);
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            } else {
-              setStep("dashboard");
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }
-          }}
-        >
-          {currentCategoryIndex < categories.length - 1
-            ? "Weiter"
-            : "Auswertung"}
-        </button>
+<button
+  type="button"
+  className="primaryBtn big"
+  onClick={() => {
+
+    if (currentCategoryIndex < categories.length - 1) {
+      setCurrentCategoryIndex((prev) => prev + 1);
+    } else {
+      setStep("dashboard");
+    }
+
+  }}
+>
+  {currentCategoryIndex < categories.length - 1
+    ? "Weiter"
+    : "Auswertung"}
+</button>
+
 
 
         {showInfo && (
@@ -4274,6 +4279,7 @@ export default function App() {
           />
         )}
 
+        <ActionOverlayComponent />
         <ResetOverlayComponent />
         <LegalOverlayComponent />
         <ContactOverlayComponent />
@@ -4811,8 +4817,11 @@ function PdfPreviewComponent({
   ]);
 
   const finalBU = React.useMemo(() => {
-    if (stableData.pdfData?.buEmpfehlung) {
-      return stableData.pdfData.buEmpfehlung;
+
+    const manualValue = stableData.pdfData?.buEmpfehlung;
+
+    if (manualValue && String(manualValue).trim() !== "") {
+      return manualValue;
     }
 
     const income =
@@ -4822,7 +4831,12 @@ function PdfPreviewComponent({
     if (!income) return "";
 
     return Math.round(Number(income) * 0.8);
-  }, [stableData]);
+
+  }, [
+    stableData.pdfData?.buEmpfehlung,
+    stableData.buIncome,
+    stableData.baseData?.gehalt
+  ]);
 
 
   const groupedAnswers = Object.entries(stableData.answers || {}).reduce((acc, [key, value]) => {
@@ -4878,7 +4892,7 @@ function PdfPreviewComponent({
 
   @page {
     size: A4;
-    margin: 18mm;
+    margin: 16mm;
   }
 
   body {
@@ -4890,38 +4904,38 @@ function PdfPreviewComponent({
   }
 
   .printWrapper {
-    max-width: 190mm;
+    max-width: 188mm;
     margin: 0 auto;
   }
 
   h1 {
-    font-size: 26px;
-    margin-bottom: 10px;
+    font-size: 24px;
+    margin-bottom: 6px;
   }
 
   /* ===== TYPOGRAFIE ===== */
 
   .pdfPreview {
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.4;
   }
 
   .pdfSection {
-    margin-bottom: 24px;
+    margin-bottom: 18px;
   }
 
   .pdfSection h3 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
     border-bottom: 1px solid #000;
   }
 
   .pdfCategoryRow {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
   }
 
   .pdfCategoryRow strong {
@@ -4929,26 +4943,25 @@ function PdfPreviewComponent({
   }
 
   .pdfRecommendation {
-    margin-bottom: 10px;
-    padding-left: 12px;
+    margin-bottom: 8px;
+    padding-left: 10px;
     border-left: 3px solid #000;
   }
 
   .pdfFooter {
-    margin-top: 40px;
-    font-size: 12px;
+    margin-top: 25px;
+    font-size: 11px;
     color: #666;
-    line-height: 1.4;
+    line-height: 1.3;
   }
 
   /* ===== SEITENUMBRUCH-STEUERUNG ===== */
 
-  /* Manuell steuerbar über className="pageBreak" im JSX */
   .pageBreak {
+    break-before: page;
     page-break-before: always;
   }
 
-  /* Kein Umbruch mitten im Block */
   .pdfSection,
   .pdfCategoryRow,
   .pdfRecommendation {
@@ -4961,31 +4974,29 @@ function PdfPreviewComponent({
     page-break-after: avoid;
   }
 
-  /* ===== FOOTER CONTACT BLOCK ===== */
+  /* ===== CONTACT BLOCK ===== */
 
   .pdfContactBlock {
-    margin-top: 50px;
-    padding-top: 20px;
+    margin-top: 30px;
+    padding-top: 14px;
     border-top: 1px solid #000;
 
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 40px;
+    gap: 30px;
   }
 
   .pdfContactLeft {
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.4;
   }
 
   .pdfContactTitle {
     font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 6px;
+    font-size: 13px;
+    margin-bottom: 4px;
   }
-
-  /* ===== QR BLOCK ===== */
 
   .pdfContactRight {
     display: flex;
@@ -4994,19 +5005,18 @@ function PdfPreviewComponent({
   }
 
   .pdfContactRight img {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 6px;
+    width: 85px;
+    height: 85px;
+    margin-bottom: 4px;
   }
 
   .pdfQrLabel {
-    font-size: 11px;
+    font-size: 10px;
     color: #666;
     text-align: center;
   }
 
 </style>
-
 
       </head>
 <body>
@@ -5160,6 +5170,7 @@ function PdfPreviewComponent({
         </div>
 
         {/* ================= KATEGORIEÜBERSICHT ================= */}
+        <div className="pageBreak" />
 
         <div className="pdfSection">
           <h3>Kategorieübersicht</h3>
@@ -5225,6 +5236,7 @@ function PdfPreviewComponent({
         <hr style={{ margin: "30px 0" }} />
 
 
+        <div className="pageBreak" />
 
         <div className="pdfContactBlock">
 
@@ -5273,7 +5285,7 @@ function PdfPreviewComponent({
         className="pdfPreviewWrapper"
         onClick={(e) => e.stopPropagation()}
       >
-        
+
         <button
           className="overlayClose"
           onClick={() => setPdfPreview(false)}
