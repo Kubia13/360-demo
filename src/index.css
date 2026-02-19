@@ -2363,3 +2363,14 @@ svg {
   border-radius: 8px;
   color: rgba(255, 255, 255, 0.8);
 }
+/* ================= GLOBAL SCROLLBAR HIDE (SAUBER) ================= */
+
+/* Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* Chrome / Edge / Safari */
+html::-webkit-scrollbar {
+  display: none;
+}
