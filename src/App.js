@@ -880,11 +880,11 @@ export default function App() {
 
   /* ================= BACK WITHOUT RESET================= */
 
-function goToBaseWithoutReset() {
-  setCurrentCategoryIndex(0);
-  setStep("base");
-  scrollToTop();
-}
+  function goToBaseWithoutReset() {
+    setCurrentCategoryIndex(0);
+    setStep("base");
+    scrollToTop();
+  }
 
 
   /* ================= DYNAMISCHE KATEGORIEN ================= */
@@ -918,28 +918,28 @@ function goToBaseWithoutReset() {
   }, [categories, currentCategoryIndex, step]);
 
 
-// ================= SCROLL TO TOP HELPER (ANDROID SAFE) =================
-const scrollToTop = () => {
-  // Aktives Input schließen (Keyboard schließen)
-  if (document.activeElement instanceof HTMLElement) {
-    document.activeElement.blur();
-  }
+  // ================= SCROLL TO TOP HELPER (ANDROID SAFE) =================
+  const scrollToTop = () => {
+    // Aktives Input schließen (Keyboard schließen)
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
 
-  // Kleine Verzögerung für Android Keyboard Animation
-  setTimeout(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "auto"
-    });
-
-    if (screenRef?.current) {
-      screenRef.current.scrollTo({
+    // Kleine Verzögerung für Android Keyboard Animation
+    setTimeout(() => {
+      window.scrollTo({
         top: 0,
         behavior: "auto"
       });
-    }
-  }, 100); // 80–120ms optimal für Android
-};
+
+      if (screenRef?.current) {
+        screenRef.current.scrollTo({
+          top: 0,
+          behavior: "auto"
+        });
+      }
+    }, 100); // 80–120ms optimal für Android
+  };
 
 
 
@@ -984,7 +984,7 @@ const scrollToTop = () => {
       rentenluecke: "",
       ktgEmpfehlung: "",
     });
-     scrollToTop();
+    scrollToTop();
   }
 
   /* ================= ANSWER ================= */
@@ -4924,13 +4924,11 @@ function PdfOverlayComponent({
 
           {infoField === "ktg" && (
             <div className="overlayInfoText">
-              Für Selbstständige und privat Versicherte ist das
-              Krankentagegeld essenziell, da keine Lohnfortzahlung
-              durch den Arbeitgeber erfolgt.
+              Für Selbstständige ist das Krankentagegeld essenziell, da keine Lohnfortzahlung durch einen Arbeitgeber erfolgt.
               <br /><br />
-              Bei Angestellten in der PKV wird die Höhe aus Netto,
-              Brutto sowie Kranken- und Pflegeversicherungsbeitrag
-              berechnet.
+              Angestellte – auch wenn sie privat krankenversichert sind – erhalten in den ersten 42 Tagen eine Lohnfortzahlung durch den Arbeitgeber.
+              <br /><br />
+              Ab dem 43. Tag entsteht bei privat Versicherten jedoch nur dann ein Leistungsanspruch, wenn ein Krankentagegeld vertraglich vereinbart wurde.
             </div>
           )}
 
