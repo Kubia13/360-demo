@@ -1112,11 +1112,17 @@ svg {
 
 .disclaimerScreen {
   position: relative;
+
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  align-items: flex-start;
+
+  padding: 80px 20px;
+
+  height: 100dvh;
+  overflow-y: auto;
 }
+
 
 .disclaimerCard {
   max-width: 380px;
