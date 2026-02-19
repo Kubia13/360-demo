@@ -5,12 +5,25 @@ body {
 }
 
 body {
-  overflow-x: hidden;
-  overflow-y: auto; /* wichtig für Pull-to-refresh */
+  overflow-x: hidden;  /* nur horizontal blockieren */
+  overflow-y: auto;    /* vertikal scroll erlauben */
   background: #071018;
   color: #fff;
   font-family: system-ui, sans-serif;
 }
+
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #071018;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+}
+
 
 
 
