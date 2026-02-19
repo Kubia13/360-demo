@@ -5,26 +5,12 @@ body {
 }
 
 body {
-  overflow-x: hidden;  /* nur horizontal blockieren */
-  overflow-y: auto;    /* vertikal scroll erlauben */
+  overflow-x: hidden;
+  overflow-y: auto; /* wichtig für Pull-to-refresh */
   background: #071018;
   color: #fff;
   font-family: system-ui, sans-serif;
 }
-
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: #071018;
-  color: #fff;
-  font-family: system-ui, sans-serif;
-}
-
-
 
 
 .center {
@@ -1446,8 +1432,7 @@ svg {
   position: relative;
   z-index: 1;
 
-  min-height: 100dvh;   /* besser als 100vh für Mobile */
-  
+  min-height: 100dvh;   /* Mobile safe */
   padding: 16px;
   padding-bottom: 110px;
 
@@ -1456,6 +1441,8 @@ svg {
 
   display: flex;
   flex-direction: column;
+
+  overflow: visible;   /* NICHT auto */
 }
 
 
@@ -2319,24 +2306,6 @@ svg {
   z-index: 9999;
 }
 
-/* ================= CLEAN APP SCROLL SYSTEM ================= */
-
-/* Body scroll deaktivieren */
-body {
-  overflow: hidden;
-}
-
-/* Nur App scrollt */
-.screen {
-  height: 100dvh; /* mobile safe */
-  overflow-y: auto;
-
-  scrollbar-width: none; /* Firefox */
-}
-
-.screen::-webkit-scrollbar {
-  display: none; /* Chrome / Edge / Safari */
-}
 
 /* ================= PDF OVERLAY FIELD CLEAN ================= */
 
