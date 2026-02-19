@@ -880,10 +880,11 @@ export default function App() {
 
   /* ================= BACK WITHOUT RESET================= */
 
-  function goToBaseWithoutReset() {
-    setCurrentCategoryIndex(0);   // Kategorie wieder auf Anfang
-    setStep("base");              // Zur persönlichen Angabe
-  }
+function goToBaseWithoutReset() {
+  setCurrentCategoryIndex(0);
+  setStep("base");
+  scrollToTop();
+}
 
 
   /* ================= DYNAMISCHE KATEGORIEN ================= */
@@ -906,7 +907,7 @@ export default function App() {
 
   const currentCategory = categories[currentCategoryIndex];
 
-  /* ===== FLOW-SCHUTZ ===== */
+  /* ================= FLOW-SCHUTZ ===== */
 
   useEffect(() => {
     if (step !== "category") return;
@@ -915,6 +916,24 @@ export default function App() {
       setCurrentCategoryIndex(0);
     }
   }, [categories, currentCategoryIndex, step]);
+
+  // ================= SCROLL TO TOP HELPER =================
+  const scrollToTop = () => {
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "auto"
+      });
+
+      if (screenRef?.current) {
+        screenRef.current.scrollTo({
+          top: 0,
+          behavior: "auto"
+        });
+      }
+    });
+  };
+
 
   /* ================= RESET ================= */
 
@@ -957,6 +976,7 @@ export default function App() {
       rentenluecke: "",
       ktgEmpfehlung: "",
     });
+     scrollToTop();
   }
 
   /* ================= ANSWER ================= */
@@ -3437,10 +3457,14 @@ export default function App() {
 
         <button
           className="primaryBtn"
-          onClick={() => setStep("category")}
+          onClick={() => {
+            setStep("category");
+            scrollToTop();
+          }}
         >
           Weiter
         </button>
+
 
         <div className="legalFooter">
           <span onClick={() => setLegalOverlay("impressum")}>
@@ -3492,7 +3516,10 @@ export default function App() {
             } else {
               setStep("base");
             }
+
+            scrollToTop();
           }}
+
           goBase={goToBaseWithoutReset}
         />
 
@@ -3759,7 +3786,10 @@ export default function App() {
               setStep("dashboard");
             }
 
+            scrollToTop();
+
           }}
+
         >
           {currentCategoryIndex < categories.length - 1
             ? "Weiter"
@@ -3874,7 +3904,10 @@ export default function App() {
 
         <Header
           goBase={goToBaseWithoutReset}
-          back={() => setStep("category")}
+          back={() => {
+            setStep("category");
+            scrollToTop();
+          }}
         />
 
 
@@ -4815,7 +4848,7 @@ function PdfOverlayComponent({
               Empfohlen werden oft 60 % des Bruttoeinkommens oder 80 % des Nettoeinkommens als maximale Absicherung.
               <br /><br />
               Für Selbstständige empfiehlt sich meist eine Absicherung in Höhe von
-             ca. 60-70% des Bruttogewinns oder 80% des Nettoeinkommens.
+              ca. 60-70% des Bruttogewinns oder 80% des Nettoeinkommens.
               <br /><br />
               Beamte benötigen statt einer BU in der Regel eine
               Dienstunfähigkeitsversicherung.
