@@ -917,22 +917,30 @@ function goToBaseWithoutReset() {
     }
   }, [categories, currentCategoryIndex, step]);
 
-  // ================= SCROLL TO TOP HELPER =================
-  const scrollToTop = () => {
-    requestAnimationFrame(() => {
-      window.scrollTo({
+
+// ================= SCROLL TO TOP HELPER (ANDROID SAFE) =================
+const scrollToTop = () => {
+  // Aktives Input schließen (Keyboard schließen)
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+
+  // Kleine Verzögerung für Android Keyboard Animation
+  setTimeout(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "auto"
+    });
+
+    if (screenRef?.current) {
+      screenRef.current.scrollTo({
         top: 0,
         behavior: "auto"
       });
+    }
+  }, 100); // 80–120ms optimal für Android
+};
 
-      if (screenRef?.current) {
-        screenRef.current.scrollTo({
-          top: 0,
-          behavior: "auto"
-        });
-      }
-    });
-  };
 
 
   /* ================= RESET ================= */
