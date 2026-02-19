@@ -2374,3 +2374,21 @@ svg {
   border-radius: 8px;
   color: rgba(255, 255, 255, 0.8);
 }
+
+/* ================= GLOBAL SCROLLBAR HIDE ================= */
+
+/* Chrome, Safari, Edge */
+*::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: none;
+}
+
+/* IE (falls relevant) */
+* {
+  -ms-overflow-style: none;
+}
