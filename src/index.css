@@ -5,11 +5,13 @@ body {
 }
 
 body {
-  overflow: hidden; /* verhindert Window-Scroll */
+  overflow-x: hidden;  /* nur horizontal blockieren */
+  overflow-y: auto;    /* vertikal scroll erlauben */
   background: #071018;
   color: #fff;
   font-family: system-ui, sans-serif;
 }
+
 
 * {
   box-sizing: border-box;
@@ -22,22 +24,7 @@ body {
   font-family: system-ui, sans-serif;
 }
 
-.screen {
-  position: relative;
-  z-index: 1;
 
-  height: 100vh;              /* statt min-height */
-  overflow-y: auto;           /* macht es zum Scroll-Container */
-
-  padding: 16px;
-  padding-bottom: 110px;
-
-  max-width: 420px;
-  margin: 0 auto;
-
-  display: flex;
-  flex-direction: column;
-}
 
 
 .center {
@@ -709,22 +696,7 @@ body::before {
   z-index: 0;
 }
 
-.screen {
-  position: relative;
-  z-index: 1;
 
-  height: 100vh;              /* statt min-height */
-  overflow-y: auto;           /* macht es zum Scroll-Container */
-
-  padding: 16px;
-  padding-bottom: 110px;
-
-  max-width: 420px;
-  margin: 0 auto;
-
-  display: flex;
-  flex-direction: column;
-}
 
 /* ================= UI UPGRADE 2 – PREMIUM CARDS ================= */
 
@@ -1471,9 +1443,8 @@ svg {
   position: relative;
   z-index: 1;
 
-  height: 100vh;              /* statt min-height */
-  overflow-y: auto;           /* macht es zum Scroll-Container */
-
+  min-height: 100dvh;   /* besser als 100vh für Mobile */
+  
   padding: 16px;
   padding-bottom: 110px;
 
@@ -2345,23 +2316,21 @@ svg {
   z-index: 9999;
 }
 
-/* Scrollbar unsichtbar machen – Scroll bleibt aktiv */
+/* ================= CLEAN APP SCROLL SYSTEM ================= */
+
+/* Body scroll deaktivieren */
+body {
+  overflow: hidden;
+}
+
+/* Nur App scrollt */
 .screen {
+  height: 100dvh; /* mobile safe */
+  overflow-y: auto;
+
   scrollbar-width: none; /* Firefox */
 }
 
 .screen::-webkit-scrollbar {
-  display: none; /* Chrome, Edge, Safari */
-}
-.screen {
-  overflow-y: auto;
-}
-.screen {
-  scrollbar-width: none;
-}
-.screen::-webkit-scrollbar {
-  display: none;
-}
-.screen {
-  overflow-y: auto;
+  display: none; /* Chrome / Edge / Safari */
 }

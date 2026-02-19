@@ -47,7 +47,7 @@ const PRIORITY_MAP = {
   private_rente: 2,
   gebaeude: 2,
   rechtsschutz: 2,
-  kfz_haftpflicht: 2,
+  fahrerschutz: 2,
 
   // Kinder – echte Verantwortung, aber nicht über Existenz
   kinder_unfall: 2,
@@ -81,8 +81,10 @@ const CORE_PRODUCTS = [
   "kinder_krankenzusatz",
   "kinder_unfall",
   "kinder_vorsorge",
-  "kfz_haftpflicht",
+
+  "fahrerschutz",   // ersetzt kfz_haftpflicht
   "kasko",
+
   "risiko_lv",
   "ruecklagen",
   "bav",
@@ -195,9 +197,9 @@ const ACTION_MAP = {
 
   /* ===== MOBILITÄT ===== */
 
-  kfz_haftpflicht: {
-    type: "abschluss",
-    url: "https://ssl.barmenia.de/online-versichern/#/kfzversicherung/Fahrzeug?adm=00840513"
+  fahrerschutz: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
   },
 
   kasko: {
@@ -400,11 +402,22 @@ const QUESTIONS = {
 
   /* ===== MOBILITÄT ===== */
 
-  kfz_haftpflicht: {
-    label: "Haftpflichtversicherung für dein Fahrzeug vorhanden? (z. B. Auto, Motorrad, Roller, Mofa)",
+  fahrerschutz: {
+    label: "Fahrerschutzversicherung vorhanden?",
     category: "mobilitaet",
     type: "yesno",
     condition: (baseData) => baseData.kfz === "Ja",
+    info: {
+      text: [
+        "Die KFZ-Haftpflicht ist in Deutschland gesetzlich vorgeschrieben und schützt andere Verkehrsteilnehmer.",
+        "",
+        "Der Fahrerschutz hingegen schützt den Fahrer selbst bei selbstverschuldeten Unfällen.",
+        "",
+        "Ohne Fahrerschutz erhält der Fahrer bei einem selbst verursachten Unfall keine Leistungen für Verdienstausfall, Schmerzensgeld oder Rentenzahlungen.",
+        "",
+        "Gerade für Familien, Selbstständige oder Hauptverdiener kann diese Absicherung existenziell sein."
+      ]
+    }
   },
 
 
@@ -727,17 +740,17 @@ export default function App() {
           }
         });
       }
-
       /* ===== KFZ ===== */
 
       if (baseData.kfz !== "Ja") {
-        ["kfz_haftpflicht", "kasko", "schutzbrief"].forEach(key => {
+        ["fahrerschutz", "kasko", "schutzbrief"].forEach(key => {
           if (updated[key] !== undefined) {
             delete updated[key];
             changed = true;
           }
         });
       }
+
 
       /* ===== TIERE ===== */
 
@@ -984,7 +997,7 @@ export default function App() {
     ) return null;
 
 
-    if ((key === "kasko" || key === "kfz_haftpflicht" || key === "schutzbrief") && baseData.kfz !== "Ja") return null;
+    if ((key === "kasko" || key === "fahrerschutz" || key === "schutzbrief") && baseData.kfz !== "Ja") return null;
     if ((key === "tierhaft" || key === "tier_op") && (!baseData.tiere || baseData.tiere === "Keine Tiere")) return null;
     if ((key === "hausrat" || key === "elementar") && baseData.wohnen === "Wohne bei Eltern") return null;
     if (key === "gebaeude" && !hatHaus) return null;
@@ -1187,14 +1200,43 @@ export default function App() {
     }
 
     /* ========================================================= */
-    /* ===== KASKO ============================================= */
+    /* ===== MOBILITÄT – INTELLIGENTE GEWICHTUNG =============== */
     /* ========================================================= */
 
-    if (key === "kasko") {
-      if (value === "vollkasko") return 100;
-      if (value === "teilkasko") return 50;
-      return 0;
+    if (key === "kasko" || key === "fahrerschutz" || key === "schutzbrief") {
+
+      const kasko = answers.kasko;
+      const fahrer = answers.fahrerschutz;
+      const schutz = answers.schutzbrief;
+
+      let maxScore = 0;
+      let score = 0;
+
+      // KASKO (Kernschutz)
+      if (kasko) {
+        maxScore += 100;
+
+        if (kasko === "vollkasko") score += 100;
+        else if (kasko === "teilkasko") score += 70;
+      }
+
+      // FAHRERSCHUTZ (Kernschutz)
+      if (fahrer) {
+        maxScore += 100;
+        if (fahrer === "ja") score += 100;
+      }
+
+      // SCHUTZBRIEF (Komfort)
+      if (schutz) {
+        maxScore += 60;
+        if (schutz === "ja") score += 60;
+      }
+
+      if (maxScore === 0) return null;
+
+      return Math.round((score / maxScore) * 100);
     }
+
 
     /* ========================================================= */
     /* ===== STANDARD JA / NEIN ================================ */
@@ -1202,6 +1244,7 @@ export default function App() {
 
     if (value === "ja") return 100;
     return 0;
+
   }
 
   /* ================= CATEGORY SCORES ================= */
@@ -1223,11 +1266,11 @@ export default function App() {
         .map((id) => getScore(id))
         .filter((score) => score !== null);
 
-   // Wenn keine bewertbaren Fragen existieren → null
-if (scores.length === 0) {
-  acc[cat] = null;
-  return acc;
-}
+      // Wenn keine bewertbaren Fragen existieren → null
+      if (scores.length === 0) {
+        acc[cat] = null;
+        return acc;
+      }
 
 
       const sum = scores.reduce((total, s) => total + s, 0);
@@ -1254,24 +1297,24 @@ if (scores.length === 0) {
       return score !== null;
     });
 
- // Dynamische Mindestanzahl: mindestens 40% der relevanten Fragen beantwortet
+    // Dynamische Mindestanzahl: mindestens 40% der relevanten Fragen beantwortet
 
-const totalRelevantQuestions = Object.keys(QUESTIONS).filter((id) => {
-  const q = QUESTIONS[id];
-  if (q.condition && !q.condition(baseData)) return false;
+    const totalRelevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
+      if (q.condition && !q.condition(baseData)) return false;
 
-  const score = getScore(id);
-  return score !== null;
-}).length;
+      const score = getScore(id);
+      return score !== null;
+    }).length;
 
-if (totalRelevantQuestions === 0) return 0;
+    if (totalRelevantQuestions === 0) return 0;
 
-const answeredCount = answeredRelevantQuestions.length;
-const minimumRequired = Math.ceil(totalRelevantQuestions * 0.4);
+    const answeredCount = answeredRelevantQuestions.length;
+    const minimumRequired = Math.ceil(totalRelevantQuestions * 0.4);
 
-if (answeredCount < minimumRequired) {
-  return 0;
-}
+    if (answeredCount < minimumRequired) {
+      return 0;
+    }
 
     const activeCategories = Object.keys(CATEGORY_WEIGHTS).filter((cat) => {
 
@@ -1422,18 +1465,19 @@ if (answeredCount < minimumRequired) {
 
     /* ===== NICHT-LINEARE PROGRESSION (HYBRID FIX) ===== */
 
-    if (finalScore > 92) {
+    if (finalScore > 92 && finalScore < 100) {
       finalScore = 92 + (finalScore - 92) * 0.85;
     }
 
-    if (finalScore > 99) {
+    if (finalScore > 99 && finalScore < 100) {
       finalScore = 99 + (finalScore - 99) * 0.6;
     }
 
     finalScore = Math.round(finalScore);
 
 
-    /* ===== 100%-REGEL (HYBRID) ===== */
+
+    /* ===== 100%-REGEL (HYBRID – ECHTE 100% ERLAUBT) ===== */
 
     if (finalScore >= 100) {
 
@@ -1449,31 +1493,39 @@ if (answeredCount < minimumRequired) {
         baseData.kinder === "Ja" ||
         baseData.wohnen === "Eigentum Haus";
 
+      let darf100 = true;
+
+      /* ===== KOMPLEXE LEBENSLAGE ===== */
+
       if (komplexeLebenslage) {
         if (
           !existenzScore || existenzScore < 90 ||
           !haftungScore || haftungScore < 85 ||
           (!hatBU && !hatRuecklagen)
         ) {
-          finalScore = 97;
+          darf100 = false;
         }
       } else {
         if (!existenzScore || existenzScore < 85) {
-          finalScore = 97;
+          darf100 = false;
         }
       }
 
-      // Mindeststruktur: mindestens 3 aktive Kategorien
+      /* ===== MINDESTSTRUKTUR ===== */
+
       if (aktiveKategorien < 3) {
-        finalScore = 97;
+        darf100 = false;
       }
 
-      console.log("Weighted:", weightedScore / totalWeight);
-      console.log("Final:", finalScore);
-      console.log("CategoryScores:", categoryScores);
+      /* ===== ENDERGEBNIS ===== */
+
+      if (!darf100) {
+        finalScore = 97;
+      } else {
+        finalScore = 100;
+      }
 
     }
-
     return finalScore;
 
 
@@ -1564,20 +1616,20 @@ if (answeredCount < minimumRequired) {
 
 
 
-/* ===== CATEGORY SCROLL FIX – FINAL STABLE ===== */
+  /* ===== CATEGORY SCROLL FIX – FINAL STABLE ===== */
 
-useEffect(() => {
+  useEffect(() => {
 
-  if (step !== "category") return;
+    if (step !== "category") return;
 
-  if (screenRef.current) {
-    screenRef.current.scrollTo({
-      top: 0,
-      behavior: "auto"   // wichtig: kein smooth hier!
-    });
-  }
+    if (screenRef.current) {
+      screenRef.current.scrollTo({
+        top: 0,
+        behavior: "auto"   // wichtig: kein smooth hier!
+      });
+    }
 
-}, [currentCategoryIndex, step]);
+  }, [currentCategoryIndex, step]);
 
 
   /* ===== OVERLAY SCROLL LOCK (FIXED) ===== */
@@ -2628,21 +2680,23 @@ useEffect(() => {
       }
 
 
-      /* ================= KFZ ================= */
+      /* ================= FAHRERSCHUTZ ================= */
 
-      case "kfz_haftpflicht": {
+      case "fahrerschutz": {
 
-        const fahrzeuge = Number(baseData.kfzAnzahl) || 1;
+        if (baseData.kfz !== "Ja") return null;
 
         if (value === "ja") return null;
 
+        const fahrzeuge = Number(baseData.kfzAnzahl) || 1;
+
         if (value === "unbekannt")
-          return "Die gesetzliche Kfz-Haftpflicht ist verpflichtend. Eine Klärung ist wichtig, da ohne Versicherung kein Schutz bei Schadenersatzforderungen besteht.";
+          return "Der Fahrerschutz schützt dich als Fahrer bei selbstverschuldeten Unfällen vor finanziellen Folgen wie Verdienstausfall oder Folgekosten. Eine Klärung ist sinnvoll.";
 
         if (fahrzeuge > 1)
-          return "Bei mehreren Fahrzeugen steigt das Haftungsrisiko. Eine fehlende Kfz-Haftpflicht kann erhebliche finanzielle Folgen haben.";
+          return "Bei mehreren Fahrzeugen steigt statistisch das Unfallrisiko. Der Fahrerschutz schützt den Fahrer bei selbstverschuldeten Schäden.";
 
-        return "Die Kfz-Haftpflicht schützt vor hohen Schadenersatzforderungen bei Personen- und Sachschäden und ist gesetzlich vorgeschrieben.";
+        return "Bei selbstverschuldeten Unfällen leistet die Kfz-Haftpflicht nicht für den eigenen Fahrer. Der Fahrerschutz schließt diese Absicherungslücke.";
       }
 
 
@@ -3996,49 +4050,59 @@ useEffect(() => {
         {animatedScore < 60 && (
           <div className="riskWarning" style={{ textAlign: "center" }}>
             <strong>Handlungsbedarf:</strong> Es bestehen mehrere relevante
-            Absicherungslücken.
+            Absicherungslücken, die wir zeitnah gemeinsam anschauen sollten.
           </div>
         )}
 
         {animatedScore >= 60 && animatedScore < 80 && (
           <div className="upgradeHint" style={{ textAlign: "center" }}>
-            Gute Ausgangsbasis. Mit gezielten Anpassungen lässt sich dein
-            Absicherungsniveau deutlich verbessern.
+            Gute Basis. Mit ein paar gezielten Anpassungen lässt sich dein
+            Schutz deutlich stabiler und langfristig sinnvoller aufstellen.
           </div>
         )}
 
-        {animatedScore >= 80 && animatedScore < 100 && (
+        {animatedScore >= 80 && animatedScore < 90 && (
           <div className="upgradeHint" style={{ textAlign: "center" }}>
-            Sehr starke Struktur. Mit wenigen strategischen Optimierungen
-            sind 90%+ realistisch erreichbar.
+            Du bist bereits gut abgesichert. Einzelne Bausteine können noch
+            sinnvoll ergänzt oder optimiert werden.
           </div>
         )}
 
-        {animatedScore === 100 && (
+        {animatedScore >= 90 && animatedScore < 100 && (
           <div className="upgradeHint" style={{ textAlign: "center" }}>
-            Sehr stark aufgestellt. In einem kurzen Strategie-Check lässt sich prüfen,
-            ob sich weitere Optimierungspotenziale ergeben.
+            Sehr stark aufgestellt. Deine Struktur ist durchdacht und
+            deckt die wesentlichen Risiken ab. Mit wenigen strategischen
+            Feinjustierungen lässt sich das Gesamtbild weiter abrunden.
           </div>
         )}
 
+        {animatedScore >= 100 && (
+          <div className="upgradeHint" style={{ textAlign: "center" }}>
+            Exzellent aufgestellt.
+            Das Fundament steht. Jetzt geht es nicht mehr um Lücken –
+            sondern um strategische Feinjustierung.
+          </div>
+        )}
 
 
         {/* ================= TOP 3 HANDLUNGSFELDER ================= */}
-        {topRecommendations.length > 0 && (
+        {(topRecommendations.length > 0 || animatedScore === 100) && (
           <div className="categoryList" style={{ marginTop: 20 }}>
 
             <h3 className="top3Headline">
               {animatedScore < 60
                 ? "Hier sollten wir gezielt nachschärfen"
                 : animatedScore < 80
-                  ? "Hier steckt noch Potenzial"
+                  ? "Hier steckt noch echtes Potenzial"
                   : animatedScore < 95
-                    ? "Sehr gute Basis – jetzt geht es um Feinschliff"
-                    : "Exzellent aufgestellt – strategische Perfektionierung"}
+                    ? "Sehr gute Basis – jetzt geht es um den Feinschliff"
+                    : animatedScore < 100
+                      ? "Exzellent aufgestellt – strategische Feinjustierung"
+                      : "Exzellent aufgestellt – aktuell kein Handlungsbedarf"}
             </h3>
 
-
-            {topRecommendations.map((item) => {
+            {/* Normale Empfehlungen */}
+            {animatedScore < 100 && topRecommendations.map((item) => {
 
               const action = ACTION_MAP[item.id];
 
@@ -4063,7 +4127,6 @@ useEffect(() => {
                         if (action.type === "beratung") {
                           setActionOverlay(item.id);
                         }
-
                       }}
                     >
                       {action.type === "abschluss"
@@ -4074,8 +4137,25 @@ useEffect(() => {
                 </div>
               );
             })}
+
+            {/* 100%-Zustand */}
+            {animatedScore === 100 && (
+              <div
+                className="recommendationItem"
+                style={{
+                  textAlign: "center",
+                  marginTop: 10,
+                  opacity: 0.85
+                }}
+              >
+                Deine Absicherungsstruktur ist aktuell vollständig und durchdacht aufgebaut.
+                Es bestehen keine prioritären Handlungsfelder.
+              </div>
+            )}
+
           </div>
         )}
+
 
         {/* Kategorien Übersicht */}
         <div className="categoryList">
@@ -4798,21 +4878,21 @@ function PdfPreviewComponent({
   const actionsRef = React.useRef(null);
   const [showScrollButton, setShowScrollButton] = React.useState(true);
 
-const scrollToBottom = () => {
-  if (!wrapperRef.current || !actionsRef.current) return;
+  const scrollToBottom = () => {
+    if (!wrapperRef.current || !actionsRef.current) return;
 
-  const wrapper = wrapperRef.current;
-  const target = actionsRef.current;
+    const wrapper = wrapperRef.current;
+    const target = actionsRef.current;
 
-  // Position relativ zum Wrapper berechnen
-  const targetPosition =
-    target.offsetTop - wrapper.offsetTop;
+    // Position relativ zum Wrapper berechnen
+    const targetPosition =
+      target.offsetTop - wrapper.offsetTop;
 
-  wrapper.scrollTo({
-    top: targetPosition,
-    behavior: "smooth"
-  });
-};
+    wrapper.scrollTo({
+      top: targetPosition,
+      behavior: "smooth"
+    });
+  };
 
   /* ===== SCROLL BUTTON VISIBILITY (OVERLAY INTERN) ===== */
 
