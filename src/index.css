@@ -1117,7 +1117,10 @@ svg {
   justify-content: center;
   align-items: flex-start;
 
-  padding: 80px 20px 40px 20px;
+  padding: 0px 20px;
+
+  height: 100dvh;
+  overflow-y: auto;
 }
 
 
@@ -2319,6 +2322,24 @@ svg {
   z-index: 9999;
 }
 
+/* ================= CLEAN APP SCROLL SYSTEM ================= */
+
+/* Body scroll deaktivieren */
+body {
+  overflow: hidden;
+}
+
+/* Nur App scrollt */
+.screen {
+  height: 100dvh; /* mobile safe */
+  overflow-y: auto;
+
+  scrollbar-width: none; /* Firefox */
+}
+
+.screen::-webkit-scrollbar {
+  display: none; /* Chrome / Edge / Safari */
+}
 
 /* ================= PDF OVERLAY FIELD CLEAN ================= */
 
