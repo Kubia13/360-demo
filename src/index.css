@@ -2294,7 +2294,7 @@ svg {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 
-  color: #A99BFF;
+  color: #ffffff;
 
   font-size: 24px;
   font-weight: 600;
@@ -2333,4 +2333,61 @@ body {
 
 .screen::-webkit-scrollbar {
   display: none; /* Chrome / Edge / Safari */
+}
+
+/* ================= PDF OVERLAY FIELD CLEAN ================= */
+
+.overlayField {
+  margin-bottom: 22px; /* exakt wie .pdfBox .field */
+}
+
+.overlayLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.overlayLabelRow label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* Dezentes Info-Icon – größer & konsistent */
+.infoIconInline {
+  min-width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  border-radius: 8px;
+  border: 1px solid rgba(139,124,246,0.45);
+
+  color: #ffffff; /* ← jetzt weiß */
+  background: rgba(139,124,246,0.25);
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.infoIconInline:hover {
+  background: rgba(139,124,246,0.2);
+}
+
+
+.overlayInfoText {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  background: rgba(139,124,246,0.08);
+  border-left: 3px solid #8B7CF6;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
 }

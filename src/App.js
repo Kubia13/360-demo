@@ -4695,6 +4695,8 @@ function PdfOverlayComponent({
   setPdfPreview
 }) {
 
+  const [infoField, setInfoField] = React.useState(null);
+
   if (!pdfOverlay) return null;
 
   const autoBU =
@@ -4795,33 +4797,110 @@ function PdfOverlayComponent({
 
         {/* BU direkt übernommen */}
 
-        <Input
-          label="BU-Rente (€)"
-          value={
-            pdfData.buEmpfehlung !== ""
-              ? pdfData.buEmpfehlung
-              : autoBU
-          }
-          onChange={(v) =>
-            setPdfData({ ...pdfData, buEmpfehlung: v })
-          }
-        />
+        {/* ================= BU ================= */}
 
-        <Input
-          label="Altersrentenlücke (€)"
-          value={pdfData.rentenluecke}
-          onChange={(v) =>
-            setPdfData({ ...pdfData, rentenluecke: v })
-          }
-        />
+        <div className="overlayField">
+          <div className="overlayLabelRow">
+            <label>BU-Rente (€)</label>
+            <span
+              className="infoIconInline"
+              onClick={() => setInfoField(infoField === "bu" ? null : "bu")}
+            >
+              i
+            </span>
+          </div>
 
-        <Input
-          label="Empfohlenes Krankentagegeld (€)"
-          value={pdfData.ktgEmpfehlung}
-          onChange={(v) =>
-            setPdfData({ ...pdfData, ktgEmpfehlung: v })
-          }
-        />
+          {infoField === "bu" && (
+            <div className="overlayInfoText">
+              Empfohlen werden oft 60 % des Bruttoeinkommens oder 80 % des Nettoeinkommens als maximale Absicherung.
+              <br /><br />
+              Für Selbstständige empfiehlt sich meist eine Absicherung in Höhe von
+             ca. 60-70% des Bruttogewinns oder 80% des Nettoeinkommens.
+              <br /><br />
+              Beamte benötigen statt einer BU in der Regel eine
+              Dienstunfähigkeitsversicherung.
+            </div>
+          )}
+
+          <Input
+            value={
+              pdfData.buEmpfehlung !== ""
+                ? pdfData.buEmpfehlung
+                : autoBU
+            }
+            onChange={(v) =>
+              setPdfData({ ...pdfData, buEmpfehlung: v })
+            }
+          />
+        </div>
+
+
+        {/* ================= RENTENLÜCKE ================= */}
+
+        <div className="overlayField">
+          <div className="overlayLabelRow">
+            <label>Altersrentenlücke (€)</label>
+            <span
+              className="infoIconInline"
+              onClick={() => setInfoField(infoField === "rente" ? null : "rente")}
+            >
+              i
+            </span>
+          </div>
+
+          {infoField === "rente" && (
+            <div className="overlayInfoText">
+              Die Rentenlücke ergibt sich aus der Differenz zwischen
+              gewünschtem Ruhestandseinkommen und der zu erwartenden
+              gesetzlichen Rente.
+              <br /><br />
+              Besonders bei Selbstständigen oder höherem Einkommen
+              entsteht hier oft deutlicher Handlungsbedarf.
+            </div>
+          )}
+
+          <Input
+            value={pdfData.rentenluecke}
+            onChange={(v) =>
+              setPdfData({ ...pdfData, rentenluecke: v })
+            }
+          />
+        </div>
+
+
+        {/* ================= KRANKENTAGEGELD ================= */}
+
+        <div className="overlayField">
+          <div className="overlayLabelRow">
+            <label>Krankentagegeld (€)</label>
+            <span
+              className="infoIconInline"
+              onClick={() => setInfoField(infoField === "ktg" ? null : "ktg")}
+            >
+              i
+            </span>
+          </div>
+
+          {infoField === "ktg" && (
+            <div className="overlayInfoText">
+              Für Selbstständige und privat Versicherte ist das
+              Krankentagegeld essenziell, da keine Lohnfortzahlung
+              durch den Arbeitgeber erfolgt.
+              <br /><br />
+              Bei Angestellten in der PKV wird die Höhe aus Netto,
+              Brutto sowie Kranken- und Pflegeversicherungsbeitrag
+              berechnet.
+            </div>
+          )}
+
+          <Input
+            value={pdfData.ktgEmpfehlung}
+            onChange={(v) =>
+              setPdfData({ ...pdfData, ktgEmpfehlung: v })
+            }
+          />
+        </div>
+
 
         <button
           className="primaryBtn big"
