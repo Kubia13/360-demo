@@ -47,7 +47,7 @@ const PRIORITY_MAP = {
   private_rente: 2,
   gebaeude: 2,
   rechtsschutz: 2,
-  kfz_haftpflicht: 2,
+  fahrerschutz: 2,
 
   // Kinder – echte Verantwortung, aber nicht über Existenz
   kinder_unfall: 2,
@@ -81,8 +81,10 @@ const CORE_PRODUCTS = [
   "kinder_krankenzusatz",
   "kinder_unfall",
   "kinder_vorsorge",
-  "kfz_haftpflicht",
+
+  "fahrerschutz",   // ersetzt kfz_haftpflicht
   "kasko",
+
   "risiko_lv",
   "ruecklagen",
   "bav",
@@ -195,9 +197,9 @@ const ACTION_MAP = {
 
   /* ===== MOBILITÄT ===== */
 
-  kfz_haftpflicht: {
-    type: "abschluss",
-    url: "https://ssl.barmenia.de/online-versichern/#/kfzversicherung/Fahrzeug?adm=00840513"
+  fahrerschutz: {
+    type: "beratung",
+    calendar: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0SLsLLWwpYi9zGo3jKaW9aH-njqaoyXli9aNibLRwSZn0jO4CdgL0-7yCHXsXNJMLAWgvFZi1N"
   },
 
   kasko: {
@@ -405,11 +407,22 @@ const QUESTIONS = {
 
   /* ===== MOBILITÄT ===== */
 
-  kfz_haftpflicht: {
-    label: "Haftpflichtversicherung für dein Fahrzeug vorhanden? (z. B. Auto, Motorrad, Roller, Mofa)",
+  fahrerschutz: {
+    label: "Fahrerschutzversicherung vorhanden?",
     category: "mobilitaet",
     type: "yesno",
     condition: (baseData) => baseData.kfz === "Ja",
+    info: {
+      text: [
+        "Die KFZ-Haftpflicht ist in Deutschland gesetzlich vorgeschrieben und schützt andere Verkehrsteilnehmer.",
+        "",
+        "Der Fahrerschutz hingegen schützt den Fahrer selbst bei selbstverschuldeten Unfällen.",
+        "",
+        "Ohne Fahrerschutz erhält der Fahrer bei einem selbst verursachten Unfall keine Leistungen für Verdienstausfall, Schmerzensgeld oder Rentenzahlungen.",
+        "",
+        "Gerade für Familien, Selbstständige oder Hauptverdiener kann diese Absicherung existenziell sein."
+      ]
+    }
   },
 
 
@@ -673,6 +686,8 @@ export default function App() {
   const [step, setStep] = useState("welcome");
   const [answers, setAnswers] = useState({});
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const screenRef = React.useRef(null);
+
 
 
   const [baseData, setBaseData] = useState({
@@ -730,17 +745,17 @@ export default function App() {
           }
         });
       }
-
       /* ===== KFZ ===== */
 
       if (baseData.kfz !== "Ja") {
-        ["kfz_haftpflicht", "kasko", "schutzbrief"].forEach(key => {
+        ["fahrerschutz", "kasko", "schutzbrief"].forEach(key => {
           if (updated[key] !== undefined) {
             delete updated[key];
             changed = true;
           }
         });
       }
+
 
       /* ===== TIERE ===== */
 
@@ -871,8 +886,9 @@ export default function App() {
   /* ================= BACK WITHOUT RESET================= */
 
   function goToBaseWithoutReset() {
-    setCurrentCategoryIndex(0);   // Kategorie wieder auf Anfang
-    setStep("base");              // Zur persönlichen Angabe
+    setCurrentCategoryIndex(0);
+    setStep("base");
+    scrollToTop();
   }
 
 
@@ -896,7 +912,7 @@ export default function App() {
 
   const currentCategory = categories[currentCategoryIndex];
 
-  /* ===== FLOW-SCHUTZ ===== */
+  /* ================= FLOW-SCHUTZ ===== */
 
   useEffect(() => {
     if (step !== "category") return;
@@ -905,6 +921,32 @@ export default function App() {
       setCurrentCategoryIndex(0);
     }
   }, [categories, currentCategoryIndex, step]);
+
+
+  // ================= SCROLL TO TOP HELPER (ANDROID SAFE) =================
+  const scrollToTop = () => {
+    // Aktives Input schließen (Keyboard schließen)
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    // Kleine Verzögerung für Android Keyboard Animation
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "auto"
+      });
+
+      if (screenRef?.current) {
+        screenRef.current.scrollTo({
+          top: 0,
+          behavior: "auto"
+        });
+      }
+    }, 100); // 80–120ms optimal für Android
+  };
+
+
 
   /* ================= RESET ================= */
 
@@ -947,6 +989,7 @@ export default function App() {
       rentenluecke: "",
       ktgEmpfehlung: "",
     });
+    scrollToTop();
   }
 
   /* ================= ANSWER ================= */
@@ -976,13 +1019,33 @@ export default function App() {
     /* ========================================================= */
 
     if (key === "kinder_krankenzusatz" && !hatKinder) return null;
-    if ((key === "kasko" || key === "kfz_haftpflicht" || key === "schutzbrief") && baseData.kfz !== "Ja") return null;
+
+    // Wenn Kinder privat versichert sind → Zusatz nicht relevant
+    if (
+      key === "kinder_krankenzusatz" &&
+      (
+        baseData.kinderKrankenversicherung === "Privat versichert (PKV)" ||
+        baseData.kinderKrankenversicherung === "Beihilfe + PKV"
+      )
+    ) return null;
+
+
+    if ((key === "kasko" || key === "fahrerschutz" || key === "schutzbrief") && baseData.kfz !== "Ja") return null;
     if ((key === "tierhaft" || key === "tier_op") && (!baseData.tiere || baseData.tiere === "Keine Tiere")) return null;
     if ((key === "hausrat" || key === "elementar") && baseData.wohnen === "Wohne bei Eltern") return null;
     if (key === "gebaeude" && !hatHaus) return null;
     if (key === "ktg" && baseData.beruf === "Beamter") return null;
     if (key === "bu" && (baseData.beruf === "Beamter" || baseData.beruf === "Nicht berufstätig")) return null;
     if (key === "du" && baseData.beruf !== "Beamter") return null;
+    // Wenn Erwachsener privat versichert ist → Krankenzusatz nicht relevant
+    if (
+      key === "krankenzusatz" &&
+      (
+        baseData.krankenversicherung === "Privat versichert (PKV)" ||
+        baseData.krankenversicherung === "Heilfürsorge"
+      )
+    ) return null;
+
 
     /* ========================================================= */
     /* ===== RÜCKLAGEN ========================================= */
@@ -1170,13 +1233,41 @@ export default function App() {
     }
 
     /* ========================================================= */
-    /* ===== KASKO ============================================= */
+    /* ===== MOBILITÄT – INTELLIGENTE GEWICHTUNG =============== */
     /* ========================================================= */
 
-    if (key === "kasko") {
-      if (value === "vollkasko") return 100;
-      if (value === "teilkasko") return 50;
-      return 0;
+    if (key === "kasko" || key === "fahrerschutz" || key === "schutzbrief") {
+
+      const kasko = answers.kasko;
+      const fahrer = answers.fahrerschutz;
+      const schutz = answers.schutzbrief;
+
+      let maxScore = 0;
+      let score = 0;
+
+      // KASKO (Kernschutz)
+      if (kasko) {
+        maxScore += 100;
+
+        if (kasko === "vollkasko") score += 100;
+        else if (kasko === "teilkasko") score += 70;
+      }
+
+      // FAHRERSCHUTZ (Kernschutz)
+      if (fahrer) {
+        maxScore += 100;
+        if (fahrer === "ja") score += 100;
+      }
+
+      // SCHUTZBRIEF (Komfort)
+      if (schutz) {
+        maxScore += 60;
+        if (schutz === "ja") score += 60;
+      }
+
+      if (maxScore === 0) return null;
+
+      return Math.round((score / maxScore) * 100);
     }
     /* ========================================================= */
     /* ===== TIER OP / TIERKRANKEN ============================= */
@@ -1206,12 +1297,14 @@ export default function App() {
       }
     }
 
+
     /* ========================================================= */
     /* ===== STANDARD JA / NEIN ================================ */
     /* ========================================================= */
 
     if (value === "ja") return 100;
     return 0;
+
   }
 
   /* ================= CATEGORY SCORES ================= */
@@ -1233,11 +1326,12 @@ export default function App() {
         .map((id) => getScore(id))
         .filter((score) => score !== null);
 
-      // Weniger als 2 beantwortete Fragen → keine Bewertung
-      if (scores.length < 2) {
+      // Wenn keine bewertbaren Fragen existieren → null
+      if (scores.length === 0) {
         acc[cat] = null;
         return acc;
       }
+
 
       const sum = scores.reduce((total, s) => total + s, 0);
       acc[cat] = Math.round(sum / scores.length);
@@ -1263,8 +1357,22 @@ export default function App() {
       return score !== null;
     });
 
-    // Mindestanzahl definieren (z.B. 3 relevante Antworten)
-    if (answeredRelevantQuestions.length < 6) {
+    // Dynamische Mindestanzahl: mindestens 40% der relevanten Fragen beantwortet
+
+    const totalRelevantQuestions = Object.keys(QUESTIONS).filter((id) => {
+      const q = QUESTIONS[id];
+      if (q.condition && !q.condition(baseData)) return false;
+
+      const score = getScore(id);
+      return score !== null;
+    }).length;
+
+    if (totalRelevantQuestions === 0) return 0;
+
+    const answeredCount = answeredRelevantQuestions.length;
+    const minimumRequired = Math.ceil(totalRelevantQuestions * 0.4);
+
+    if (answeredCount < minimumRequired) {
       return 0;
     }
 
@@ -1417,18 +1525,19 @@ export default function App() {
 
     /* ===== NICHT-LINEARE PROGRESSION (HYBRID FIX) ===== */
 
-    if (finalScore > 92) {
+    if (finalScore > 92 && finalScore < 100) {
       finalScore = 92 + (finalScore - 92) * 0.85;
     }
 
-    if (finalScore > 99) {
+    if (finalScore > 99 && finalScore < 100) {
       finalScore = 99 + (finalScore - 99) * 0.6;
     }
 
     finalScore = Math.round(finalScore);
 
 
-    /* ===== 100%-REGEL (HYBRID) ===== */
+
+    /* ===== 100%-REGEL (HYBRID – ECHTE 100% ERLAUBT) ===== */
 
     if (finalScore >= 100) {
 
@@ -1444,31 +1553,39 @@ export default function App() {
         baseData.kinder === "Ja" ||
         baseData.wohnen === "Eigentum Haus";
 
+      let darf100 = true;
+
+      /* ===== KOMPLEXE LEBENSLAGE ===== */
+
       if (komplexeLebenslage) {
         if (
           !existenzScore || existenzScore < 90 ||
           !haftungScore || haftungScore < 85 ||
           (!hatBU && !hatRuecklagen)
         ) {
-          finalScore = 97;
+          darf100 = false;
         }
       } else {
         if (!existenzScore || existenzScore < 85) {
-          finalScore = 97;
+          darf100 = false;
         }
       }
 
-      // Mindeststruktur: mindestens 3 aktive Kategorien
+      /* ===== MINDESTSTRUKTUR ===== */
+
       if (aktiveKategorien < 3) {
-        finalScore = 97;
+        darf100 = false;
       }
 
-      console.log("Weighted:", weightedScore / totalWeight);
-      console.log("Final:", finalScore);
-      console.log("CategoryScores:", categoryScores);
+      /* ===== ENDERGEBNIS ===== */
+
+      if (!darf100) {
+        finalScore = 97;
+      } else {
+        finalScore = 100;
+      }
 
     }
-
     return finalScore;
 
 
@@ -1559,34 +1676,45 @@ export default function App() {
 
 
 
-  /* ===== CATEGORY SCROLL FIX – STABIL (OHNE SMOOTH) ===== */
+  /* ===== CATEGORY SCROLL FIX – FINAL STABLE ===== */
 
   useEffect(() => {
 
     if (step !== "category") return;
 
-    // Sofortiger Scroll ohne Animation
-    window.scrollTo(0, 0);
+    if (screenRef.current) {
+      screenRef.current.scrollTo({
+        top: 0,
+        behavior: "auto"   // wichtig: kein smooth hier!
+      });
+    }
 
   }, [currentCategoryIndex, step]);
 
-  /* ===== OVERLAY SCROLL LOCK ===== */
+
+  /* ===== OVERLAY SCROLL LOCK (FIXED) ===== */
 
   useEffect(() => {
-    const overlayOpen =
-      legalOverlay !== null ||
-      contactOverlay === true ||
-      showResetConfirm === true ||
-      actionOverlay !== null ||
-      pdfOverlay === true ||
-      calculatorOverlay === true ||
-      pdfPreview === true;
 
-    document.body.style.overflow = overlayOpen ? "hidden" : "auto";
+    const overlayOpen =
+      Boolean(legalOverlay) ||
+      Boolean(contactOverlay) ||
+      Boolean(showResetConfirm) ||
+      Boolean(actionOverlay) ||
+      Boolean(pdfOverlay) ||
+      Boolean(calculatorOverlay) ||
+      Boolean(pdfPreview);
+
+    if (overlayOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
 
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     };
+
   }, [
     legalOverlay,
     contactOverlay,
@@ -1597,6 +1725,55 @@ export default function App() {
     pdfPreview
   ]);
 
+
+  /* ===== GLOBAL FOCUS SMOOTH SCROLL ===== */
+
+  useEffect(() => {
+
+    const handleFocus = (e) => {
+
+      if (!e || !e.target) return;
+
+      const el = e.target;
+
+      if (typeof el.scrollIntoView !== "function") return;
+
+      // 🔥 Nur reagieren wenn Overlay aktiv ist
+      const overlayOpen =
+        Boolean(legalOverlay) ||
+        Boolean(contactOverlay) ||
+        Boolean(showResetConfirm) ||
+        Boolean(actionOverlay) ||
+        Boolean(pdfOverlay) ||
+        Boolean(calculatorOverlay) ||
+        Boolean(pdfPreview);
+
+      if (!overlayOpen) return;
+
+      setTimeout(() => {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 120);
+    };
+
+
+    document.addEventListener("focusin", handleFocus);
+
+    return () => {
+      document.removeEventListener("focusin", handleFocus);
+    };
+
+  }, [
+    legalOverlay,
+    contactOverlay,
+    showResetConfirm,
+    actionOverlay,
+    pdfOverlay,
+    calculatorOverlay,
+    pdfPreview
+  ]);
 
 
   /* ================= TOP 3 HANDLUNGSFELDER ================= */
@@ -1814,7 +1991,8 @@ export default function App() {
 
   if (step === "products") {
     return (
-      <div className="screen">
+      <div className="screen" ref={screenRef}>
+
         <Header
           goBase={goToBaseWithoutReset}
           back={() => setStep("dashboard")}
@@ -2598,21 +2776,23 @@ export default function App() {
       }
 
 
-      /* ================= KFZ ================= */
+      /* ================= FAHRERSCHUTZ ================= */
 
-      case "kfz_haftpflicht": {
+      case "fahrerschutz": {
 
-        const fahrzeuge = Number(baseData.kfzAnzahl) || 1;
+        if (baseData.kfz !== "Ja") return null;
 
         if (value === "ja") return null;
 
+        const fahrzeuge = Number(baseData.kfzAnzahl) || 1;
+
         if (value === "unbekannt")
-          return "Die gesetzliche Kfz-Haftpflicht ist verpflichtend. Eine Klärung ist wichtig, da ohne Versicherung kein Schutz bei Schadenersatzforderungen besteht.";
+          return "Der Fahrerschutz schützt dich als Fahrer bei selbstverschuldeten Unfällen vor finanziellen Folgen wie Verdienstausfall oder Folgekosten. Eine Klärung ist sinnvoll.";
 
         if (fahrzeuge > 1)
-          return "Bei mehreren Fahrzeugen steigt das Haftungsrisiko. Eine fehlende Kfz-Haftpflicht kann erhebliche finanzielle Folgen haben.";
+          return "Bei mehreren Fahrzeugen steigt statistisch das Unfallrisiko. Der Fahrerschutz schützt den Fahrer bei selbstverschuldeten Schäden.";
 
-        return "Die Kfz-Haftpflicht schützt vor hohen Schadenersatzforderungen bei Personen- und Sachschäden und ist gesetzlich vorgeschrieben.";
+        return "Bei selbstverschuldeten Unfällen leistet die Kfz-Haftpflicht nicht für den eigenen Fahrer. Der Fahrerschutz schließt diese Absicherungslücke.";
       }
 
 
@@ -3353,10 +3533,14 @@ export default function App() {
 
         <button
           className="primaryBtn"
-          onClick={() => setStep("category")}
+          onClick={() => {
+            setStep("category");
+            scrollToTop();
+          }}
         >
           Weiter
         </button>
+
 
         <div className="legalFooter">
           <span onClick={() => setLegalOverlay("impressum")}>
@@ -3399,7 +3583,8 @@ export default function App() {
     });
 
     return (
-      <div className="screen">
+      <div className="screen" ref={screenRef}>
+
         <Header
           back={() => {
             if (currentCategoryIndex > 0) {
@@ -3407,7 +3592,10 @@ export default function App() {
             } else {
               setStep("base");
             }
+
+            scrollToTop();
           }}
+
           goBase={goToBaseWithoutReset}
         />
 
@@ -3691,19 +3879,23 @@ export default function App() {
           type="button"
           className="primaryBtn big"
           onClick={() => {
+
             if (currentCategoryIndex < categories.length - 1) {
               setCurrentCategoryIndex((prev) => prev + 1);
-              window.scrollTo({ top: 0, behavior: "smooth" });
             } else {
               setStep("dashboard");
-              window.scrollTo({ top: 0, behavior: "smooth" });
             }
+
+            scrollToTop();
+
           }}
+
         >
           {currentCategoryIndex < categories.length - 1
             ? "Weiter"
             : "Auswertung"}
         </button>
+
 
 
         {showInfo && (
@@ -3808,10 +4000,14 @@ export default function App() {
 
   if (step === "dashboard") {
     return (
-      <div className="screen">
+      <div className="screen" ref={screenRef}>
+
         <Header
           goBase={goToBaseWithoutReset}
-          back={() => setStep("category")}
+          back={() => {
+            setStep("category");
+            scrollToTop();
+          }}
         />
 
 
@@ -3987,49 +4183,59 @@ export default function App() {
         {animatedScore < 60 && (
           <div className="riskWarning" style={{ textAlign: "center" }}>
             <strong>Handlungsbedarf:</strong> Es bestehen mehrere relevante
-            Absicherungslücken.
+            Absicherungslücken, die wir zeitnah gemeinsam anschauen sollten.
           </div>
         )}
 
         {animatedScore >= 60 && animatedScore < 80 && (
           <div className="upgradeHint" style={{ textAlign: "center" }}>
-            Gute Ausgangsbasis. Mit gezielten Anpassungen lässt sich dein
-            Absicherungsniveau deutlich verbessern.
+            Gute Basis. Mit ein paar gezielten Anpassungen lässt sich dein
+            Schutz deutlich stabiler und langfristig sinnvoller aufstellen.
           </div>
         )}
 
-        {animatedScore >= 80 && animatedScore < 100 && (
+        {animatedScore >= 80 && animatedScore < 90 && (
           <div className="upgradeHint" style={{ textAlign: "center" }}>
-            Sehr starke Struktur. Mit wenigen strategischen Optimierungen
-            sind 90%+ realistisch erreichbar.
+            Du bist bereits gut abgesichert. Einzelne Bausteine können noch
+            sinnvoll ergänzt oder optimiert werden.
           </div>
         )}
 
-        {animatedScore === 100 && (
+        {animatedScore >= 90 && animatedScore < 100 && (
           <div className="upgradeHint" style={{ textAlign: "center" }}>
-            Sehr stark aufgestellt. In einem kurzen Strategie-Check lässt sich prüfen,
-            ob sich weitere Optimierungspotenziale ergeben.
+            Sehr stark aufgestellt. Deine Struktur ist durchdacht und
+            deckt die wesentlichen Risiken ab. Mit wenigen strategischen
+            Feinjustierungen lässt sich das Gesamtbild weiter abrunden.
           </div>
         )}
 
+        {animatedScore >= 100 && (
+          <div className="upgradeHint" style={{ textAlign: "center" }}>
+            Exzellent aufgestellt.
+            Das Fundament steht. Jetzt geht es nicht mehr um Lücken –
+            sondern um strategische Feinjustierung.
+          </div>
+        )}
 
 
         {/* ================= TOP 3 HANDLUNGSFELDER ================= */}
-        {topRecommendations.length > 0 && (
+        {(topRecommendations.length > 0 || animatedScore === 100) && (
           <div className="categoryList" style={{ marginTop: 20 }}>
 
             <h3 className="top3Headline">
               {animatedScore < 60
                 ? "Hier sollten wir gezielt nachschärfen"
                 : animatedScore < 80
-                  ? "Hier steckt noch Potenzial"
+                  ? "Hier steckt noch echtes Potenzial"
                   : animatedScore < 95
-                    ? "Sehr gute Basis – jetzt geht es um Feinschliff"
-                    : "Exzellent aufgestellt – strategische Perfektionierung"}
+                    ? "Sehr gute Basis – jetzt geht es um den Feinschliff"
+                    : animatedScore < 100
+                      ? "Exzellent aufgestellt – strategische Feinjustierung"
+                      : "Exzellent aufgestellt – aktuell kein Handlungsbedarf"}
             </h3>
 
-
-            {topRecommendations.map((item) => {
+            {/* Normale Empfehlungen */}
+            {animatedScore < 100 && topRecommendations.map((item) => {
 
               const action = ACTION_MAP[item.id];
 
@@ -4054,7 +4260,6 @@ export default function App() {
                         if (action.type === "beratung") {
                           setActionOverlay(item.id);
                         }
-
                       }}
                     >
                       {action.type === "abschluss"
@@ -4065,8 +4270,25 @@ export default function App() {
                 </div>
               );
             })}
+
+            {/* 100%-Zustand */}
+            {animatedScore === 100 && (
+              <div
+                className="recommendationItem"
+                style={{
+                  textAlign: "center",
+                  marginTop: 10,
+                  opacity: 0.85
+                }}
+              >
+                Deine Absicherungsstruktur ist aktuell vollständig und durchdacht aufgebaut.
+                Es bestehen keine prioritären Handlungsfelder.
+              </div>
+            )}
+
           </div>
         )}
+
 
         {/* Kategorien Übersicht */}
         <div className="categoryList">
@@ -4313,6 +4535,7 @@ export default function App() {
           />
         )}
 
+        <ActionOverlayComponent />
         <ResetOverlayComponent />
         <LegalOverlayComponent />
         <ContactOverlayComponent />
@@ -4542,7 +4765,7 @@ const CalculatorOverlayComponent = React.memo(function CalculatorOverlayComponen
             rel="noopener noreferrer"
             className="calculatorItem"
           >
-            <strong>Rentenlücken-Rechner</strong>
+            <strong>Altersrentenlücken-Rechner</strong>
             <span>Berechnet deine voraussichtliche Versorgungslücke im Ruhestand.</span>
           </a>
 
@@ -4571,7 +4794,7 @@ const CalculatorOverlayComponent = React.memo(function CalculatorOverlayComponen
 
           <div className="buResult">
             <div className="buResultLabel">
-              Empfohlene BU-Rente (80%)
+              BU-Rente (80%)
             </div>
 
             <div className="buResultValue">
@@ -4604,6 +4827,8 @@ function PdfOverlayComponent({
   buIncome,
   setPdfPreview
 }) {
+
+  const [infoField, setInfoField] = React.useState(null);
 
   if (!pdfOverlay) return null;
 
@@ -4705,33 +4930,108 @@ function PdfOverlayComponent({
 
         {/* BU direkt übernommen */}
 
-        <Input
-          label="Empfohlene BU-Rente (€)"
-          value={
-            pdfData.buEmpfehlung !== ""
-              ? pdfData.buEmpfehlung
-              : autoBU
-          }
-          onChange={(v) =>
-            setPdfData({ ...pdfData, buEmpfehlung: v })
-          }
-        />
+        {/* ================= BU ================= */}
 
-        <Input
-          label="Rentenlücke (€)"
-          value={pdfData.rentenluecke}
-          onChange={(v) =>
-            setPdfData({ ...pdfData, rentenluecke: v })
-          }
-        />
+        <div className="overlayField">
+          <div className="overlayLabelRow">
+            <label>BU-Rente (€)</label>
+            <span
+              className="infoIconInline"
+              onClick={() => setInfoField(infoField === "bu" ? null : "bu")}
+            >
+              i
+            </span>
+          </div>
 
-        <Input
-          label="Empfohlenes Krankentagegeld (€)"
-          value={pdfData.ktgEmpfehlung}
-          onChange={(v) =>
-            setPdfData({ ...pdfData, ktgEmpfehlung: v })
-          }
-        />
+          {infoField === "bu" && (
+            <div className="overlayInfoText">
+              Empfohlen werden oft 60 % des Bruttoeinkommens oder 80 % des Nettoeinkommens als maximale Absicherung.
+              <br /><br />
+              Für Selbstständige empfiehlt sich meist eine Absicherung in Höhe von
+              ca. 60-70% des Bruttogewinns oder 80% des Nettoeinkommens.
+              <br /><br />
+              Beamte benötigen statt einer BU in der Regel eine
+              Dienstunfähigkeitsversicherung.
+            </div>
+          )}
+
+          <Input
+            value={
+              pdfData.buEmpfehlung !== ""
+                ? pdfData.buEmpfehlung
+                : autoBU
+            }
+            onChange={(v) =>
+              setPdfData({ ...pdfData, buEmpfehlung: v })
+            }
+          />
+        </div>
+
+
+        {/* ================= RENTENLÜCKE ================= */}
+
+        <div className="overlayField">
+          <div className="overlayLabelRow">
+            <label>Altersrentenlücke (€)</label>
+            <span
+              className="infoIconInline"
+              onClick={() => setInfoField(infoField === "rente" ? null : "rente")}
+            >
+              i
+            </span>
+          </div>
+
+          {infoField === "rente" && (
+            <div className="overlayInfoText">
+              Die Rentenlücke ergibt sich aus der Differenz zwischen
+              gewünschtem Ruhestandseinkommen und der zu erwartenden
+              gesetzlichen Rente.
+              <br /><br />
+              Besonders bei Selbstständigen oder höherem Einkommen
+              entsteht hier oft deutlicher Handlungsbedarf.
+            </div>
+          )}
+
+          <Input
+            value={pdfData.rentenluecke}
+            onChange={(v) =>
+              setPdfData({ ...pdfData, rentenluecke: v })
+            }
+          />
+        </div>
+
+
+        {/* ================= KRANKENTAGEGELD ================= */}
+
+        <div className="overlayField">
+          <div className="overlayLabelRow">
+            <label>Krankentagegeld (€)</label>
+            <span
+              className="infoIconInline"
+              onClick={() => setInfoField(infoField === "ktg" ? null : "ktg")}
+            >
+              i
+            </span>
+          </div>
+
+          {infoField === "ktg" && (
+            <div className="overlayInfoText">
+              Für Selbstständige ist das Krankentagegeld essenziell, da keine Lohnfortzahlung durch einen Arbeitgeber erfolgt.
+              <br /><br />
+              Angestellte – auch wenn sie privat krankenversichert sind – erhalten in den ersten 42 Tagen eine Lohnfortzahlung durch den Arbeitgeber.
+              <br /><br />
+              Ab dem 43. Tag entsteht bei privat Versicherten jedoch nur dann ein Leistungsanspruch, wenn ein Krankentagegeld vertraglich vereinbart wurde.
+            </div>
+          )}
+
+          <Input
+            value={pdfData.ktgEmpfehlung}
+            onChange={(v) =>
+              setPdfData({ ...pdfData, ktgEmpfehlung: v })
+            }
+          />
+        </div>
+
 
         <button
           className="primaryBtn big"
@@ -4784,7 +5084,57 @@ function PdfPreviewComponent({
   answers
 }) {
 
+  const wrapperRef = React.useRef(null);
+  const actionsRef = React.useRef(null);
+  const [showScrollButton, setShowScrollButton] = React.useState(true);
+
+  const scrollToBottom = () => {
+    if (!wrapperRef.current || !actionsRef.current) return;
+
+    const wrapper = wrapperRef.current;
+    const target = actionsRef.current;
+
+    // Position relativ zum Wrapper berechnen
+    const targetPosition =
+      target.offsetTop - wrapper.offsetTop;
+
+    wrapper.scrollTo({
+      top: targetPosition,
+      behavior: "smooth"
+    });
+  };
+
+  /* ===== SCROLL BUTTON VISIBILITY (OVERLAY INTERN) ===== */
+
+  React.useEffect(() => {
+
+    if (!pdfPreview) return;   // <-- hier absichern
+
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    const handleScroll = () => {
+
+      const scrollPosition = wrapper.scrollTop + wrapper.clientHeight;
+      const scrollHeight = wrapper.scrollHeight;
+
+      if (scrollPosition >= scrollHeight - 40) {
+        setShowScrollButton(false);
+      } else {
+        setShowScrollButton(true);
+      }
+    };
+
+    wrapper.addEventListener("scroll", handleScroll);
+
+    return () => {
+      wrapper.removeEventListener("scroll", handleScroll);
+    };
+
+  }, [pdfPreview]);
+
   if (!pdfPreview) return null;
+
 
   /* ================= DATEN EINFRIEREN ================= */
 
@@ -4807,8 +5157,11 @@ function PdfPreviewComponent({
   ]);
 
   const finalBU = React.useMemo(() => {
-    if (stableData.pdfData?.buEmpfehlung) {
-      return stableData.pdfData.buEmpfehlung;
+
+    const manualValue = stableData.pdfData?.buEmpfehlung;
+
+    if (manualValue && String(manualValue).trim() !== "") {
+      return manualValue;
     }
 
     const income =
@@ -4818,7 +5171,12 @@ function PdfPreviewComponent({
     if (!income) return "";
 
     return Math.round(Number(income) * 0.8);
-  }, [stableData]);
+
+  }, [
+    stableData.pdfData?.buEmpfehlung,
+    stableData.buIncome,
+    stableData.baseData?.gehalt
+  ]);
 
 
   const groupedAnswers = Object.entries(stableData.answers || {}).reduce((acc, [key, value]) => {
@@ -4874,7 +5232,7 @@ function PdfPreviewComponent({
 
   @page {
     size: A4;
-    margin: 18mm;
+    margin: 16mm;
   }
 
   body {
@@ -4886,38 +5244,38 @@ function PdfPreviewComponent({
   }
 
   .printWrapper {
-    max-width: 190mm;
+    max-width: 188mm;
     margin: 0 auto;
   }
 
   h1 {
-    font-size: 26px;
-    margin-bottom: 10px;
+    font-size: 24px;
+    margin-bottom: 6px;
   }
 
   /* ===== TYPOGRAFIE ===== */
 
   .pdfPreview {
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.4;
   }
 
   .pdfSection {
-    margin-bottom: 24px;
+    margin-bottom: 18px;
   }
 
   .pdfSection h3 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
     border-bottom: 1px solid #000;
   }
 
   .pdfCategoryRow {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
   }
 
   .pdfCategoryRow strong {
@@ -4925,26 +5283,25 @@ function PdfPreviewComponent({
   }
 
   .pdfRecommendation {
-    margin-bottom: 10px;
-    padding-left: 12px;
+    margin-bottom: 8px;
+    padding-left: 10px;
     border-left: 3px solid #000;
   }
 
   .pdfFooter {
-    margin-top: 40px;
-    font-size: 12px;
+    margin-top: 25px;
+    font-size: 11px;
     color: #666;
-    line-height: 1.4;
+    line-height: 1.3;
   }
 
   /* ===== SEITENUMBRUCH-STEUERUNG ===== */
 
-  /* Manuell steuerbar über className="pageBreak" im JSX */
   .pageBreak {
+    break-before: page;
     page-break-before: always;
   }
 
-  /* Kein Umbruch mitten im Block */
   .pdfSection,
   .pdfCategoryRow,
   .pdfRecommendation {
@@ -4957,31 +5314,29 @@ function PdfPreviewComponent({
     page-break-after: avoid;
   }
 
-  /* ===== FOOTER CONTACT BLOCK ===== */
+  /* ===== CONTACT BLOCK ===== */
 
   .pdfContactBlock {
-    margin-top: 50px;
-    padding-top: 20px;
+    margin-top: 30px;
+    padding-top: 14px;
     border-top: 1px solid #000;
 
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 40px;
+    gap: 30px;
   }
 
   .pdfContactLeft {
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.4;
   }
 
   .pdfContactTitle {
     font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 6px;
+    font-size: 13px;
+    margin-bottom: 4px;
   }
-
-  /* ===== QR BLOCK ===== */
 
   .pdfContactRight {
     display: flex;
@@ -4990,19 +5345,18 @@ function PdfPreviewComponent({
   }
 
   .pdfContactRight img {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 6px;
+    width: 85px;
+    height: 85px;
+    margin-bottom: 4px;
   }
 
   .pdfQrLabel {
-    font-size: 11px;
+    font-size: 10px;
     color: #666;
     text-align: center;
   }
 
 </style>
-
 
       </head>
 <body>
@@ -5134,17 +5488,17 @@ function PdfPreviewComponent({
         {/* ================= ERGÄNZENDE WERTE ================= */}
 
         <div className="pdfSection">
-          <h3>Ergänzende Werte</h3>
+          <h3>Ergänzende Werte/Lücken</h3>
 
           {finalBU && (
             <div className="pdfCategoryRow">
-              <strong>Empfohlene BU-Rente:</strong> {finalBU} €
+              <strong>BU-Rente:</strong> {finalBU} €
             </div>
           )}
 
           {stableData.pdfData?.rentenluecke && (
             <div className="pdfCategoryRow">
-              <strong>Rentenlücke:</strong> {stableData.pdfData.rentenluecke} €
+              <strong>Altersrententenlücke:</strong> {stableData.pdfData.rentenluecke} €
             </div>
           )}
 
@@ -5156,6 +5510,7 @@ function PdfPreviewComponent({
         </div>
 
         {/* ================= KATEGORIEÜBERSICHT ================= */}
+        <div className="pageBreak" />
 
         <div className="pdfSection">
           <h3>Kategorieübersicht</h3>
@@ -5221,6 +5576,7 @@ function PdfPreviewComponent({
         <hr style={{ margin: "30px 0" }} />
 
 
+        <div className="pageBreak" />
 
         <div className="pdfContactBlock">
 
@@ -5265,6 +5621,7 @@ function PdfPreviewComponent({
       onClick={() => setPdfPreview(false)}
     >
       <div
+        ref={wrapperRef}
         className="pdfPreviewWrapper"
         onClick={(e) => e.stopPropagation()}
       >
@@ -5278,7 +5635,7 @@ function PdfPreviewComponent({
 
         {pdfDocument}
 
-        <div className="pdfActions">
+        <div className="pdfActions" ref={actionsRef}>
           <button
             className="primaryBtn"
             onClick={handlePrint}
@@ -5293,6 +5650,16 @@ function PdfPreviewComponent({
             Schließen
           </button>
         </div>
+
+        {showScrollButton && (
+          <button
+            className="scrollDownBtn"
+            onClick={scrollToBottom}
+          >
+            ↓
+          </button>
+        )}
+
 
       </div>
     </div>

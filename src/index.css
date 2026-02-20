@@ -1,3 +1,18 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;  /* nur horizontal blockieren */
+  overflow-y: auto;    /* vertikal scroll erlauben */
+  background: #071018;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+}
+
+
 * {
   box-sizing: border-box;
 }
@@ -9,16 +24,6 @@ body {
   font-family: system-ui, sans-serif;
 }
 
-.screen {
-  padding: 20px;
-  max-width: 420px;
-  margin: auto;
-  padding-bottom: 140px;
-
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
 
 .center {
   text-align: center;
@@ -689,10 +694,7 @@ body::before {
   z-index: 0;
 }
 
-.screen {
-  position: relative;
-  z-index: 1;
-}
+
 
 /* ================= UI UPGRADE 2 – PREMIUM CARDS ================= */
 
@@ -979,26 +981,6 @@ body::before {
   /* ← DAS IST DER WICHTIGE TEIL */
 }
 
-@media (max-width: 480px) {
-  .screen {
-    padding-bottom: 120px;
-  }
-
-  .legalFooter {
-    margin-bottom: 80px;
-  }
-}
-
-@media (max-width: 480px) {
-  .productRow {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .productButton {
-    width: 100%;
-  }
-}
 
 .recommendationBtn,
 .productButton,
@@ -1128,11 +1110,14 @@ svg {
 
 .disclaimerScreen {
   position: relative;
+
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  align-items: flex-start;
+
+  padding: 80px 20px 40px 20px;
 }
+
 
 .disclaimerCard {
   max-width: 380px;
@@ -1451,27 +1436,26 @@ svg {
   max-width: 95%;
 }
 
-@media (max-width: 480px) {
 
-  .recommendationItem p {
-    font-size: 13.5px;
-    line-height: 1.55;
-  }
-
-  .questionText {
-    font-size: 15.3px;
-    line-height: 1.4;
-  }
-
-}
 
 /* ================= GLOBAL COMPACT FIX ================= */
 
-/* Screen weniger vertikale Luft */
 .screen {
+  position: relative;
+  z-index: 1;
+
+  min-height: 100dvh;   /* besser als 100vh für Mobile */
+  
   padding: 16px;
   padding-bottom: 110px;
+
+  max-width: 420px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
 }
+
 
 /* ================= DASHBOARD TITLE ================= */
 
@@ -1606,32 +1590,107 @@ svg {
   transform: scale(0.95);
 }
 
-/* ================= MOBILE FINAL COMPACT FIX ================= */
+/* ================= MOBILE CLEAN OVERLAY OPTIMIZED ================= */
 
 @media (max-width: 480px) {
 
+  /* ===== GLOBAL SCREEN ===== */
+  .screen {
+    padding: 16px;
+    padding-bottom: 120px;
+  }
+
+  /* ===== QUESTION CARDS ===== */
   .questionCard.dark {
-    padding: 16px 16px 18px 16px !important;
-    margin-bottom: 14px !important;
+    padding: 16px;
+    margin-bottom: 14px;
   }
 
   .questionText {
-    font-size: 15px !important;
-    line-height: 1.32 !important;
-    margin-bottom: 8px !important;
+    font-size: 15px;
+    line-height: 1.4;
+    margin-bottom: 8px;
   }
 
   .buttonRow {
-    gap: 8px !important;
-    margin-top: 6px !important;
+    gap: 8px;
+    margin-top: 6px;
   }
 
   .answerBtn {
-    padding: 11px !important;
+    padding: 12px;
     font-size: 14px;
   }
 
+  /* ===== RECOMMENDATION CARDS ===== */
+  .recommendationItem {
+    padding: 12px;
+    margin-top: 8px;
+  }
+
+  .recommendationItem p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ===== PDF PREVIEW WRAPPER ===== */
+  .pdfPreviewWrapper {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .pdfSection {
+    margin-bottom: 24px;
+  }
+
+  /* ===== PDF ROW FIX (WICHTIG FÜR BU RENTEN BUG) ===== */
+  .pdfCategoryRow {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .pdfCategoryRow strong {
+    margin-bottom: 2px;
+  }
+
+  .pdfCategoryRow span {
+    text-align: left;
+  }
+
+  /* ===== FOOTER CONTACT BLOCK ===== */
+  .pdfContactBlock {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pdfContactRight {
+    align-items: flex-start;
+  }
+
+  /* ===== FIXED CONTACT BAR ===== */
+  .contactFixed {
+    padding: 12px;
+  }
+
+  .contactBtn {
+    height: 52px;
+    font-size: 14px;
+  }
+
+  /* ===== LEGAL FOOTER ===== */
+  .legalFooter {
+    margin-bottom: 80px;
+  }
+
 }
+
+@media (min-width: 769px) {
+  .scrollDownBtn {
+    display: none;
+  }
+}
+
 
 /* ================= CONVERSION BOX CLEAN ================= */
 
@@ -1805,20 +1864,42 @@ svg {
 
 .outlineBtn {
   width: 100%;
-  height: 52px;
+  height: 55px;                 /* deutlich höher */
+
   margin-top: 18px;
-  border-radius: 18px;
-  border: 1px solid rgba(139,124,246,0.5);
-  background: transparent;
-  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 20px;          /* proportional größer */
+  border: 2px solid rgba(139,124,246,0.7);
+
+  background: rgba(139,124,246,0.14);
+  backdrop-filter: blur(8px);
+
+  color: #ffffff;
   font-weight: 600;
+  font-size: 15px;              /* unverändert */
+
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .outlineBtn:hover {
-  background: rgba(139,124,246,0.15);
+  background: rgba(139,124,246,0.22);
+  box-shadow: 0 10px 28px rgba(139,124,246,0.4);
+  transform: translateY(-2px);
 }
+
+.outlineBtn:active {
+  transform: scale(0.97);
+}
+.outlineBtn {
+  flex: none;        /* verhindert flex-scaling */
+}
+
+
 /* ================= CALCULATOR OVERLAY ================= */
 
 .calculatorBox h3 {
@@ -2062,6 +2143,9 @@ svg {
 
   display: flex;
   flex-direction: column;
+
+  max-height: 90vh;      /* WICHTIG */
+  overflow-y: auto;      /* WICHTIG */
 }
 
 /* ================= PDF LAYOUT PREMIUM CLEAN ================= */
@@ -2194,4 +2278,117 @@ svg {
   letter-spacing: 0.4px;
   color: rgba(255,255,255,0.6);
 }
+/* ================= PDF SCROLL DOWN BUTTON – PREMIUM FIXED ================= */
 
+.scrollDownBtn {
+  position: fixed;
+  right: 22px;
+  bottom: 110px;
+
+  width: 52px;
+  height: 52px;
+
+  border-radius: 16px;
+  border: 1px solid rgba(139,124,246,0.4);
+
+  background: rgba(139,124,246,0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  color: #ffffff;
+
+  font-size: 24px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 28px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.25s ease;
+
+  z-index: 9999;
+}
+
+
+/* ================= PDF OVERLAY FIELD CLEAN ================= */
+
+.overlayField {
+  margin-bottom: 22px; /* exakt wie .pdfBox .field */
+}
+
+.overlayLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.overlayLabelRow label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* Dezentes Info-Icon – größer & konsistent */
+.infoIconInline {
+  min-width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  border-radius: 8px;
+  border: 1px solid rgba(139,124,246,0.45);
+
+  color: #ffffff; /* ← jetzt weiß */
+  background: rgba(139,124,246,0.25);
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.infoIconInline:hover {
+  background: rgba(139,124,246,0.2);
+}
+
+
+.overlayInfoText {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  background: rgba(139,124,246,0.08);
+  border-left: 3px solid #8B7CF6;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ================= GLOBAL SCROLLBAR HIDE ================= */
+
+/* Chrome, Safari, Edge */
+*::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: none;
+}
+
+/* IE (falls relevant) */
+* {
+  -ms-overflow-style: none;
+}
