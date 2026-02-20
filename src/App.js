@@ -360,6 +360,11 @@ const QUESTIONS = {
       baseData.tiere === "Hund" ||
       baseData.tiere === "Katze" ||
       baseData.tiere === "Hund und Katze",
+
+    subOptions: [
+      { key: "tier_op_only", label: "Nur OP-Versicherung" },
+      { key: "tier_full", label: "Vollständige Tierkrankenversicherung" }
+    ]
   },
 
   rechtsschutz: {
@@ -1172,6 +1177,33 @@ export default function App() {
       if (value === "vollkasko") return 100;
       if (value === "teilkasko") return 50;
       return 0;
+    }
+    /* ========================================================= */
+    /* ===== TIER OP / TIERKRANKEN ============================= */
+    /* ========================================================= */
+
+    if (key === "tier_op") {
+
+      if (value === "ja") {
+
+        if (answers.tier_op_type === "voll") {
+          return 100;   // Vollversicherung
+        }
+
+        if (answers.tier_op_type === "op") {
+          return 60;    // Teilabsicherung
+        }
+
+        return 0;       // Ja ohne Auswahl
+      }
+
+      if (value === "unbekannt") {
+        return 20;
+      }
+
+      if (value === "nein") {
+        return 0;
+      }
     }
 
     /* ========================================================= */
@@ -2334,6 +2366,42 @@ export default function App() {
 
         return "Ein einzelner Haftpflichtschaden kann existenzielle Folgen haben. Diese Absicherung gehört zur absoluten Basis.";
       }
+      
+      /* ================= TIER OP / TIERKRANKEN ================= */
+
+      case "tier_op": {
+
+        const hatTier =
+          baseData.tiere === "Hund" ||
+          baseData.tiere === "Katze" ||
+          baseData.tiere === "Hund und Katze";
+
+        if (!hatTier) return null;
+
+        const type = answers.tier_op_type;
+
+        // Voll abgesichert → keine Empfehlung
+        if (value === "ja" && type === "voll") {
+          return null;
+        }
+
+        // Unbekannt
+        if (value === "unbekannt") {
+          return "Ob dein Tier medizinisch abgesichert ist, sollte geprüft werden. Tierarztkosten können schnell mehrere tausend Euro erreichen.";
+        }
+
+        // Kein Schutz
+        if (value === "nein") {
+          return "Tierarzt- oder OP-Kosten können schnell hohe Summen erreichen. Ohne Absicherung trägst du das volle finanzielle Risiko.";
+        }
+
+        // Nur OP
+        if (value === "ja" && type === "op") {
+          return "Eine reine OP-Versicherung deckt nur chirurgische Eingriffe ab. Ambulante Behandlungen oder chronische Erkrankungen bleiben ungeschützt.";
+        }
+
+        return null;
+      }
 
       /* ================= RECHTSSCHUTZ ================= */
 
@@ -3483,6 +3551,7 @@ export default function App() {
                         </button>
                       );
                     })}
+
                     {/* FLOATING INFO ICON */}
                     {q.info && (
                       <button
@@ -3507,7 +3576,30 @@ export default function App() {
                     )}
 
                   </div>
+                  {/* TIER OP SUB OPTIONS – AUSSERHALB VON buttonRow */}
+                  {id === "tier_op" && answers?.[id] === "ja" && (
+                    <div className="subOptions">
+                      <label className="checkbox">
+                        <input
+                          type="radio"
+                          name="tier_op_type"
+                          checked={answers?.tier_op_type === "op"}
+                          onChange={() => answer("tier_op_type", "op")}
+                        />
+                        <span>Nur OP-Versicherung</span>
+                      </label>
 
+                      <label className="checkbox">
+                        <input
+                          type="radio"
+                          name="tier_op_type"
+                          checked={answers?.tier_op_type === "voll"}
+                          onChange={() => answer("tier_op_type", "voll")}
+                        />
+                        <span>Tierkrankenversicherung mit OP</span>
+                      </label>
+                    </div>
+                  )}
 
                   {/* RECHTSSCHUTZ SUBOPTIONEN */}
 
