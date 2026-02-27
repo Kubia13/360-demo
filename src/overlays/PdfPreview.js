@@ -1,0 +1,605 @@
+
+import React from "react";
+import { QUESTIONS } from "../data/questions";
+import { CATEGORY_LABELS } from "../config/categoryLabels";
+
+export default function PdfPreview({
+
+    
+    pdfPreview,
+    setPdfPreview,
+    totalScore,
+    topRecommendations,
+    categoryScores,
+    baseData,
+    pdfData,
+    buIncome,
+    answers
+}) {
+    
+
+    const wrapperRef = React.useRef(null);
+    const actionsRef = React.useRef(null);
+    const [showScrollButton, setShowScrollButton] = React.useState(true);
+
+    const scrollToBottom = () => {
+        if (!wrapperRef.current || !actionsRef.current) return;
+
+        const wrapper = wrapperRef.current;
+        const target = actionsRef.current;
+
+        // Position relativ zum Wrapper berechnen
+        const targetPosition =
+            target.offsetTop - wrapper.offsetTop;
+
+        wrapper.scrollTo({
+            top: targetPosition,
+            behavior: "smooth"
+        });
+    };
+
+    /* ===== SCROLL BUTTON VISIBILITY (OVERLAY INTERN) ===== */
+
+    React.useEffect(() => {
+
+        if (!pdfPreview) return;   // <-- hier absichern
+
+        const wrapper = wrapperRef.current;
+        if (!wrapper) return;
+
+        const handleScroll = () => {
+
+            const scrollPosition = wrapper.scrollTop + wrapper.clientHeight;
+            const scrollHeight = wrapper.scrollHeight;
+
+            if (scrollPosition >= scrollHeight - 40) {
+                setShowScrollButton(false);
+            } else {
+                setShowScrollButton(true);
+            }
+        };
+
+        wrapper.addEventListener("scroll", handleScroll);
+
+        return () => {
+            wrapper.removeEventListener("scroll", handleScroll);
+        };
+
+    }, [pdfPreview]);
+
+
+
+    /* ================= DATEN EINFRIEREN ================= */
+
+    const stableData = React.useMemo(() => ({
+        totalScore,
+        topRecommendations,
+        categoryScores,
+        baseData,
+        pdfData,
+        buIncome,
+        answers
+    }), [
+        totalScore,
+        topRecommendations,
+        categoryScores,
+        baseData,
+        pdfData,
+        buIncome,
+        answers
+    ]);
+
+    const finalBU = React.useMemo(() => {
+
+        const manualValue = stableData.pdfData?.buEmpfehlung;
+
+        if (manualValue && String(manualValue).trim() !== "") {
+            return manualValue;
+        }
+
+        const income =
+            stableData.buIncome ||
+            stableData.baseData?.gehalt;
+
+        if (!income) return "";
+
+        return Math.round(Number(income) * 0.8);
+
+    }, [
+        stableData.pdfData?.buEmpfehlung,
+        stableData.buIncome,
+        stableData.baseData?.gehalt
+    ]);
+
+
+    const groupedAnswers = Object.entries(stableData.answers || {}).reduce((acc, [key, value]) => {
+
+        if (
+            value === false ||
+            value === null ||
+            value === "" ||
+            value === undefined
+        ) return acc;
+
+        let question = QUESTIONS[key];
+        let category = null;
+        let label = null;
+
+        if (question) {
+            category = question.category;
+            label = question.label;
+        } else {
+            // Suboptionen erkennen (z.B. rechtsschutz_Privat)
+            const mainKey = key.split("_")[0];
+            const mainQuestion = QUESTIONS[mainKey];
+
+            if (!mainQuestion) return acc;
+
+            category = mainQuestion.category;
+            label = key.replace(mainKey + "_", mainQuestion.label + " – ");
+        }
+
+        if (!acc[category]) acc[category] = [];
+
+        acc[category].push({
+            label,
+            value
+        });
+
+        return acc;
+
+    }, {});
+
+
+    const handlePrint = () => {
+
+        const printArea = document.querySelector(".printArea");
+        if (!printArea) return;
+
+        const printContent = printArea.innerHTML;
+
+        const printWindow = window.open("", "_blank");
+        if (!printWindow) return;
+
+        printWindow.document.write(`
+<html>
+  <head>
+    <title>360° Absicherungsanalyse</title>
+    <style>
+
+      @page {
+        size: A4;
+        margin: 16mm;
+      }
+
+      body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: white;
+        color: black;
+      }
+
+      .printWrapper {
+        max-width: 188mm;
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 6px;
+      }
+
+      /* ===== TYPOGRAFIE ===== */
+
+      .pdfPreview {
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .pdfSection {
+        margin-bottom: 18px;
+      }
+
+      .pdfSection h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #000;
+      }
+
+      .pdfCategoryRow {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 3px;
+      }
+
+      .pdfCategoryRow strong {
+        font-weight: 600;
+      }
+
+      .pdfRecommendation {
+        margin-bottom: 8px;
+        padding-left: 10px;
+        border-left: 3px solid #000;
+      }
+
+      .pdfFooter {
+        margin-top: 25px;
+        font-size: 11px;
+        color: #666;
+        line-height: 1.3;
+      }
+
+      /* ===== SEITENUMBRUCH-STEUERUNG ===== */
+
+      .pageBreak {
+        break-before: page;
+        page-break-before: always;
+      }
+
+      .pdfSection,
+      .pdfCategoryRow,
+      .pdfRecommendation {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .pdfSection h3 {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      /* ===== CONTACT BLOCK ===== */
+
+      .pdfContactBlock {
+        margin-top: 30px;
+        padding-top: 14px;
+        border-top: 1px solid #000;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 30px;
+      }
+
+      .pdfContactLeft {
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .pdfContactTitle {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+
+      .pdfContactRight {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .pdfContactRight img {
+        width: 85px;
+        height: 85px;
+        margin-bottom: 4px;
+      }
+
+      .pdfQrLabel {
+        font-size: 10px;
+        color: #666;
+        text-align: center;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div class="printWrapper">
+      ${printContent}
+    </div>
+  </body>
+</html>
+
+`);
+
+        printWindow.document.close();
+        printWindow.focus();
+
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
+    };
+
+
+    /* ================= DOKUMENT-INHALT ================= */
+
+    const pdfDocument = (
+        <div className="printArea">
+            <div className="pdfPreview">
+
+                {/* ================= HEADER ================= */}
+                <div className="pdfHeader">
+                    <h1>360° Absicherungsanalyse</h1>
+                    <div className="pdfScoreValue">
+                        {stableData.totalScore}%
+                    </div>
+                    <div className="pdfScoreLabel">
+                        Gesamt-Absicherungsstatus
+                    </div>
+                </div>
+
+                <hr style={{ margin: "30px 0" }} />
+
+                {/* ================= PERSÖNLICHE ANGABEN ================= */}
+
+                <div className="pdfSection">
+                    <h3>Persönliche Angaben</h3>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Anrede:</strong> {stableData.baseData?.anrede || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Vorname:</strong> {stableData.baseData?.vorname || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Nachname:</strong> {stableData.baseData?.nachname || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Familienstand:</strong> {stableData.baseData?.beziehungsstatus || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Alter:</strong> {stableData.baseData?.alter || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Berufliche Situation:</strong> {stableData.baseData?.beruf || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Krankenversicherung:</strong> {stableData.baseData?.krankenversicherung || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Monatliches Netto-Gehalt:</strong> {stableData.baseData?.gehalt || "-"} €
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Kinder vorhanden:</strong> {stableData.baseData?.kinder || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Kinder krankenversichert:</strong> {stableData.baseData?.kinderKrankenversicherung || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Anzahl Kinder:</strong> {stableData.baseData?.kinderAnzahl || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Haustiere:</strong> {stableData.baseData?.tiere || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Wohnsituation:</strong> {stableData.baseData?.wohnen || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Fahrzeug vorhanden:</strong> {stableData.baseData?.kfz || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Anzahl Fahrzeuge:</strong> {stableData.baseData?.kfzAnzahl || "-"}
+                    </div>
+
+                    <hr style={{ margin: "20px 0" }} />
+
+                    {/* ================= ADRESSE & KONTAKT ================= */}
+
+                    <div className="pdfCategoryRow">
+                        <strong>Adresse:</strong> {stableData.pdfData?.adresse || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>PLZ / Ort:</strong> {stableData.pdfData?.plz || "-"} {stableData.pdfData?.ort || ""}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>E-Mail:</strong> {stableData.pdfData?.email || "-"}
+                    </div>
+
+                    <div className="pdfCategoryRow">
+                        <strong>Telefon:</strong> {stableData.pdfData?.telefon || stableData.pdfData?.handy || "-"}
+                    </div>
+
+                </div>
+
+                <hr style={{ margin: "30px 0" }} />
+
+                {/* ================= ERGÄNZENDE WERTE ================= */}
+
+                <div className="pdfSection">
+                    <h3>Ergänzende Werte/Lücken</h3>
+
+                    {finalBU && (
+                        <div className="pdfCategoryRow">
+                            <strong>BU-Rente:</strong> {finalBU} €
+                        </div>
+                    )}
+
+                    {stableData.pdfData?.rentenluecke && (
+                        <div className="pdfCategoryRow">
+                            <strong>Altersrentenlücke:</strong> {stableData.pdfData.rentenluecke} €
+                        </div>
+                    )}
+
+                    {stableData.pdfData?.ktgEmpfehlung && (
+                        <div className="pdfCategoryRow">
+                            <strong>Krankentagegeld:</strong> {stableData.pdfData.ktgEmpfehlung} €
+                        </div>
+                    )}
+                </div>
+
+                {/* ================= KATEGORIEÜBERSICHT ================= */}
+                <div className="pageBreak" />
+
+                <div className="pdfSection">
+                    <h3>Kategorieübersicht</h3>
+                    {Object.keys(stableData.categoryScores || {}).map((cat) => (
+                        <div key={cat} className="pdfCategoryRow">
+                            {CATEGORY_LABELS[cat] || cat} – {stableData.categoryScores[cat] ?? 0}%
+                        </div>
+                    ))}
+                </div>
+
+                <hr style={{ margin: "30px 0" }} />
+
+                {/* ================= HANDLUNGSFELDER ================= */}
+
+                <div className="pdfSection">
+                    <h3>Priorisierte Handlungsfelder</h3>
+
+                    {stableData.topRecommendations?.length === 0 && (
+                        <p>Keine unmittelbaren Optimierungsfelder.</p>
+                    )}
+
+                    {stableData.topRecommendations?.slice(0, 3).map((item, index) => (
+                        <div key={item.id} className="pdfRecommendation">
+                            <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                                #{index + 1} Priorität
+                            </div>
+                            <div>{item.text}</div>
+                        </div>
+                    ))}
+                </div>
+
+                <hr style={{ margin: "30px 0" }} />
+
+                {/* ================= DETAILS ================= */}
+
+                <div className="pdfSection">
+                    <h3>Deine Angaben im Detail</h3>
+
+                    {Object.keys(groupedAnswers || {})
+                        .filter(category => groupedAnswers[category].length > 0)
+                        .map((category) => (
+                            <div key={category} style={{ marginBottom: 16 }}>
+                                <strong>
+                                    {CATEGORY_LABELS[category] || category}
+                                </strong>
+
+                                {groupedAnswers[category].map((item, i) => (
+                                    <div key={i} className="pdfCategoryRow">
+                                        {item.label}:{" "}
+                                        {item.value === true
+                                            ? "✓"
+                                            : item.value === "ja"
+                                                ? "Ja"
+                                                : item.value === "nein"
+                                                    ? "Nein"
+                                                    : item.value}
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                </div>
+
+                <hr style={{ margin: "30px 0" }} />
+
+
+                <div className="pageBreak" />
+
+                <div className="pdfContactBlock">
+
+                    <div className="pdfContactLeft">
+
+                        <div className="pdfContactTitle">
+                            BarmeniaGothaer – Florian Löffler
+                        </div>
+
+                        <div>Breisacher Str. 145b</div>
+                        <div>79110 Freiburg</div>
+
+                        <div className="pdfContactSpacer" />
+
+                        <div>Mail: florian.loeffler@barmenia.de</div>
+                        <div>Tel.: 0761 2027423</div>
+
+                    </div>
+
+                    <div className="pdfContactRight">
+                        <img
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://agentur.barmenia.de/florian_loeffler"
+                            alt="QR Code Website"
+                        />
+                        <div className="pdfQrLabel">Agentur online aufrufen</div>
+                    </div>
+
+                </div>
+
+                <div className="pdfFooter">
+                    Diese Analyse basiert auf deinen eigenen Angaben und stellt keine
+                    individuelle Beratung im Sinne des VVG dar.
+                </div>
+
+            </div>
+        </div>
+    );
+
+    return (
+        <div
+            className="infoOverlay"
+            onClick={() => setPdfPreview(false)}
+        >
+            <div
+                ref={wrapperRef}
+                className="pdfPreviewWrapper"
+                onClick={(e) => e.stopPropagation()}
+            >
+
+                <button
+                    className="overlayClose"
+                    onClick={() => setPdfPreview(false)}
+                >
+                    ×
+                </button>
+
+                {pdfDocument}
+
+                <div className="pdfActions" ref={actionsRef}>
+                    <button
+                        className="primaryBtn"
+                        onClick={handlePrint}
+                    >
+                        Drucken / Als PDF speichern
+                    </button>
+
+                    <button
+                        className="secondaryBtn"
+                        onClick={() => setPdfPreview(false)}
+                    >
+                        Schließen
+                    </button>
+                </div>
+
+                {showScrollButton && (
+                    <button
+                        className="scrollDownBtn"
+                        onClick={scrollToBottom}
+                    >
+                        ↓
+                    </button>
+                )}
+
+
+            </div>
+        </div>
+    );
+}
+
