@@ -7,6 +7,8 @@ export default function Input({
   onChange,
   inputRef,
   onEnter,
+  onBlur,
+  error
 }) {
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && onEnter) {
@@ -38,8 +40,12 @@ export default function Input({
           value={value ?? ""}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
+          onBlur={onBlur}
+          style={{
+            borderColor: error ? "#d93025" : undefined
+          }}
         />
-
+        
         {isNumber && (
           <div className="numberStepper">
             <button type="button" onClick={increase}>+</button>

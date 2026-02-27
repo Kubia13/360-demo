@@ -19,6 +19,8 @@ export default function PdfOverlay({
 
   const [infoField, setInfoField] = useState(null);
 
+  const [touched, setTouched] = useState({});
+
   if (!pdfOverlay) return null;
 
   const autoBU = calculateAutoBU({
@@ -32,10 +34,8 @@ export default function PdfOverlay({
 
   const validateEmail = (value = "") => {
     const email = value.trim();
-
     const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
   };
 
@@ -43,6 +43,32 @@ export default function PdfOverlay({
     const hasNumber = /\d/.test(value);
     const hasLetter = /[a-zA-Z]/.test(value);
     return hasNumber && hasLetter;
+  };
+
+  // ================= LIVE ERROR LOGIC =================
+
+  const errors = {
+    adresse:
+      touched.adresse && !validateStreet(pdfData.adresse)
+        ? "Bitte Straße UND Hausnummer angeben."
+        : null,
+
+    email:
+      touched.email && !validateEmail(pdfData.email)
+        ? "Bitte eine gültige E-Mail-Adresse eingeben."
+        : null,
+
+    plz:
+      touched.plz && pdfData.plz.trim() === ""
+        ? "Bitte PLZ angeben."
+        : null,
+
+    telefon:
+      (touched.telefon || touched.handy) &&
+        pdfData.telefon.trim() === "" &&
+        pdfData.handy.trim() === ""
+        ? "Bitte Telefon oder Handy angeben."
+        : null
   };
 
   const isValid =
@@ -85,7 +111,17 @@ export default function PdfOverlay({
           }
           inputRef={pdfFormRefs.adresse}
           onEnter={() => focusNext(pdfFormRefs.adresse)}
+          onBlur={() =>
+            setTouched(prev => ({ ...prev, adresse: true }))
+          }
+          error={errors.adresse}
         />
+
+        {errors.adresse && (
+          <div className="fieldError">
+            {errors.adresse}
+          </div>
+        )}
 
         <Input
           label="PLZ"
@@ -120,13 +156,24 @@ export default function PdfOverlay({
 
         <Input
           label="E-Mail *"
+          type="email"
           value={pdfData.email}
           onChange={(v) =>
             setPdfData({ ...pdfData, email: v })
           }
           inputRef={pdfFormRefs.email}
           onEnter={() => focusNext(pdfFormRefs.email)}
+          onBlur={() =>
+            setTouched(prev => ({ ...prev, email: true }))
+          }
+          error={errors.email}
         />
+
+        {errors.email && (
+          <div className="fieldError">
+            {errors.email}
+          </div>
+        )}
 
         <Input
           label="Telefon"
