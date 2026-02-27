@@ -1,3 +1,7 @@
+import { usePdfFormNavigation } from "../hooks/usePdfFormNavigation";
+
+import { calculateAutoBU } from "../logic/pdfDataEngine";
+
 import React, { useState } from "react";
 import Input from "../components/UI/Input";
 
@@ -11,20 +15,40 @@ export default function PdfOverlay({
   setPdfPreview
 }) {
 
+  const { pdfFormRefs, focusNext } = usePdfFormNavigation();
+
   const [infoField, setInfoField] = useState(null);
 
   if (!pdfOverlay) return null;
 
-  const autoBU =
-    buIncome
-      ? Math.round(Number(buIncome) * 0.8)
-      : baseData.gehalt
-        ? Math.round(Number(baseData.gehalt) * 0.8)
-        : "";
+  const autoBU = calculateAutoBU({
+    buIncome,
+    baseData
+  });
+
+  // ================= INPUT VALIDATION HELPERS =================
+
+  const onlyNumbers = (value) => value.replace(/\D/g, "");
+
+  const validateEmail = (value = "") => {
+    const email = value.trim();
+
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    return emailRegex.test(email);
+  };
+
+  const validateStreet = (value = "") => {
+    const hasNumber = /\d/.test(value);
+    const hasLetter = /[a-zA-Z]/.test(value);
+    return hasNumber && hasLetter;
+  };
 
   const isValid =
-    pdfData.adresse.trim() !== "" &&
-    pdfData.email.trim() !== "" &&
+    validateStreet(pdfData.adresse) &&
+    validateEmail(pdfData.email) &&
+    pdfData.plz.trim() !== "" &&
     (
       pdfData.telefon.trim() !== "" ||
       pdfData.handy.trim() !== ""
@@ -54,26 +78,33 @@ export default function PdfOverlay({
         {/* Pflichtfelder */}
 
         <Input
-          label="Straße & Hausnummer "
+          label="Straße & Hausnummer"
           value={pdfData.adresse}
           onChange={(v) =>
             setPdfData({ ...pdfData, adresse: v })
           }
+          inputRef={pdfFormRefs.adresse}
+          onEnter={() => focusNext(pdfFormRefs.adresse)}
         />
 
         <Input
           label="PLZ"
           value={pdfData.plz}
           onChange={(v) =>
-            setPdfData({ ...pdfData, plz: v })
+            setPdfData({ ...pdfData, plz: onlyNumbers(v) })
           }
+          inputRef={pdfFormRefs.plz}
+          onEnter={() => focusNext(pdfFormRefs.plz)}
         />
+
         <Input
           label="Ort"
           value={pdfData.ort}
           onChange={(v) =>
             setPdfData({ ...pdfData, ort: v })
           }
+          inputRef={pdfFormRefs.ort}
+          onEnter={() => focusNext(pdfFormRefs.ort)}
         />
 
         <Input
@@ -83,6 +114,8 @@ export default function PdfOverlay({
           onChange={(v) =>
             setPdfData({ ...pdfData, geburtsdatum: v })
           }
+          inputRef={pdfFormRefs.geburtsdatum}
+          onEnter={() => focusNext(pdfFormRefs.geburtsdatum)}
         />
 
         <Input
@@ -91,22 +124,28 @@ export default function PdfOverlay({
           onChange={(v) =>
             setPdfData({ ...pdfData, email: v })
           }
+          inputRef={pdfFormRefs.email}
+          onEnter={() => focusNext(pdfFormRefs.email)}
         />
 
         <Input
           label="Telefon"
           value={pdfData.telefon}
           onChange={(v) =>
-            setPdfData({ ...pdfData, telefon: v })
+            setPdfData({ ...pdfData, telefon: onlyNumbers(v) })
           }
+          inputRef={pdfFormRefs.telefon}
+          onEnter={() => focusNext(pdfFormRefs.telefon)}
         />
 
         <Input
           label="Handy"
           value={pdfData.handy}
           onChange={(v) =>
-            setPdfData({ ...pdfData, handy: v })
+            setPdfData({ ...pdfData, handy: onlyNumbers(v) })
           }
+          inputRef={pdfFormRefs.handy}
+          onEnter={() => focusNext(pdfFormRefs.handy)}
         />
 
         <hr style={{ margin: "20px 0", opacity: 0.2 }} />
@@ -147,6 +186,8 @@ export default function PdfOverlay({
             onChange={(v) =>
               setPdfData({ ...pdfData, buEmpfehlung: v })
             }
+            inputRef={pdfFormRefs.buEmpfehlung}
+            onEnter={() => focusNext(pdfFormRefs.buEmpfehlung)}
           />
         </div>
 
@@ -212,6 +253,13 @@ export default function PdfOverlay({
             onChange={(v) =>
               setPdfData({ ...pdfData, ktgEmpfehlung: v })
             }
+            inputRef={pdfFormRefs.ktgEmpfehlung}
+            onEnter={() => {
+              if (!isValid) return;
+
+              setPdfOverlay(false);
+              setPdfPreview(true);
+            }}
           />
         </div>
 
@@ -226,12 +274,10 @@ export default function PdfOverlay({
           onClick={() => {
             if (!isValid) return;
 
-            const autoBU =
-              buIncome
-                ? Math.round(Number(buIncome) * 0.8)
-                : baseData.gehalt
-                  ? Math.round(Number(baseData.gehalt) * 0.8)
-                  : "";
+            const autoBU = calculateAutoBU({
+              buIncome,
+              baseData
+            });
 
             if (!pdfData.buEmpfehlung && autoBU) {
               setPdfData(prev => ({

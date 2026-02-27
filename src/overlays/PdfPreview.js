@@ -1,11 +1,16 @@
 
+import {
+  calculateFinalBU,
+  groupAnswersForPdf
+} from "../logic/pdfDataEngine";
+
 import React from "react";
 import { QUESTIONS } from "../data/questions";
 import { CATEGORY_LABELS } from "../config/categoryLabels";
 
 export default function PdfPreview({
 
-    
+
     pdfPreview,
     setPdfPreview,
     totalScore,
@@ -16,7 +21,7 @@ export default function PdfPreview({
     buIncome,
     answers
 }) {
-    
+
 
     const wrapperRef = React.useRef(null);
     const actionsRef = React.useRef(null);
@@ -90,66 +95,23 @@ export default function PdfPreview({
     ]);
 
     const finalBU = React.useMemo(() => {
-
-        const manualValue = stableData.pdfData?.buEmpfehlung;
-
-        if (manualValue && String(manualValue).trim() !== "") {
-            return manualValue;
-        }
-
-        const income =
-            stableData.buIncome ||
-            stableData.baseData?.gehalt;
-
-        if (!income) return "";
-
-        return Math.round(Number(income) * 0.8);
-
+        return calculateFinalBU({
+            pdfData: stableData.pdfData,
+            buIncome: stableData.buIncome,
+            baseData: stableData.baseData
+        });
     }, [
-        stableData.pdfData?.buEmpfehlung,
+        stableData.pdfData,
         stableData.buIncome,
-        stableData.baseData?.gehalt
+        stableData.baseData
     ]);
 
-
-    const groupedAnswers = Object.entries(stableData.answers || {}).reduce((acc, [key, value]) => {
-
-        if (
-            value === false ||
-            value === null ||
-            value === "" ||
-            value === undefined
-        ) return acc;
-
-        let question = QUESTIONS[key];
-        let category = null;
-        let label = null;
-
-        if (question) {
-            category = question.category;
-            label = question.label;
-        } else {
-            // Suboptionen erkennen (z.B. rechtsschutz_Privat)
-            const mainKey = key.split("_")[0];
-            const mainQuestion = QUESTIONS[mainKey];
-
-            if (!mainQuestion) return acc;
-
-            category = mainQuestion.category;
-            label = key.replace(mainKey + "_", mainQuestion.label + " – ");
-        }
-
-        if (!acc[category]) acc[category] = [];
-
-        acc[category].push({
-            label,
-            value
+    const groupedAnswers = React.useMemo(() => {
+        return groupAnswersForPdf({
+            answers: stableData.answers,
+            QUESTIONS
         });
-
-        return acc;
-
-    }, {});
-
+    }, [stableData.answers]);
 
     const handlePrint = () => {
 

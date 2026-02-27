@@ -216,7 +216,7 @@
               lineHeight: 1.5
             }}
           >
-            {getDynamicHint()}
+            {getDynamicHint}
           </p>
 
         </div>
