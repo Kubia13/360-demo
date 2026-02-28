@@ -1,4 +1,4 @@
-  /* ================= LEGAL OVERLAY ================= */
+/* ================= LEGAL OVERLAY ================= */
 import React from "react";
 
 export default function LegalOverlay({
@@ -35,7 +35,7 @@ export default function LegalOverlay({
             <p><strong>Florian Löffler</strong></p>
 
             <p>
-              BarmeniaGothaer VZ Südbaden
+              BarmeniaGothaer VZ Südbaden<br />
               Breisacher Str. 145b<br />
               79110 Freiburg im Breisgau
             </p>
@@ -53,6 +53,7 @@ export default function LegalOverlay({
             </p>
 
             <p>
+              Tätig als gebundener Versicherungsvertreter gemäß § 34d Abs. 7 GewO<br />
               Vermittlerregisternummer: D-3ED0-I0NGJ-87
             </p>
 
@@ -75,29 +76,28 @@ export default function LegalOverlay({
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.75 }}>
-              Der 360° Absicherungscheck stellt ein unverbindliches digitales
-              Informations- und Analyseangebot dar. Er ersetzt keine individuelle
-              Versicherungsberatung oder Bedarfsanalyse im Sinne des
-              Versicherungsvertragsgesetzes (VVG).
+              Der 360° Absicherungscheck ist ein unverbindliches digitales Informations-
+              und Analyseangebot zur strukturierten Selbsteinschätzung der persönlichen
+              Absicherungssituation. Er ersetzt keine individuelle Versicherungsberatung
+              oder Bedarfsanalyse im Sinne des Versicherungsvertragsgesetzes (VVG).
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.75 }}>
               Die dargestellten Ergebnisse basieren ausschließlich auf den vom Nutzer
               gemachten Angaben sowie auf einer algorithmischen Auswertung.
-              Angezeigte Handlungsfelder oder Abschlussmöglichkeiten stellen
-              keine individuelle Empfehlung dar.
+              Angezeigte Handlungsfelder oder Tarifübersichten stellen keine
+              individuelle Produktempfehlung dar.
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.75 }}>
               Ein Beratungsverhältnis entsteht erst im Rahmen eines persönlichen
-              Gesprächs. Die Nutzung von Abschluss- oder Terminlinks erfolgt
+              Gesprächs. Die Nutzung von Termin- oder Abschlusslinks erfolgt
               eigenverantwortlich.
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.75 }}>
-              Florian Löffler ist als gebundener Versicherungsvertreter gemäß
-              § 34d Abs. 7 GewO tätig und vermittelt ausschließlich die Produkte
-              folgender Gesellschaften:
+              Florian Löffler vermittelt ausschließlich die Produkte folgender
+              Gesellschaften:
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.75 }}>
@@ -117,6 +117,14 @@ export default function LegalOverlay({
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.75 }}>
+              Es bestehen keine direkten oder indirekten Beteiligungen von über 10 %
+              an den Stimmrechten oder am Kapital eines Versicherungsunternehmens.
+              Ebenso hält kein Versicherungsunternehmen oder Mutterunternehmen
+              eines Versicherungsunternehmens eine direkte oder indirekte Beteiligung
+              von über 10 % an den Stimmrechten oder am Kapital von Florian Löffler.
+            </p>
+
+            <p style={{ fontSize: 13, opacity: 0.75 }}>
               Zuständige Schlichtungsstellen:
             </p>
 
@@ -131,6 +139,24 @@ export default function LegalOverlay({
               Postfach 06 02 22<br />
               10052 Berlin
             </p>
+
+            <p style={{ fontSize: 13, opacity: 0.75 }}>
+              Zuständige Aufsichtsbehörde gemäß § 34d GewO:<br />
+              Industrie- und Handelskammer Südlicher Oberrhein<br />
+              Schnewlinstraße 11–13<br />
+              79098 Freiburg
+            </p>
+
+            <p style={{ fontSize: 13, opacity: 0.75 }}>
+              Plattform der EU-Kommission zur Online-Streitbeilegung:<br />
+              <a
+                href="https://ec.europa.eu/consumers/odr"
+                target="_blank"
+                rel="noreferrer"
+              >
+                https://ec.europa.eu/consumers/odr
+              </a>
+            </p>
           </>
         )}
 
@@ -141,25 +167,34 @@ export default function LegalOverlay({
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.8 }}>
-              Diese Anwendung speichert keine personenbezogenen Daten auf Servern.
-              Alle Eingaben erfolgen ausschließlich lokal in deinem Browser.
+              Diese Anwendung verarbeitet personenbezogene Daten ausschließlich lokal
+              in deinem Browser. Eine Speicherung der eingegebenen Daten auf externen
+              Servern findet nicht statt.
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.8 }}>
-              Es findet keine automatische Übertragung deiner eingegebenen Daten
-              an Dritte statt.
+              Es erfolgt keine automatische Übermittlung deiner Eingaben an Dritte.
+              Tracking- oder Analyse-Tools werden nicht eingesetzt.
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.8 }}>
-              Beim Klick auf externe Links (z. B. Online-Abschluss,
-              Terminvereinbarung oder externe Rechner) verlässt du diese Anwendung.
-              Für die Datenverarbeitung der jeweiligen Anbieter gelten deren
-              eigene Datenschutzbestimmungen.
+              Die technische Bereitstellung der Website (Hosting) kann durch einen
+              externen Dienstleister erfolgen. Dabei werden aus technischen Gründen
+              Server-Logfiles (z. B. IP-Adresse, Datum, Uhrzeit, Browsertyp) verarbeitet.
+              Diese Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
+              (berechtigtes Interesse an einer sicheren und stabilen Bereitstellung).
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.8 }}>
-              Sofern eine PDF-Auswertung erzeugt wird, erfolgt diese ausschließlich
-              lokal in deinem Browser ohne Speicherung auf externen Servern.
+              Beim Klick auf externe Links (z. B. Online-Abschluss, Terminvereinbarung
+              oder externe Rechner) verlässt du diese Anwendung. Für die
+              Datenverarbeitung der jeweiligen Anbieter sind ausschließlich deren
+              Datenschutzhinweise maßgeblich.
+            </p>
+
+            <p style={{ fontSize: 13, opacity: 0.8 }}>
+              Sofern eine PDF-Auswertung erzeugt wird, erfolgt diese vollständig lokal
+              in deinem Browser ohne Übertragung oder Speicherung auf externen Servern.
             </p>
           </>
         )}
@@ -171,29 +206,30 @@ export default function LegalOverlay({
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.8 }}>
-              Der 360° Absicherungscheck ist ein digitales Analyse-Tool zur
-              strukturierten Selbsteinschätzung deiner aktuellen Absicherung.
+              Der 360° Absicherungscheck ist ein digitales Informations- und Analyse-Tool
+              zur strukturierten Selbsteinschätzung deiner aktuellen Absicherungssituation.
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.8 }}>
-              Die Auswertung basiert ausschließlich auf deinen eigenen Angaben
-              und stellt keine individuelle Versicherungsberatung im Sinne des
-              Versicherungsvertragsgesetzes (VVG) dar.
+              Die Auswertung erfolgt ausschließlich auf Grundlage deiner eigenen Angaben
+              sowie einer algorithmischen Berechnungslogik. Es findet keine individuelle
+              Bedarfsanalyse oder persönliche Beratung im Sinne des Versicherungsvertragsgesetzes (VVG) statt.
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.8 }}>
-              Die angezeigten Ergebnisse stellen eine algorithmusbasierte Orientierung dar.
-              Sofern Handlungsfelder oder Abschlussmöglichkeiten angezeigt werden,
-              erfolgt dies ohne individuelle Bedarfsanalyse im Sinne des § 6 VVG.
+              Angezeigte Handlungsfelder, Hinweise oder Tarifübersichten stellen
+              eine allgemeine Orientierung dar und sind keine konkrete
+              Produktempfehlung.
             </p>
 
             <p style={{ fontSize: 13, opacity: 0.8 }}>
               Ein Beratungsverhältnis entsteht erst im Rahmen eines persönlichen Gesprächs.
-              Die Nutzung von Abschluss- oder Terminlinks erfolgt eigenverantwortlich.
+              Die Nutzung von Termin- oder Abschlusslinks erfolgt eigenverantwortlich.
+              Für die Inhalte und Datenschutzbestimmungen externer Anbieter sind
+              ausschließlich deren Betreiber verantwortlich.
             </p>
           </>
         )}
-
       </div>
     </div>
   );

@@ -13,10 +13,10 @@ export default function ProductsScreen({
   return (
     <div className="screen" ref={screenRef}>
 
-    <Header
-  back={() => setStep("dashboard")}
-  goBase={() => setStep("base")}
-/>
+      <Header
+        back={() => setStep("dashboard")}
+        goBase={() => setStep("base")}
+      />
 
       <h2>Abschlussmöglichkeiten</h2>
 
@@ -71,7 +71,7 @@ export default function ProductsScreen({
                           window.open(product.url, "_blank", "noopener,noreferrer")
                         }
                       >
-                        jetzt Online absichern
+                        Zum Online-Antrag
                       </button>
                     </div>
                   ))}

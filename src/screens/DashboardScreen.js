@@ -306,7 +306,7 @@
                       }}
                     >
                       {action.type === "abschluss"
-                        ? "jetzt Online absichern"
+                        ? "Zum Online-Antrag"
                         : "jetzt Beratung vereinbaren"}
                     </button>
                   )}
@@ -420,7 +420,7 @@
                                 }}
                               >
                                 {action.type === "abschluss"
-                                  ? "jetzt Online absichern"
+                                  ? "Zum Online-Antrag"
                                   : "jetzt Beratung vereinbaren"}
                               </button>
                             )}
@@ -502,7 +502,7 @@
           className="outlineBtn"
           onClick={() => setStep("products")}
         >
-          Alle Tarifoptionen anzeigen
+        Tarifübersicht öffnen
         </button>
 
         {/* ================= LEGAL FOOTER ================= */}
