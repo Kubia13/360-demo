@@ -62,8 +62,7 @@ import WelcomeScreen from "./screens/WelcomeScreen";
 /* ================= DEV TOOL ================= */
 
 const DEV_BYPASS =
-  process.env.NODE_ENV !== "production" &&
-  new URLSearchParams(window.location.search).get("dev") === "1";
+new URLSearchParams(window.location.search).get("dev") === "1";
 
 
 /* ================= APP ================= */
