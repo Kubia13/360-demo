@@ -30,7 +30,8 @@ export default function PdfOverlay({
 
   // ================= INPUT VALIDATION HELPERS =================
 
-  const onlyNumbers = (value) => value.replace(/\D/g, "");
+  const onlyNumbers = (value) => value.replace(/\D/g, "").slice(0, 5);
+  const isValidPlz = (value = "") => /^\d{5}$/.test(value.trim());
 
   const validateEmail = (value = "") => {
     const email = value.trim();
@@ -59,8 +60,8 @@ export default function PdfOverlay({
         : null,
 
     plz:
-      touched.plz && pdfData.plz.trim() === ""
-        ? "Bitte PLZ angeben."
+      touched.plz && !isValidPlz(pdfData.plz)
+        ? "PLZ muss exakt 5 Ziffern haben."
         : null,
 
     telefon:
@@ -74,7 +75,7 @@ export default function PdfOverlay({
   const isValid =
     validateStreet(pdfData.adresse) &&
     validateEmail(pdfData.email) &&
-    pdfData.plz.trim() !== "" &&
+    isValidPlz(pdfData.plz) &&
     (
       pdfData.telefon.trim() !== "" ||
       pdfData.handy.trim() !== ""

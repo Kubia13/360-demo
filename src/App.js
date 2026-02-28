@@ -1,67 +1,69 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import "./index.css";
 
 /* ================= IMPORT UI ================= */
 
-import { Header, Input, Select, Checkbox, ContactButton } from "./components/UI";
+import { Header, Select, Checkbox, ContactButton } from "./components/UI";
 
 
 /* ================= IMPORT CONFIG ================= */
 
-import { CATEGORY_WEIGHTS } from "./config/categoryWeights";
-import { CATEGORY_LABELS } from "./config/categoryLabels";
-import { PRIORITY_MAP } from "./config/priorityMap";
-import { CORE_PRODUCTS } from "./config/coreProducts";
 import { ACTION_MAP } from "./config/actionMap";
-
+import { CATEGORY_LABELS } from "./config/categoryLabels";
+import { CATEGORY_WEIGHTS } from "./config/categoryWeights";
+import { CORE_PRODUCTS } from "./config/coreProducts";
+import { PRIORITY_MAP } from "./config/priorityMap";
 
 /* ================= IMPORT DATA ================= */
 
-import { QUESTIONS } from "./data/questions";
 import { PRODUCT_STRUCTURE } from "./data/productStructure";
-
+import { QUESTIONS } from "./data/questions";
 
 /* ================= IMPORT HOOKS ================= */
 
-import { useBuIncomeAutoSync } from "./hooks/useBuIncomeAutoSync";
-import { useScoreAnimation } from "./hooks/useScoreAnimation";
-import { useOverlayEffects } from "./hooks/useOverlayEffects";
 import { useBaseFormNavigation } from "./hooks/useBaseFormNavigation";
 import { useBaseDataValidation } from "./hooks/useBaseDataValidation";
-import { useTopRecommendations } from "./hooks/useTopRecommendations";
+import { useBuIncomeAutoSync } from "./hooks/useBuIncomeAutoSync";
 import { useCategoryFlowGuard } from "./hooks/useCategoryFlowGuard";
+import { useOverlayEffects } from "./hooks/useOverlayEffects";
+import { useScoreAnimation } from "./hooks/useScoreAnimation";
+import { useTopRecommendations } from "./hooks/useTopRecommendations";
+
 
 /* ================= IMPORT LOGIC ================= */
 
-import { calculateScoreEngine } from "./logic/scoring";
-import { getScore } from "./logic/scoring";
-import { getStrategicRecommendation } from "./logic/recommendationEngine";
-import { resetAppState } from "./logic/resetAppState";
 import { getDynamicCategories } from "./logic/categoryEngine";
 import { getDynamicHint } from "./logic/dashboardEngine";
-
+import { getStrategicRecommendation } from "./logic/recommendationEngine";
+import { resetAppState } from "./logic/resetAppState";
+import { calculateScoreEngine, getScore } from "./logic/scoring";
 
 /* ================= IMPORT OVERLAYS ================= */
 
 import ActionOverlay from "./overlays/ActionOverlay";
+import CalculatorOverlay from "./overlays/CalculatorOverlay";
 import ContactOverlay from "./overlays/ContactOverlay";
 import LegalOverlay from "./overlays/LegalOverlay";
-import ResetOverlay from "./overlays/ResetOverlay";
 import PdfOverlay from "./overlays/PdfOverlay";
-import CalculatorOverlay from "./overlays/CalculatorOverlay";
 import PdfPreview from "./overlays/PdfPreview";
+import ResetOverlay from "./overlays/ResetOverlay";
 
 
 /* ================= IMPORT SCREENS ================= */
 
-import DashboardScreen from "./screens/DashboardScreen";
-import CategoryScreen from "./screens/CategoryScreens";
-import ProductsScreen from "./screens/ProductsScreen";
-
-import WelcomeScreen from "./screens/WelcomeScreen";
-import DisclaimerScreen from "./screens/DisclaimerScreen";
 import BaseScreen from "./screens/BaseScreen";
+import CategoryScreen from "./screens/CategoryScreens";
+import DashboardScreen from "./screens/DashboardScreen";
+import DisclaimerScreen from "./screens/DisclaimerScreen";
+import ProductsScreen from "./screens/ProductsScreen";
+import WelcomeScreen from "./screens/WelcomeScreen";
 
+
+/* ================= DEV TOOL ================= */
+
+const DEV_BYPASS =
+  process.env.NODE_ENV !== "production" &&
+  new URLSearchParams(window.location.search).get("dev") === "1";
 
 
 /* ================= APP ================= */
@@ -134,8 +136,18 @@ export default function App() {
 
   /* ================= PDF DATA ================= */
 
-  const [pdfOverlay, setPdfOverlay] = useState(false);
-  const [pdfPreview, setPdfPreview] = useState(false); // ← DAS FEHLT
+  const [pdfOverlay, _setPdfOverlay] = useState(false);
+  const [pdfPreview, _setPdfPreview] = useState(false);
+
+  const setPdfOverlay = (v) => {
+    _setPdfOverlay(v);
+    if (v) _setPdfPreview(false);
+  };
+
+  const setPdfPreview = (v) => {
+    _setPdfPreview(v);
+    if (v) _setPdfOverlay(false);
+  };
 
   const [pdfData, setPdfData] = useState({
     adresse: "",
@@ -230,7 +242,7 @@ export default function App() {
       answers
     });
   }, [baseData, answers, getDynamicHint]);
-  
+
 
   /* ===== SCORE ANIMATION (Hook) ===== */
 
@@ -323,6 +335,9 @@ export default function App() {
           setLegalOverlay={setLegalOverlay}
           setShowResetConfirm={setShowResetConfirm}
           setContactOverlay={setContactOverlay}
+
+          baseValidation={baseValidation}
+          devBypass={DEV_BYPASS}
         />
       )}
 
@@ -336,7 +351,7 @@ export default function App() {
           baseData={baseData}
           animatedScore={animatedScore}
           hasValidScoreData={hasValidScoreData}
-          getDynamicHint={dynamicHint}
+          dynamicHint={dynamicHint}
           topRecommendations={topRecommendations}
           ACTION_MAP={ACTION_MAP}
           QUESTIONS={QUESTIONS}
@@ -404,6 +419,8 @@ export default function App() {
           Select={Select}
           Checkbox={Checkbox}
           ContactButton={ContactButton}
+          QUESTIONS={QUESTIONS}
+          devBypass={DEV_BYPASS}
         />
       )}
 

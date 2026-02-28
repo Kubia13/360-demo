@@ -78,12 +78,28 @@ export function useBaseDataValidation({
 
     const errors = {};
 
+    const isEmptySelect = (v) =>
+      !v ||
+      String(v).trim() === "" ||
+      String(v).toLowerCase().includes("bitte");
+
     // Pflichtfelder
+    if (isEmptySelect(baseData.anrede)) errors.anrede = "Anrede fehlt";
+    if (isEmptySelect(baseData.krankenversicherung)) errors.krankenversicherung = "Krankenversicherung fehlt";
     if (!baseData.vorname?.trim()) errors.vorname = "Vorname fehlt";
     if (!baseData.nachname?.trim()) errors.nachname = "Nachname fehlt";
     if (!baseData.alter) errors.alter = "Alter fehlt";
     if (!baseData.beruf?.trim()) errors.beruf = "Beruf fehlt";
     if (!baseData.wohnen) errors.wohnen = "Wohnsituation fehlt";
+    if (isEmptySelect(baseData.beziehungsstatus)) errors.beziehungsstatus = "Beziehungsstatus fehlt";
+
+    // Diese Felder brauchst du für sauberen Flow (sonst wird "Weiter" zu früh aktiv)
+    if (!baseData.gehalt) errors.gehalt = "Gehalt fehlt";
+    if (baseData.kinder === "Ja" && isEmptySelect(baseData.kinderKrankenversicherung)) {
+      errors.kinderKrankenversicherung = "Kinder-KV fehlt";
+    }
+    if (!baseData.tiere) errors.tiere = "Tier-Angabe fehlt";
+    if (!baseData.kfz) errors.kfz = "KFZ-Angabe fehlt";
 
     // Zahlenvalidierung
     const age = Number(baseData.alter);
@@ -101,8 +117,10 @@ export function useBaseDataValidation({
       errors.kinderAnzahl = "Kinderanzahl fehlt";
     }
 
-    if (baseData.kfz === "Ja" && !baseData.kfzAnzahl) {
-      errors.kfzAnzahl = "KFZ-Anzahl fehlt";
+    if (baseData.kfz === "Ja") {
+      const n = Number(baseData.kfzAnzahl);
+      if (!baseData.kfzAnzahl) errors.kfzAnzahl = "KFZ-Anzahl fehlt";
+      else if (isNaN(n) || n <= 0) errors.kfzAnzahl = "KFZ-Anzahl ungültig";
     }
 
     return {

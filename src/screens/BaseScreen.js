@@ -13,9 +13,13 @@ export default function BaseScreen({
   goToBaseWithoutReset,
   setLegalOverlay,
   setShowResetConfirm,
-  setContactOverlay
+  setContactOverlay,
+  baseValidation,
+  devBypass
 }) {
+  const canProceed = devBypass || baseValidation?.isValid;
   return (
+
     <div className="screen">
       <Header goBase={goToBaseWithoutReset} />
 
@@ -190,7 +194,10 @@ export default function BaseScreen({
 
       <button
         className="primaryBtn"
+        disabled={!canProceed}
+        style={{ opacity: canProceed ? 1 : 0.5 }}
         onClick={() => {
+          if (!canProceed) return;
           setStep("category");
           scrollToTop();
         }}

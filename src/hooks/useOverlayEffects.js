@@ -37,14 +37,65 @@ export function useOverlayEffects({
       Boolean(calculatorOverlay) ||
       Boolean(pdfPreview);
 
+    const body = document.body;
+    const html = document.documentElement;
+
+    // helpers for cleanup
+    const prevOverflow = body.style.overflow;
+    const prevPaddingRight = body.style.paddingRight;
+    const prevPosition = body.style.position;
+    const prevTop = body.style.top;
+    const prevWidth = body.style.width;
+
+    const prevHtmlOverscroll = html.style.overscrollBehaviorY;
+
     if (overlayOpen) {
-      document.body.style.overflow = "hidden";
+      // Prevent layout shift when scrollbar disappears (desktop)
+      const scrollBarWidth = window.innerWidth - html.clientWidth;
+      if (scrollBarWidth > 0) {
+        body.style.paddingRight = `${scrollBarWidth}px`;
+      }
+
+      // Lock scroll (works reliably incl. iOS when combined with fixed positioning)
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+
+      body.style.overflow = "hidden";
+      body.style.position = "fixed";
+      body.style.top = `-${scrollY}px`;
+      body.style.width = "100%";
+
+      // Reduce scroll chaining / overscroll
+      html.style.overscrollBehaviorY = "none";
     } else {
-      document.body.style.overflow = "";
+      // restore
+      const top = body.style.top;
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPaddingRight;
+      body.style.position = prevPosition;
+      body.style.top = prevTop;
+      body.style.width = prevWidth;
+
+      html.style.overscrollBehaviorY = prevHtmlOverscroll;
+
+      // restore scroll position after fixed lock
+      const y = top ? Math.abs(parseInt(top, 10)) : 0;
+      if (y) window.scrollTo(0, y);
     }
 
     return () => {
-      document.body.style.overflow = "";
+      // hard cleanup
+      const top = body.style.top;
+
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPaddingRight;
+      body.style.position = prevPosition;
+      body.style.top = prevTop;
+      body.style.width = prevWidth;
+
+      html.style.overscrollBehaviorY = prevHtmlOverscroll;
+
+      const y = top ? Math.abs(parseInt(top, 10)) : 0;
+      if (overlayOpen && y) window.scrollTo(0, y);
     };
   }, [
     legalOverlay,
