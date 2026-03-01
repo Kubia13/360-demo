@@ -1,0 +1,122 @@
+.screen {
+  position: relative;
+  z-index: 1;
+
+  min-height: 100dvh;
+
+  padding: 16px;
+  padding-bottom: 110px;
+
+  max-width: 420px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= DASHBOARD TITLE ================= */
+
+.screen h2 {
+  text-align: center;
+  margin: 0 0 18px 0;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  opacity: 0.95;
+}
+
+/* ================= HEADER ================= */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: rgba(7, 16, 24, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  padding: 8px 0;
+  margin-bottom: 10px;
+
+  border-bottom: 1px solid rgba(139, 124, 246, 0.1);
+}
+
+/* ================= GENERIC ALIGNMENT ================= */
+
+.center {
+  text-align: center;
+}
+
+/* ================= LOGO ================= */
+
+.logo.large {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 20px auto;
+}
+
+.logo.small {
+  height: 50px;
+  cursor: pointer;
+}
+
+/* ================= DISCLAIMER SCREEN ================= */
+
+.disclaimerScreen {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding: 80px 20px 40px 20px;
+}
+
+/* ================= POSITION HELPERS ================= */
+
+.buttonRowWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+@media (max-width: 480px) {
+  .screen {
+    padding: 16px;
+    padding-bottom: 120px;
+  }
+}
+
+/* ================= LEGAL FOOTER (GLOBAL) ================= */
+
+.legalFooter {
+  margin-top: auto;
+  padding-top: 20px;
+
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.6;
+
+  margin-bottom: 70px;
+  /* Abstand zum fixed Contact Bereich */
+}
+
+.legalFooter span {
+  color: #8B7CF6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.legalFooter span:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Mobile: extra Abstand unten */
+@media (max-width: 480px) {
+  .legalFooter {
+    margin-bottom: 80px;
+  }
+}

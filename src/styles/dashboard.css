@@ -1,0 +1,364 @@
+/* ================= DASHBOARD ANIMATIONS ================= */
+
+@keyframes softPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* ================= CATEGORY LIST / ROW ================= */
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.categoryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 16px;
+  border-radius: 14px;
+
+  background: #111c26;
+  border: 1px solid rgba(139, 124, 246, 0.15);
+
+  backdrop-filter: blur(6px);
+
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.categoryRow:hover {
+  border-color: rgba(139, 124, 246, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(139, 124, 246, 0.18);
+}
+
+.categoryRow span:last-child {
+  font-weight: 600;
+  color: #A99BFF;
+}
+
+/* ================= CATEGORY CHEVRON ================= */
+
+.categoryChevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 26px;
+  height: 26px;
+
+  border-radius: 8px;
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(139, 124, 246, 0.18);
+
+  color: #A99BFF;
+
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.categoryRow:hover .categoryChevron {
+  background: rgba(139, 124, 246, 0.12);
+}
+
+.categoryChevron svg {
+  pointer-events: none;
+}
+
+/* ================= CATEGORY DETAILS ================= */
+
+.categoryDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  max-height: 0;
+  overflow: hidden;
+
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+
+  padding: 0 10px;
+}
+
+.categoryDetails.open {
+  max-height: 1000px;
+  opacity: 1;
+  padding-top: 6px;
+}
+
+/* ================= SUB OPTIONS ================= */
+
+.subOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  margin-top: 14px;
+  padding-left: 12px;
+
+  border-left: 2px solid #5E4AE3;
+}
+
+/* ================= RECOMMENDATION CARD ================= */
+
+.recommendationItem {
+  background: rgba(15, 26, 35, 0.85);
+  border-left: 3px solid #8B7CF6;
+
+  padding: 10px 12px;
+  margin-top: 6px;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+  backdrop-filter: blur(8px);
+}
+
+.recommendationItem p {
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+  max-width: 95%;
+
+  opacity: 0.85;
+  margin: 3px 0 0 0;
+}
+
+/* ================= NO ISSUES ================= */
+
+.noIssues {
+  font-size: 13px;
+  opacity: 0.6;
+  padding: 6px 0;
+}
+
+/* ================= DASHBOARD TITLE ================= */
+
+.dashboardTitle {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  margin-bottom: 10px;
+}
+
+/* ================= PREMIUM SCORE ================= */
+
+.ringWrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 12px 0 8px 0;
+  overflow: visible;
+}
+
+.ringGlow {
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  z-index: 0;
+
+  filter: blur(50px);
+  pointer-events: none;
+}
+
+.ringCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.ringScore {
+  font-size: 42px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.ringStatus {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ================= SCORE LABEL ================= */
+
+.scoreLabel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  margin-top: -6px;
+  margin-bottom: 16px;
+
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.scoreLabel p {
+  margin: 2px 0;
+}
+
+.scoreLabel p:first-child {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.scoreLabel p:nth-child(2) {
+  color: #A99BFF;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* ================= TOP 3 ================= */
+
+.top3Wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.top3Headline {
+  text-align: center;
+  margin: 0 0 2px 0;
+
+  font-size: 21px;
+  font-weight: 650;
+
+  line-height: 1.35;
+  padding-bottom: 2px;
+  overflow: visible;
+
+  background: linear-gradient(135deg, #ffffff, #A99BFF);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ================= STATUS HINTS ================= */
+
+.riskWarning,
+.upgradeHint {
+  text-align: center;
+  margin: 10px auto 0 auto;
+  max-width: 90%;
+  line-height: 1.4;
+}
+
+/* ================= CONVERSION ================= */
+
+.conversionBox {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.conversionHeadline {
+  margin-bottom: 14px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.conversionText {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+
+  margin-bottom: 18px;
+  max-width: 340px;
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.conversionSub {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 12px;
+}
+
+.secondaryActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* ================= PRODUCT ROW ================= */
+
+.productRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+
+  padding: 16px 18px;
+  border-radius: 16px;
+
+  background: rgba(20, 30, 45, 0.7);
+  border: 1px solid rgba(139, 124, 246, 0.15);
+
+  backdrop-filter: blur(10px);
+
+  transition: all 0.2s ease;
+}
+
+.productRow:hover {
+  border: 1px solid rgba(139, 124, 246, 0.35);
+  box-shadow: 0 0 18px rgba(139, 124, 246, 0.25);
+}
+
+/* ================= MOBILE DASHBOARD ================= */
+
+@media (max-width: 480px) {
+  .recommendationItem {
+    padding: 12px;
+    margin-top: 8px;
+  }
+
+  .recommendationItem p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+/* ================= CTA CLEAN ================= */
+/* Wenn ctaSubline auch außerhalb des Dashboards genutzt wird -> später nach components/utilities schieben. */
+.ctaSubline {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 10px;
+}

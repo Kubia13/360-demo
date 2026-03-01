@@ -1,0 +1,443 @@
+/* ================= OVERLAY FIX – NO CLIPPING ================= */
+
+.infoOverlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.75);
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding: 60px 20px;
+
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* ================= OVERLAY BOXES ================= */
+
+.infoBox,
+.legalBox,
+.contactBox {
+  position: relative;
+
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+
+  padding: 28px;
+  border-radius: 18px;
+
+  background: #141c24;
+  border: 1px solid rgba(139, 124, 246, 0.25);
+
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  transform: translateZ(0);
+}
+
+/* ================= SCROLLBAR CLEAN ================= */
+
+.infoBox::-webkit-scrollbar,
+.legalBox::-webkit-scrollbar,
+.contactBox::-webkit-scrollbar {
+  width: 6px;
+}
+
+.infoBox::-webkit-scrollbar-thumb,
+.legalBox::-webkit-scrollbar-thumb,
+.contactBox::-webkit-scrollbar-thumb {
+  background: rgba(139, 124, 246, 0.4);
+  border-radius: 6px;
+}
+
+/* ================= LINKS IM IMPRESSUM ================= */
+
+.legalBox a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: underline;
+  text-decoration-color: rgba(139, 124, 246, 0.6);
+  text-underline-offset: 3px;
+  transition: all 0.2s ease;
+}
+
+.legalBox a:hover {
+  color: #ffffff;
+  text-decoration-color: #8B7CF6;
+}
+
+/* ================= OVERLAY HEADER ================= */
+
+.overlayHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+/* ================= BUTTON CONTAINER ================= */
+
+.overlayButtons {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ================= OVERLAY BUTTON ================= */
+
+.overlayBtn {
+  flex: 1;
+  height: 56px;
+  min-height: 56px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  border-radius: 18px;
+  border: 1px solid transparent;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.overlayBtn.primary {
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+}
+
+.overlayBtn.primary:hover {
+  box-shadow: 0 0 18px rgba(139, 124, 246, 0.6);
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.overlayBtn.secondary {
+  background: #1a2a36;
+  color: white;
+  border: 1px solid #5E4AE3;
+}
+
+.overlayBtn.secondary:hover {
+  background: #223445;
+  transform: translateY(-2px);
+}
+
+.overlayBtn:active {
+  transform: scale(0.97);
+}
+
+/* ================= INLINE LINK ================= */
+
+.inlineLink {
+  display: inline-block;
+  margin-top: 8px;
+
+  color: #A99BFF;
+  text-decoration: none;
+  font-weight: 500;
+
+  transition: 0.2s ease;
+}
+
+.inlineLink:hover {
+  color: #A99BFF;
+  text-decoration: underline;
+}
+
+.inlineLink:active {
+  transform: scale(0.97);
+}
+
+/* ================= PDF OVERLAY FIELD CLEAN ================= */
+
+.overlayField {
+  margin-bottom: 22px;
+}
+
+.overlayLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.overlayLabelRow label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.overlayInfoText {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  background: rgba(139, 124, 246, 0.08);
+  border-left: 3px solid #8B7CF6;
+  border-radius: 8px;
+
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ================= FIXED CONTACT AREA ================= */
+
+.contactFixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background: #071018;
+  padding: 14px;
+
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+
+  border-top: 1px solid rgba(139, 124, 246, 0.15);
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.55);
+
+  z-index: 1000;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  transform: translateZ(0);
+}
+
+.contactBtn {
+  flex: 1;
+  max-width: 200px;
+
+  height: 56px;
+  min-height: 56px;
+
+  padding: 0;
+  margin: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1;
+
+  border-radius: 18px;
+
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+
+  border: 1px solid transparent;
+
+  background: linear-gradient(135deg, #8B7CF6, #5E4AE3);
+  color: white;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  box-shadow: 0 5px 14px rgba(94, 74, 227, 0.3);
+}
+
+.contactBtn.secondary {
+  background: #1a2a36;
+  border: 1px solid #5E4AE3;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+}
+
+.contactBtn:hover {
+  filter: brightness(1.1);
+}
+
+.contactBtn.secondary:hover {
+  background: #223445;
+}
+
+.contactBtn:active {
+  transform: scale(0.97);
+}
+
+/* ================= CALCULATOR OVERLAY ================= */
+
+.calculatorBox h3 {
+  text-align: left;
+}
+
+.calculatorList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.calculatorItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  padding: 16px;
+  border-radius: 14px;
+
+  background: rgba(139, 124, 246, 0.08);
+  border: 1px solid rgba(139, 124, 246, 0.25);
+
+  text-decoration: none;
+  color: white;
+
+  transition: 0.2s ease;
+}
+
+.calculatorItem:hover {
+  background: rgba(139, 124, 246, 0.18);
+  transform: translateY(-2px);
+}
+
+.calculatorItem strong {
+  font-size: 15px;
+}
+
+.calculatorItem span {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* ================= BU CALCULATOR LAYOUT ================= */
+
+.buCalculatorRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.buInput label,
+.buResultLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.75;
+  margin-bottom: 8px;
+}
+
+.buInput input {
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(139, 124, 246, 0.25);
+
+  background: rgba(15, 25, 40, 0.8);
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 500;
+
+  box-sizing: border-box;
+}
+
+.buResultValue {
+  width: 100%;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+
+  font-size: 27px;
+  font-weight: 600;
+  color: #8B7CF6;
+
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+/* ================= DISCLAIMER CARD ================= */
+
+.disclaimerCard {
+  max-width: 380px;
+  padding: 28px;
+
+  border-radius: 22px;
+
+  background: rgba(15, 26, 35, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border: 1px solid rgba(139, 124, 246, 0.2);
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(139, 124, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  animation: fadeIn 0.5s ease;
+}
+
+.disclaimerCard h2 {
+  background: linear-gradient(135deg, #8B7CF6, #A99BFF);
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.disclaimerCard p {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+  margin-bottom: 14px;
+}
+
+.disclaimerCheckbox {
+  margin-top: 16px;
+}
+
+.disclaimerCard:has(input:checked) {
+  border-color: rgba(139, 124, 246, 0.45);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(139, 124, 246, 0.25),
+    0 0 30px rgba(139, 124, 246, 0.25);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= MOBILE OVERLAY ================= */
+
+@media (max-width: 480px) {
+  .contactFixed {
+    padding: 12px;
+  }
+
+  .contactBtn {
+    height: 52px;
+    font-size: 14px;
+  }
+}

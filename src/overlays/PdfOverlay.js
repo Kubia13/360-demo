@@ -30,7 +30,8 @@ export default function PdfOverlay({
 
   // ================= INPUT VALIDATION HELPERS =================
 
-  const onlyNumbers = (value) => value.replace(/\D/g, "").slice(0, 5);
+  const numbersOnly = (value) => value.replace(/[^\d+]/g, "");
+  const plzOnly = (value) => value.replace(/\D/g, "").slice(0, 5);
   const isValidPlz = (value = "") => /^\d{5}$/.test(value.trim());
 
   const validateEmail = (value = "") => {
@@ -66,8 +67,8 @@ export default function PdfOverlay({
 
     telefon:
       (touched.telefon || touched.handy) &&
-        pdfData.telefon.trim() === "" &&
-        pdfData.handy.trim() === ""
+        (pdfData.telefon || "").trim() === "" &&
+        (pdfData.handy || "").trim() === ""
         ? "Bitte Telefon oder Handy angeben."
         : null
   };
@@ -77,8 +78,8 @@ export default function PdfOverlay({
     validateEmail(pdfData.email) &&
     isValidPlz(pdfData.plz) &&
     (
-      pdfData.telefon.trim() !== "" ||
-      pdfData.handy.trim() !== ""
+      (pdfData.telefon || "").trim() !== "" ||
+      (pdfData.handy || "").trim() !== ""
     );
 
   return (
@@ -128,7 +129,7 @@ export default function PdfOverlay({
           label="PLZ"
           value={pdfData.plz}
           onChange={(v) =>
-            setPdfData({ ...pdfData, plz: onlyNumbers(v) })
+            setPdfData({ ...pdfData, plz: plzOnly(v) })
           }
           inputRef={pdfFormRefs.plz}
           onEnter={() => focusNext(pdfFormRefs.plz)}
@@ -190,7 +191,7 @@ export default function PdfOverlay({
           label="Telefon"
           value={pdfData.telefon}
           onChange={(v) =>
-            setPdfData({ ...pdfData, telefon: onlyNumbers(v) })
+            setPdfData({ ...pdfData, telefon: numbersOnly(v) })
           }
           inputRef={pdfFormRefs.telefon}
           onEnter={() => focusNext(pdfFormRefs.telefon)}
@@ -203,7 +204,7 @@ export default function PdfOverlay({
           label="Handy"
           value={pdfData.handy}
           onChange={(v) =>
-            setPdfData({ ...pdfData, handy: onlyNumbers(v) })
+            setPdfData({ ...pdfData, handy: numbersOnly(v) })
           }
           inputRef={pdfFormRefs.handy}
           onEnter={() => focusNext(pdfFormRefs.handy)}

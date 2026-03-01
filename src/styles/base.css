@@ -1,0 +1,81 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+  background: #071018;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ================= DEPTH BACKGROUND ================= */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 10%,
+      rgba(139, 124, 246, 0.08),
+      transparent 40%),
+    radial-gradient(circle at 80% 90%,
+      rgba(94, 74, 227, 0.06),
+      transparent 50%);
+  z-index: 0;
+}
+
+/* ================= GLOBAL SCROLLBAR – PREMIUM DESKTOP ================= */
+
+@media (min-width: 769px) {
+
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #8B7CF6 #071018;
+  }
+
+  html::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  html::-webkit-scrollbar-track {
+    background: #071018;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #8B7CF6, #5E4AE3);
+    border-radius: 8px;
+  }
+
+}
+
+/* ================= MOBILE SCROLLBAR – FULL HIDE ================= */
+
+@media (max-width: 768px) {
+
+  html,
+  .infoOverlay,
+  .infoBox,
+  .legalBox,
+  .contactBox,
+  .pdfPreviewWrapper {
+    scrollbar-width: none;      /* Firefox */
+  }
+
+  html::-webkit-scrollbar,
+  .infoOverlay::-webkit-scrollbar,
+  .infoBox::-webkit-scrollbar,
+  .legalBox::-webkit-scrollbar,
+  .contactBox::-webkit-scrollbar,
+  .pdfPreviewWrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+}
