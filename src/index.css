@@ -30,3 +30,11 @@
     0 0 12px rgba(139, 124, 246, 0.6),
     0 0 22px rgba(94, 74, 227, 0.4);
 }
+
+/* ================= GLOBAL MOBILE INPUT FIX ================= */
+
+input,
+textarea,
+select {
+  font-size: 16px;
+}

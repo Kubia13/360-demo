@@ -1,6 +1,9 @@
 /* ================= LEGAL OVERLAY ================= */
 import React from "react";
 
+const BUILD_TIME = process.env.REACT_APP_BUILD_TIME || "DEV";
+const GIT_HASH = process.env.REACT_APP_GIT_HASH || "LOCAL";
+
 export default function LegalOverlay({
   legalOverlay,
   setLegalOverlay
@@ -228,6 +231,11 @@ export default function LegalOverlay({
               Für die Inhalte und Datenschutzbestimmungen externer Anbieter sind
               ausschließlich deren Betreiber verantwortlich.
             </p>
+            <hr className="legalDivider" />
+
+            <div className="legalVersion">
+              Version {GIT_HASH} · {BUILD_TIME}
+            </div>
           </>
         )}
       </div>

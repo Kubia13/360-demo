@@ -90,6 +90,21 @@
   text-decoration-color: #8B7CF6;
 }
 
+/* ================= CONTACT OVERLAY LINKS ================= */
+
+.infoBox a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: underline;
+  text-decoration-color: rgba(139, 124, 246, 0.6);
+  text-underline-offset: 3px;
+  transition: all 0.2s ease;
+}
+
+.infoBox a:hover {
+  color: #ffffff;
+  text-decoration-color: #8B7CF6;
+}
+
 /* ================= OVERLAY HEADER ================= */
 
 .overlayHeader {
@@ -458,4 +473,20 @@
     height: 52px;
     font-size: 14px;
   }
+}
+
+/* Version im Hinweis-Overlay */
+
+.legalDivider {
+  margin-top: 28px;
+  margin-bottom: 14px;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.legalVersion {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
 }

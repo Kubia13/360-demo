@@ -1,12 +1,73 @@
 @media (max-width: 480px) {
+
+  /* ================= WRAPPER ================= */
+
   .pdfPreviewWrapper {
-    padding: 20px;
+    padding: 18px;
     border-radius: 16px;
   }
 
-  .pdfSection {
-    margin-bottom: 24px;
+  .pdfPreview {
+    font-size: 14px;
+    line-height: 1.55;
   }
+
+  /* ================= SECTION ================= */
+
+  .pdfSection {
+    margin-bottom: 26px;
+  }
+
+  .pdfSection h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* ================= TABLE ================= */
+
+  .pdfTable {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .pdfTable th,
+  .pdfTable td {
+    font-size: 13px;
+    padding: 6px 4px;
+    word-break: break-word;
+  }
+
+  .pdfTable th:nth-child(1),
+  .pdfTable td:nth-child(1) {
+    width: 36%;
+    text-align: left;
+  }
+
+  .pdfTable th:nth-child(2),
+  .pdfTable td:nth-child(2) {
+    width: 21%;
+    text-align: right;
+  }
+
+  .pdfTable th:nth-child(3),
+  .pdfTable td:nth-child(3) {
+    width: 21%;
+    text-align: right;
+  }
+
+  .pdfTable th:nth-child(4),
+  .pdfTable td:nth-child(4) {
+    width: 22%;
+    text-align: right;
+  }
+
+  /* Zahlen ruhiger */
+
+  .pdfTable td {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ================= CATEGORY ROW FALLBACK ================= */
 
   .pdfCategoryRow {
     flex-direction: column;
@@ -22,20 +83,74 @@
     text-align: left;
   }
 
+  /* ================= CONTACT BLOCK ================= */
+
   .pdfContactBlock {
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
+    align-items: flex-start;
   }
 
   .pdfContactRight {
     align-items: flex-start;
   }
+
+  .pdfContactRight img {
+    width: 80px;
+    height: 80px;
+  }
+
+  /* ================= BUTTON FIX ================= */
+
+  .pdfActions {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .pdfActions button {
+    width: 100%;
+    height: 48px;
+    /* weniger wuchtig */
+    border-radius: 16px;
+    font-size: 14px;
+    /* kompakter */
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 0 14px;
+  }
+
+  /* Druckbutton speziell */
+  .primaryBtn {
+    white-space: normal;
+    /* erlaubt sauberen Umbruch */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
 }
 
-@media (min-width: 769px) {
-  .scrollDownBtn {
-    display: none;
+/* ================= MOBILE LABEL ICON FIX ================= */
+
+@media (max-width: 480px) {
+
+  .pdfBox .overlayLabelRow {
+    position: relative;
+    padding-right: 20px;
+    /* Platz für das i */
   }
+
+  .pdfBox .overlayLabelRow label {
+    padding-right: 20px;
+    /* verhindert Text-Überlagerung */
+  }
+
+  .pdfBox .overlayLabelRow .infoIconInline {
+    right: 2px;
+  }
+
 }
 
 /* ================= PDF FORM – COMPACT PREMIUM ================= */
@@ -70,7 +185,7 @@
 }
 
 
-/* ================= OVERLAY LABEL UNIFIED ================= */
+/* ================= OVERLAY LABEL – FLUID UNIFIED ================= */
 
 .pdfBox label {
   display: flex;
@@ -79,19 +194,16 @@
 
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 
-  font-size: 14.5px;
-  /* vorher 13.5 → jetzt angenehmer */
+  /* Fluid Typography */
+  font-size: clamp(13.5px, 3.2vw, 15px);
   font-weight: 500;
-  letter-spacing: 0.28px;
-  /* minimal angepasst für Balance */
-  line-height: 1.3;
-  /* verhindert gequetschte Labels */
+  letter-spacing: 0.25px;
 
-  color: rgba(255, 255, 255, 0.9);
-  /* minimal cleaner als 0.88 */
+  line-height: 1.35;
+
+  color: rgba(255, 255, 255, 0.92);
 
   margin-bottom: 7px;
-  /* bleibt gleich für Rhythmus */
 }
 
 /* ================= PDF LABEL ROW – ICON FIX ================= */
@@ -111,34 +223,36 @@
 }
 
 
-/* ================= PDF INPUT ================= */
+/* ================= PDF INPUT – FLUID MOBILE SAFE ================= */
 
 .pdfBox input {
-  height: 48px;
-  /* vorher 56 → deutlich ruhiger */
+  height: clamp(46px, 11vw, 52px);
   padding: 0 16px;
 
   border-radius: 14px;
 
-  font-size: 15px;
-  /* harmonischer */
+  /* Fluid Typography */
+  font-size: clamp(14px, 3.6vw, 16px);
   font-weight: 500;
+  line-height: 1.4;
 
   border: 1px solid rgba(139, 124, 246, 0.22);
   background: rgba(15, 25, 40, 0.72);
 
+  color: #ffffff;
+
   transition: all 0.2s ease;
+
+  /* verhindert Zoom auf iOS */
+  -webkit-text-size-adjust: 100%;
 }
 
 .pdfBox input:focus {
   outline: none;
   border-color: #8B7CF6;
   box-shadow: 0 0 0 2px rgba(139, 124, 246, 0.18);
-  /* weniger massiv */
   background: rgba(15, 25, 40, 0.9);
 }
-
-
 
 /* ================= PDF SEPARATOR ================= */
 

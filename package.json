@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build --no-minify",
+    "build": "node build-version.js && react-scripts build --no-minify",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -25,5 +25,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "git-rev-sync": "^3.0.2",
+    "stylelint": "^17.4.0",
+    "stylelint-config-standard": "^40.0.0"
   }
 }
