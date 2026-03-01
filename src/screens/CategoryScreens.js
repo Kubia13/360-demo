@@ -103,30 +103,20 @@ export default function CategoryScreen({
       />
 
       {/* Progress */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 14, opacity: 0.7 }}>
+      <div className="progressBlock">
+        <div className="progressMeta">
           Kategorie {currentCategoryIndex + 1} von {categories.length}
         </div>
 
-        <div style={{ fontSize: 20, fontWeight: "bold" }}>
+        <div className="progressTitle">
           {CATEGORY_LABELS[currentCategory]}
         </div>
 
-        <div
-          style={{
-            height: 6,
-            background: "#1a2a36",
-            borderRadius: 6,
-            marginTop: 8,
-            overflow: "hidden",
-          }}
-        >
+        <div className="progressBarWrapper">
           <div
+            className="progressFill"
             style={{
-              width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`,
-              height: "100%",
-              background: "linear-gradient(135deg, #8B7CF6, #5E4AE3)",
-              transition: "0.3s ease",
+              width: `${((currentCategoryIndex + 1) / categories.length) * 100}%`
             }}
           />
         </div>

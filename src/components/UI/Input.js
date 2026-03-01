@@ -45,7 +45,7 @@ export default function Input({
             borderColor: error ? "#d93025" : undefined
           }}
         />
-        
+
         {isNumber && (
           <div className="numberStepper">
             <button type="button" onClick={increase}>+</button>
@@ -53,6 +53,12 @@ export default function Input({
           </div>
         )}
       </div>
+
+      {error && (
+        <div className="fieldError">
+          {error}
+        </div>
+      )}
     </div>
   );
 }

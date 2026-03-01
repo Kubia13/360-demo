@@ -38,38 +38,76 @@
   }
 }
 
-/* ================= PDF FORM PREMIUM BOOST ================= */
+/* ================= PDF FORM – COMPACT PREMIUM ================= */
+
+.pdfBox {
+  max-width: 540px;
+  /* minimal schlanker */
+  padding: 32px 30px;
+  /* weniger Luft */
+}
+
+
+/* ================= PDF HEADLINE ================= */
 
 .pdfBox h3 {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   margin-bottom: 28px;
+  /* kompakter */
 }
+
+
+/* ================= PDF FIELD WRAPPER ================= */
 
 .pdfBox .field {
-  margin-bottom: 22px;
+  margin-bottom: 20px;
+  /* vorher 24 */
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  /* enger */
 }
+
+
+/* ================= PDF LABEL ================= */
 
 .pdfBox .field label {
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  font-size: 13px;
+  /* etwas kleiner */
   font-weight: 500;
   opacity: 0.75;
-  margin-bottom: 6px;
-  display: block;
 }
 
+
+/* ================= PDF INFO ICON ================= */
+
+.pdfBox .field label .infoIconInline {
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+
+/* ================= PDF INPUT ================= */
+
 .pdfBox input {
-  height: 56px;
-  padding: 0 18px;
+  height: 48px;
+  /* vorher 56 → deutlich ruhiger */
+  padding: 0 16px;
 
-  border-radius: 16px;
+  border-radius: 14px;
 
-  font-size: 16px;
+  font-size: 15px;
+  /* harmonischer */
   font-weight: 500;
 
-  border: 1px solid rgba(139, 124, 246, 0.25);
-  background: rgba(15, 25, 40, 0.75);
+  border: 1px solid rgba(139, 124, 246, 0.22);
+  background: rgba(15, 25, 40, 0.72);
 
   transition: all 0.2s ease;
 }
@@ -77,41 +115,34 @@
 .pdfBox input:focus {
   outline: none;
   border-color: #8B7CF6;
-  box-shadow: 0 0 0 3px rgba(139, 124, 246, 0.2);
-  background: rgba(15, 25, 40, 0.95);
+  box-shadow: 0 0 0 2px rgba(139, 124, 246, 0.18);
+  /* weniger massiv */
+  background: rgba(15, 25, 40, 0.9);
 }
+
+
+
+/* ================= PDF SEPARATOR ================= */
+
 
 .pdfBox hr {
-  margin: 30px 0;
+  margin: 18px 0;
   border: none;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(139, 124, 246, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(139, 124, 246, 0.35),
+      transparent);
 }
 
-.pdfBox .primaryBtn.big {
-  height: 58px;
-  font-size: 17px;
-  letter-spacing: 0.3px;
+/* ================= PDF PRIMARY BUTTON HOVER – COMPACT ================= */
 
-  border-radius: 18px;
-
-  box-shadow: 0 10px 30px rgba(94, 74, 227, 0.35);
-}
-
-.pdfBox .primaryBtn.big:hover {
+.pdfBox .primaryBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 40px rgba(94, 74, 227, 0.45);
+  box-shadow: 0 12px 28px rgba(94, 74, 227, 0.38);
+  /* weniger massiv */
 }
 
-.pdfBox {
-  max-width: 560px;
-  padding: 36px;
-}
 
 /* ================= PDF ACTION BUTTONS – FINAL FIX ================= */
 
@@ -155,6 +186,58 @@
   font-size: 15px;
   line-height: 1.65;
   color: #f4f6fa;
+}
+
+/* ================= PDF FIELD ERROR ================= */
+
+.pdfBox .fieldError {
+  font-size: 11px;
+  margin-top: 4px;
+  margin-bottom: 12;
+  /* kein extra Abstand nach unten */
+}
+
+
+/* ================= PDF OVERLAY FIELD – CLEAN RESET ================= */
+
+.pdfBox .overlayField {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* ================= PDF FIX – REMOVE DOUBLE FIELD MARGIN ================= */
+
+.pdfBox .overlayField .field {
+  margin-bottom: 0;
+}
+
+/* ================= PDF LABEL ROW – FIXED HEIGHT ================= */
+
+.pdfBox .overlayLabelRow {
+  position: relative;
+  min-height: 18px;
+  display: flex;
+  align-items: center;
+}
+
+/* ================= PDF INFO ICON – NO LAYOUT INFLUENCE ================= */
+
+.pdfBox .overlayLabelRow .infoIconInline {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
 }
 
 /* ================= SECTION ================= */

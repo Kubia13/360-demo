@@ -464,14 +464,14 @@ export default function DashboardScreen({
         <div className="secondaryActions">
 
           <button
-            className="secondaryMiniBtn"
+            className="secondaryActionBtn calculatorAction"
             onClick={() => setCalculatorOverlay(true)}
           >
             Rechner öffnen
           </button>
 
           <button
-            className="secondaryMiniBtn"
+            className="secondaryActionBtn pdfAction"
             onClick={() => {
               setShowResetConfirm(false);
               setPdfPreview(false);
@@ -488,7 +488,7 @@ export default function DashboardScreen({
       {/* ================= SEKUNDÄR – TARIFOPTIONEN ================= */}
 
       <button
-        className="outlineBtn"
+        className="tertiaryBtn"
         onClick={() => setStep("products")}
       >
         Tarifübersicht öffnen

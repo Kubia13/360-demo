@@ -7,11 +7,12 @@
 @import "./styles/utilities.css";
 
 
-
 /* ================= PROGRESS ================= */
 
-.screen>div[style*="height: 6"] {
+.progressBarWrapper {
   position: relative;
+  height: 6px;
+
   background: rgba(26, 42, 54, 0.6) !important;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -22,7 +23,8 @@
     0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.screen>div[style*="height: 6"]>div {
+.progressBarWrapper > div {
+  height: 100%;
   border-radius: 6px;
   box-shadow:
     0 0 12px rgba(139, 124, 246, 0.6),

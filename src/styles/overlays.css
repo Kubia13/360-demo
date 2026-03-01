@@ -13,7 +13,8 @@
   padding: 60px 20px;
 
   overflow-y: auto;
-  z-index: 1000;
+
+  z-index: 10000;
 }
 
 /* ================= OVERLAY BOXES ================= */
@@ -44,17 +45,34 @@
 
 /* ================= SCROLLBAR CLEAN ================= */
 
-.infoBox::-webkit-scrollbar,
-.legalBox::-webkit-scrollbar,
-.contactBox::-webkit-scrollbar {
-  width: 6px;
-}
+@media (min-width: 769px) {
 
-.infoBox::-webkit-scrollbar-thumb,
-.legalBox::-webkit-scrollbar-thumb,
-.contactBox::-webkit-scrollbar-thumb {
-  background: rgba(139, 124, 246, 0.4);
-  border-radius: 6px;
+  .infoBox,
+  .legalBox,
+  .contactBox {
+    scrollbar-width: thin;
+    scrollbar-color: #A99BFF transparent;
+  }
+
+  .infoBox::-webkit-scrollbar,
+  .legalBox::-webkit-scrollbar,
+  .contactBox::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .infoBox::-webkit-scrollbar-track,
+  .legalBox::-webkit-scrollbar-track,
+  .contactBox::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .infoBox::-webkit-scrollbar-thumb,
+  .legalBox::-webkit-scrollbar-thumb,
+  .contactBox::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #A99BFF, #8B7CF6);
+    border-radius: 6px;
+  }
+
 }
 
 /* ================= LINKS IM IMPRESSUM ================= */
@@ -210,12 +228,12 @@
   border-top: 1px solid rgba(139, 124, 246, 0.15);
   box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.55);
 
-  z-index: 1000;
-
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
   transform: translateZ(0);
+
+  z-index: 9000;
 }
 
 .contactBtn {

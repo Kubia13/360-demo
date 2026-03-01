@@ -119,12 +119,6 @@ export default function PdfOverlay({
           error={errors.adresse}
         />
 
-        {errors.adresse && (
-          <div className="fieldError">
-            {errors.adresse}
-          </div>
-        )}
-
         <Input
           label="PLZ"
           value={pdfData.plz}
@@ -138,12 +132,6 @@ export default function PdfOverlay({
           }
           error={errors.plz}
         />
-
-        {errors.plz && (
-          <div className="fieldError">
-            {errors.plz}
-          </div>
-        )}
 
         <Input
           label="Ort"
@@ -181,12 +169,6 @@ export default function PdfOverlay({
           error={errors.email}
         />
 
-        {errors.email && (
-          <div className="fieldError">
-            {errors.email}
-          </div>
-        )}
-
         <Input
           label="Telefon"
           value={pdfData.telefon}
@@ -213,13 +195,7 @@ export default function PdfOverlay({
           }
         />
 
-        {errors.telefon && (
-          <div className="fieldError">
-            {errors.telefon}
-          </div>
-        )}
-
-        <hr style={{ margin: "20px 0", opacity: 0.2 }} />
+        <div className="pdfSeparator" />
 
         {/* BU direkt übernommen */}
 
