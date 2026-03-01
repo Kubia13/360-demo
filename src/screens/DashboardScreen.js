@@ -353,7 +353,24 @@ export default function DashboardScreen({
                 <span>{CATEGORY_LABELS[cat]}</span>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span>{categoryScores[cat] || 0}%</span>
+                  {(() => {
+                    const score = categoryScores[cat] || 0;
+
+                    return (
+                      <span style={{ fontWeight: 600 }}>
+                        {score}%
+                        <small
+                          style={{
+                            marginLeft: 4,
+                            opacity: 0.45,
+                            fontWeight: 500
+                          }}
+                        >
+                          abgesichert
+                        </small>
+                      </span>
+                    );
+                  })()}
 
                   <div
                     className="categoryChevron"
@@ -366,7 +383,7 @@ export default function DashboardScreen({
                       height="14"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="currentColor"
+                      stroke="#ffffff"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"

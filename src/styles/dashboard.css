@@ -284,7 +284,7 @@
 /* ================= CONVERSION ================= */
 
 .conversionBox {
-  margin-top: 30px;
+  margin-top: 10px;
   text-align: center;
 }
 
@@ -377,8 +377,9 @@
 .tertiaryBtn {
   width: 100%;
   height: 52px;
-  /* <— war 50 */
   margin-top: 18px;
+
+  cursor: pointer;
 
   display: flex;
   align-items: center;
@@ -386,14 +387,21 @@
 
   border-radius: 16px;
 
-  background: rgba(139, 124, 246, 0.05);
-  border: 1px solid rgba(139, 124, 246, 0.18);
+  background: rgba(139, 124, 246, 0.08);
+  border: 1px solid rgba(139, 124, 246, 0.28);
 
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 16px;
   font-weight: 500;
 
   transition: all 0.2s ease;
+}
+
+.tertiaryBtn:hover {
+  background: rgba(139, 124, 246, 0.15);
+  border-color: rgba(139, 124, 246, 0.5);
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
 /* ================= PRODUCT ROW ================= */
@@ -440,4 +448,27 @@
   font-size: 12px;
   opacity: 0.6;
   margin-top: 10px;
+}
+
+/* ================= CATEGORY CHEVRON PREMIUM ================= */
+
+.categoryChevron {
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: rgba(139, 124, 246, 0.18);
+  border: 1px solid rgba(139, 124, 246, 0.45);
+
+  transition: all 0.2s ease;
+}
+
+.categoryChevron:hover {
+  background: rgba(139, 124, 246, 0.28);
+  border-color: rgba(139, 124, 246, 0.7);
 }
