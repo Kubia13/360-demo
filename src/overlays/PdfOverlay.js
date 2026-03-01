@@ -16,7 +16,7 @@ export default function PdfOverlay({
 }) {
 
   const { pdfFormRefs, focusNext } = usePdfFormNavigation();
-
+  const blurRef = (ref) => ref?.current?.blur();
   const [infoField, setInfoField] = useState(null);
 
   const [touched, setTouched] = useState({});
@@ -27,6 +27,7 @@ export default function PdfOverlay({
     buIncome,
     baseData
   });
+
 
   // ================= INPUT VALIDATION HELPERS =================
 
@@ -47,6 +48,12 @@ export default function PdfOverlay({
     return hasNumber && hasLetter;
   };
 
+  const isValidDate = (value = "") => {
+    if (!value) return false;
+    const date = new Date(value);
+    return !isNaN(date) && date <= new Date();
+  };
+
   // ================= LIVE ERROR LOGIC =================
 
   const errors = {
@@ -65,6 +72,11 @@ export default function PdfOverlay({
         ? "PLZ muss exakt 5 Ziffern haben."
         : null,
 
+    geburtsdatum:
+      touched.geburtsdatum && !isValidDate(pdfData.geburtsdatum)
+        ? "Bitte Geburtsdatum angeben."
+        : null,
+
     telefon:
       (touched.telefon || touched.handy) &&
         (pdfData.telefon || "").trim() === "" &&
@@ -77,6 +89,7 @@ export default function PdfOverlay({
     validateStreet(pdfData.adresse) &&
     validateEmail(pdfData.email) &&
     isValidPlz(pdfData.plz) &&
+    isValidDate(pdfData.geburtsdatum) &&
     (
       (pdfData.telefon || "").trim() !== "" ||
       (pdfData.handy || "").trim() !== ""
@@ -112,7 +125,10 @@ export default function PdfOverlay({
             setPdfData({ ...pdfData, adresse: v })
           }
           inputRef={pdfFormRefs.adresse}
-          onEnter={() => focusNext(pdfFormRefs.adresse)}
+          onEnter={() => {
+            blurRef(pdfFormRefs.adresse);
+            focusNext(pdfFormRefs.adresse);
+          }}
           onBlur={() =>
             setTouched(prev => ({ ...prev, adresse: true }))
           }
@@ -126,7 +142,10 @@ export default function PdfOverlay({
             setPdfData({ ...pdfData, plz: plzOnly(v) })
           }
           inputRef={pdfFormRefs.plz}
-          onEnter={() => focusNext(pdfFormRefs.plz)}
+          onEnter={() => {
+            blurRef(pdfFormRefs.plz);
+            focusNext(pdfFormRefs.plz);
+          }}
           onBlur={() =>
             setTouched(prev => ({ ...prev, plz: true }))
           }
@@ -140,18 +159,29 @@ export default function PdfOverlay({
             setPdfData({ ...pdfData, ort: v })
           }
           inputRef={pdfFormRefs.ort}
-          onEnter={() => focusNext(pdfFormRefs.ort)}
+          onEnter={() => {
+            blurRef(pdfFormRefs.ort);
+            focusNext(pdfFormRefs.ort);
+          }}
         />
 
         <Input
           label="Geburtsdatum *"
           type="date"
           value={pdfData.geburtsdatum || ""}
-          onChange={(v) =>
-            setPdfData({ ...pdfData, geburtsdatum: v })
-          }
+          onChange={(v) => {
+            setPdfData({ ...pdfData, geburtsdatum: v });
+            blurRef(pdfFormRefs.geburtsdatum); // iOS Fix
+          }}
           inputRef={pdfFormRefs.geburtsdatum}
-          onEnter={() => focusNext(pdfFormRefs.geburtsdatum)}
+          onEnter={() => {
+            blurRef(pdfFormRefs.geburtsdatum);
+            focusNext(pdfFormRefs.geburtsdatum);
+          }}
+          onBlur={() =>
+            setTouched(prev => ({ ...prev, geburtsdatum: true }))
+          }
+          error={errors.geburtsdatum}
         />
 
         <Input
@@ -162,7 +192,10 @@ export default function PdfOverlay({
             setPdfData({ ...pdfData, email: v })
           }
           inputRef={pdfFormRefs.email}
-          onEnter={() => focusNext(pdfFormRefs.email)}
+          onEnter={() => {
+            blurRef(pdfFormRefs.email);
+            focusNext(pdfFormRefs.email);
+          }}
           onBlur={() =>
             setTouched(prev => ({ ...prev, email: true }))
           }
@@ -176,7 +209,10 @@ export default function PdfOverlay({
             setPdfData({ ...pdfData, telefon: numbersOnly(v) })
           }
           inputRef={pdfFormRefs.telefon}
-          onEnter={() => focusNext(pdfFormRefs.telefon)}
+          onEnter={() => {
+            blurRef(pdfFormRefs.telefon);
+            focusNext(pdfFormRefs.telefon);
+          }}
           onBlur={() =>
             setTouched(prev => ({ ...prev, telefon: true }))
           }
@@ -189,7 +225,10 @@ export default function PdfOverlay({
             setPdfData({ ...pdfData, handy: numbersOnly(v) })
           }
           inputRef={pdfFormRefs.handy}
-          onEnter={() => focusNext(pdfFormRefs.handy)}
+          onEnter={() => {
+            blurRef(pdfFormRefs.handy);
+            focusNext(pdfFormRefs.handy);
+          }}
           onBlur={() =>
             setTouched(prev => ({ ...prev, handy: true }))
           }
@@ -234,7 +273,10 @@ export default function PdfOverlay({
               setPdfData({ ...pdfData, buEmpfehlung: v })
             }
             inputRef={pdfFormRefs.buEmpfehlung}
-            onEnter={() => focusNext(pdfFormRefs.buEmpfehlung)}
+            onEnter={() => {
+              blurRef(pdfFormRefs.buEmpfehlung);
+              focusNext(pdfFormRefs.buEmpfehlung);
+            }}
           />
         </div>
 
@@ -320,11 +362,6 @@ export default function PdfOverlay({
           }}
           onClick={() => {
             if (!isValid) return;
-
-            const autoBU = calculateAutoBU({
-              buIncome,
-              baseData
-            });
 
             if (!pdfData.buEmpfehlung && autoBU) {
               setPdfData(prev => ({
