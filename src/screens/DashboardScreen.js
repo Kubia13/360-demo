@@ -104,7 +104,7 @@ export default function DashboardScreen({
                 />
               )}
 
-              <svg width="260" height="260" viewBox="0 0 260 260">
+              <svg width="280" height="280" viewBox="0 0 260 260">
 
                 <defs>
                   <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">

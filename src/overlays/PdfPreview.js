@@ -1,7 +1,7 @@
 
 import {
-  calculateFinalBU,
-  groupAnswersForPdf
+    calculateFinalBU,
+    groupAnswersForPdf
 } from "../logic/pdfDataEngine";
 
 import React from "react";
@@ -123,6 +123,8 @@ export default function PdfPreview({
         const printWindow = window.open("", "_blank");
         if (!printWindow) return;
 
+        /* ================= PDF PRINT ================= */
+
         printWindow.document.write(`
 <html>
   <head>
@@ -166,20 +168,74 @@ export default function PdfPreview({
       .pdfSection h3 {
         font-size: 16px;
         font-weight: 700;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
         padding-bottom: 4px;
         border-bottom: 1px solid #000;
       }
 
-      .pdfCategoryRow {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 3px;
-      }
+/* ===== TABELLE IST / SOLL / DIFFERENZ ===== */
 
-      .pdfCategoryRow strong {
-        font-weight: 600;
-      }
+.pdfTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  margin-bottom: 14px;
+}
+
+.pdfTable th,
+.pdfTable td {
+  padding: 5px 0;
+  font-size: 13px;
+  vertical-align: top;
+}
+
+/* Kopfzeile */
+
+.pdfTable th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #000;
+  padding-bottom: 6px;
+}
+
+/* Zahlen-Spalten rechtsbündig (2,3,4) */
+
+.pdfTable td:nth-child(2),
+.pdfTable td:nth-child(3),
+.pdfTable td:nth-child(4),
+.pdfTable th:nth-child(2),
+.pdfTable th:nth-child(3),
+.pdfTable th:nth-child(4) {
+  text-align: right;
+}
+
+/* Noch abzusichern etwas dezenter */
+
+.pdfTable td:nth-child(4) {
+  font-style: italic;
+}
+
+/* Zahlen sauber untereinander */
+
+.pdfTable td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Kein Bestand */
+
+.mutedValue {
+  font-style: italic;
+  color: #666;
+  font-size: 12px;
+}
+
+/* Zeilen nicht umbrechen lassen */
+
+.pdfTable tr {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+      /* ===== EMPFEHLUNGEN ===== */
 
       .pdfRecommendation {
         margin-bottom: 8px;
@@ -201,9 +257,7 @@ export default function PdfPreview({
         page-break-before: always;
       }
 
-      .pdfSection,
-      .pdfCategoryRow,
-      .pdfRecommendation {
+      .pdfSection {
         break-inside: avoid;
         page-break-inside: avoid;
       }
@@ -219,27 +273,18 @@ export default function PdfPreview({
         margin-top: 30px;
         padding-top: 14px;
         border-top: 1px solid #000;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 30px;
+        display: table;
+        width: 100%;
       }
 
-      .pdfContactLeft {
-        font-size: 12px;
-        line-height: 1.4;
-      }
-
-      .pdfContactTitle {
-        font-weight: 600;
-        font-size: 13px;
-        margin-bottom: 4px;
+      .pdfContactLeft,
+      .pdfContactRight {
+        display: table-cell;
+        vertical-align: top;
       }
 
       .pdfContactRight {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        text-align: right;
       }
 
       .pdfContactRight img {
@@ -263,7 +308,6 @@ export default function PdfPreview({
     </div>
   </body>
 </html>
-
 `);
 
         printWindow.document.close();
@@ -275,6 +319,38 @@ export default function PdfPreview({
         }, 500);
     };
 
+    // ================= BERECHNUNGEN =================
+
+    // Hilfsfunktion
+    const parseValue = (val) => {
+        if (val === undefined || val === null || val === "") return null;
+        const num = Number(val);
+        return isNaN(num) ? null : num;
+    };
+
+    // ================= BU =================
+
+    const buIstRaw = parseValue(stableData.pdfData?.existingBU);
+    const buSoll = Number(finalBU) || 0;
+
+    const buIst = buIstRaw !== null ? buIstRaw : 0;
+    const buDiff = Math.max(buSoll - buIst, 0);
+
+    // ================= ALTERSVORSORGE =================
+
+    const renteIstRaw = parseValue(stableData.pdfData?.existingRente);
+    const renteSoll = Number(stableData.pdfData?.rentenluecke) || 0;
+
+    const renteIst = renteIstRaw !== null ? renteIstRaw : 0;
+    const renteDiff = Math.max(renteSoll - renteIst, 0);
+
+    // ================= KRANKENTAGEGELD =================
+
+    const ktgIstRaw = parseValue(stableData.pdfData?.existingKTG);
+    const ktgSoll = Number(stableData.pdfData?.ktgEmpfehlung) || 0;
+
+    const ktgIst = ktgIstRaw !== null ? ktgIstRaw : 0;
+    const ktgDiff = Math.max(ktgSoll - ktgIst, 0);
 
     /* ================= DOKUMENT-INHALT ================= */
 
@@ -387,25 +463,94 @@ export default function PdfPreview({
                 {/* ================= ERGÄNZENDE WERTE ================= */}
 
                 <div className="pdfSection">
-                    <h3>Ergänzende Werte/Lücken</h3>
+                    <h3>Strategisch empfohlene Zielwerte</h3>
 
-                    {finalBU && (
-                        <div className="pdfCategoryRow">
-                            <strong>BU-Rente:</strong> {finalBU} €
-                        </div>
-                    )}
+                    <table className="pdfTable">
+                        <thead>
+                            <tr>
+                                <th>Bereich</th>
+                                <th>Dein aktueller Schutz</th>
+                                <th>Empfohlene Höhe</th>
+                                <th>Noch abzusichern</th>
+                            </tr>
+                        </thead>
 
-                    {stableData.pdfData?.rentenluecke && (
-                        <div className="pdfCategoryRow">
-                            <strong>Altersrentenlücke:</strong> {stableData.pdfData.rentenluecke} €
-                        </div>
-                    )}
+                        <tbody>
 
-                    {stableData.pdfData?.ktgEmpfehlung && (
-                        <div className="pdfCategoryRow">
-                            <strong>Krankentagegeld:</strong> {stableData.pdfData.ktgEmpfehlung} €
-                        </div>
-                    )}
+                            {buSoll > 0 && (
+                                <tr>
+                                    <td>BU-Absicherung (mtl.)</td>
+
+                                    <td>
+                                        {buIstRaw === null ? (
+                                            <span className="mutedValue">Kein Bestand angegeben</span>
+                                        ) : buIst === 0 ? (
+                                            <span className="mutedValue">Kein Schutz vorhanden</span>
+                                        ) : (
+                                            `${buIst} €`
+                                        )}
+                                    </td>
+
+                                    <td>{buSoll} €</td>
+
+                                    <td>
+                                        {buDiff > 0
+                                            ? `${buDiff} €`
+                                            : "Bereits ausreichend abgesichert"}
+                                    </td>
+                                </tr>
+                            )}
+
+                            {renteSoll > 0 && (
+                                <tr>
+                                    <td>Altersvorsorge (mtl.)</td>
+
+                                    <td>
+                                        {renteIstRaw === null ? (
+                                            <span className="mutedValue">Kein Bestand angegeben</span>
+                                        ) : renteIst === 0 ? (
+                                            <span className="mutedValue">Kein Schutz vorhanden</span>
+                                        ) : (
+                                            `${renteIst} €`
+                                        )}
+                                    </td>
+
+                                    <td>{renteSoll} €</td>
+
+                                    <td>
+                                        {renteDiff > 0
+                                            ? `${renteDiff} €`
+                                            : "Bereits ausreichend abgesichert"}
+                                    </td>
+                                </tr>
+                            )}
+
+                            {ktgSoll > 0 && (
+                                <tr>
+                                    <td>Krankentagegeld (tgl.)</td>
+
+                                    <td>
+                                        {ktgIstRaw === null ? (
+                                            <span className="mutedValue">Kein Bestand angegeben</span>
+                                        ) : ktgIst === 0 ? (
+                                            <span className="mutedValue">Kein Schutz vorhanden</span>
+                                        ) : (
+                                            `${ktgIst} €`
+                                        )}
+                                    </td>
+
+                                    <td>{ktgSoll} €</td>
+
+                                    <td>
+                                        {ktgDiff > 0
+                                            ? `${ktgDiff} €`
+                                            : "Bereits ausreichend abgesichert"}
+                                    </td>
+                                </tr>
+                            )}
+
+                        </tbody>
+                    </table>
                 </div>
 
                 {/* ================= KATEGORIEÜBERSICHT ================= */}

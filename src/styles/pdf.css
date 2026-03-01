@@ -63,27 +63,45 @@
 
 .pdfBox .field {
   margin-bottom: 20px;
-  /* vorher 24 */
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  /* enger */
+  gap: 6px;
+  /* vorher 5 → minimal luftiger */
 }
 
 
-/* ================= PDF LABEL ================= */
+/* ================= OVERLAY LABEL UNIFIED ================= */
 
-.pdfBox .field label {
+.pdfBox label {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  font-size: 13px;
-  /* etwas kleiner */
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+
+  font-size: 14.5px;
+  /* vorher 13.5 → jetzt angenehmer */
   font-weight: 500;
-  opacity: 0.75;
+  letter-spacing: 0.28px;
+  /* minimal angepasst für Balance */
+  line-height: 1.3;
+  /* verhindert gequetschte Labels */
+
+  color: rgba(255, 255, 255, 0.9);
+  /* minimal cleaner als 0.88 */
+
+  margin-bottom: 7px;
+  /* bleibt gleich für Rhythmus */
 }
 
+/* ================= PDF LABEL ROW – ICON FIX ================= */
+
+.pdfBox .overlayLabelRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+}
 
 /* ================= PDF INFO ICON ================= */
 
@@ -193,36 +211,42 @@
 .pdfBox .fieldError {
   font-size: 11px;
   margin-top: 4px;
-  margin-bottom: 12;
-  /* kein extra Abstand nach unten */
-}
-
-
-/* ================= PDF OVERLAY FIELD – CLEAN RESET ================= */
-
-.pdfBox .overlayField {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-/* ================= PDF FIX – REMOVE DOUBLE FIELD MARGIN ================= */
-
-.pdfBox .overlayField .field {
   margin-bottom: 0;
 }
 
-/* ================= PDF LABEL ROW – FIXED HEIGHT ================= */
+/* ================= PDF OVERLAY FIELD – CLEAN STRUCTURE ================= */
+
+.pdfBox .overlayField {
+  margin-bottom: 22px;
+  /* harmonisiert */
+  display: flex;
+  flex-direction: column;
+}
+
+erner Abstand Label → Input */
+/* ================= SUB FIELD – IDENTISCHES SYSTEM ================= */
+
+.overlaySubField {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.overlaySubField label {
+  margin-bottom: 6px;
+}
+
+/* ================= INFO ICON – NO LAYOUT SHIFT ================= */
 
 .pdfBox .overlayLabelRow {
   position: relative;
-  min-height: 18px;
   display: flex;
   align-items: center;
 }
 
-/* ================= PDF INFO ICON – NO LAYOUT INFLUENCE ================= */
+.pdfBox .overlayLabelRow {
+  isolation: isolate;
+}
 
 .pdfBox .overlayLabelRow .infoIconInline {
   position: absolute;
@@ -230,14 +254,21 @@
   top: 50%;
   transform: translateY(-50%);
 
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   border-radius: 8px;
+}
+
+/* FIX: Label Color Consistency */
+.pdfBox label,
+.pdfBox .overlayLabelRow label {
+  color: rgba(255, 255, 255, 0.88) !important;
+  opacity: 1 !important;
 }
 
 /* ================= SECTION ================= */
@@ -258,17 +289,68 @@
   letter-spacing: 0.4px;
 }
 
-/* ================= DATA ROW ================= */
+/* ================= PDF TABLE – IDENTISCH ZUM PRINT ================= */
 
-.pdfCategoryRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+.pdfTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  margin-bottom: 14px;
+}
 
-  gap: 24px;
+.pdfTable th,
+.pdfTable td {
   padding: 6px 0;
+  font-size: 14px;
+  vertical-align: top;
+}
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+/* Kopfzeile */
+
+.pdfTable th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 6px;
+}
+
+/* Spalte 1 bleibt links */
+
+.pdfTable th:nth-child(1),
+.pdfTable td:nth-child(1) {
+  text-align: left;
+}
+
+/* Spalten 2–4 rechtsbündig */
+
+.pdfTable th:nth-child(2),
+.pdfTable th:nth-child(3),
+.pdfTable th:nth-child(4),
+.pdfTable td:nth-child(2),
+.pdfTable td:nth-child(3),
+.pdfTable td:nth-child(4) {
+  text-align: right;
+}
+
+/* Noch abzusichern dezenter */
+
+.pdfTable td:nth-child(4) {
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* Zahlen exakt untereinander */
+
+.pdfTable td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Kein Bestand */
+
+.mutedValue {
+  font-style: italic;
+  opacity: 0.6;
+  font-size: 13px;
 }
 
 /* ================= LABEL ================= */
@@ -286,6 +368,7 @@
   flex: 1;
   color: #ffffff;
 }
+
 
 /* ================= RECOMMENDATIONS ================= */
 

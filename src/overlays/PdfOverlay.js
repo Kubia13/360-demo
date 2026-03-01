@@ -242,7 +242,7 @@ export default function PdfOverlay({
 
         <div className="overlayField">
           <div className="overlayLabelRow">
-            <label>BU-Rente (€)</label>
+            <label>Empfohlene BU-Absicherung (mtl. in €)</label>
             <span
               className="infoIconInline"
               onClick={() => setInfoField(infoField === "bu" ? null : "bu")}
@@ -278,6 +278,18 @@ export default function PdfOverlay({
               focusNext(pdfFormRefs.buEmpfehlung);
             }}
           />
+
+          {/* IST-FELD */}
+          <div className="overlaySubField">
+            <label>Dein aktueller BU-Schutz (mtl. in €)</label>
+            <Input
+              type="number"
+              value={pdfData.existingBU || ""}
+              onChange={(v) =>
+                setPdfData({ ...pdfData, existingBU: v })
+              }
+            />
+          </div>
         </div>
 
 
@@ -285,7 +297,7 @@ export default function PdfOverlay({
 
         <div className="overlayField">
           <div className="overlayLabelRow">
-            <label>Altersrentenlücke (€)</label>
+            <label> Empfohlene Altersvorsorge (mtl. in €)</label>
             <span
               className="infoIconInline"
               onClick={() => setInfoField(infoField === "rente" ? null : "rente")}
@@ -311,6 +323,18 @@ export default function PdfOverlay({
               setPdfData({ ...pdfData, rentenluecke: v })
             }
           />
+
+          {/* IST-FELD */}
+          <div className="overlaySubField">
+            <label>Deine aktuelle Altersvorsorge (mtl. in €)</label>
+            <Input
+              type="number"
+              value={pdfData.existingRente || ""}
+              onChange={(v) =>
+                setPdfData({ ...pdfData, existingRente: v })
+              }
+            />
+          </div>
         </div>
 
 
@@ -318,7 +342,7 @@ export default function PdfOverlay({
 
         <div className="overlayField">
           <div className="overlayLabelRow">
-            <label>Krankentagegeld (€)</label>
+            <label> Empfohlenes Krankentagegeld (tgl. in €)</label>
             <span
               className="infoIconInline"
               onClick={() => setInfoField(infoField === "ktg" ? null : "ktg")}
@@ -350,6 +374,18 @@ export default function PdfOverlay({
               setPdfPreview(true);
             }}
           />
+
+          {/* IST-FELD */}
+          <div className="overlaySubField">
+            <label>Dein aktuelles Krankentagegeld (tgl. in €)</label>
+            <Input
+              type="number"
+              value={pdfData.existingKTG || ""}
+              onChange={(v) =>
+                setPdfData({ ...pdfData, existingKTG: v })
+              }
+            />
+          </div>
         </div>
 
 
