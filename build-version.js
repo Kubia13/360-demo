@@ -3,8 +3,14 @@ const git = require("git-rev-sync");
 
 const now = new Date();
 
-// ISO ist stabiler als locale (keine Server-Zeitzonen Überraschungen)
-const buildTime = now.toISOString();
+const buildTime =
+  now.toLocaleDateString("de-DE") +
+  " " +
+  now.toLocaleTimeString("de-DE", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
 const gitHash = git.short();
 
 const content = `
@@ -12,9 +18,11 @@ REACT_APP_BUILD_TIME=${buildTime}
 REACT_APP_GIT_HASH=${gitHash}
 `;
 
-// Wichtig: CRA liest diese sicher ein
-fs.writeFileSync(".env.production", content.trim());
-fs.writeFileSync(".env.development", content.trim());
+// Production
+fs.writeFileSync(".env.production.local", content.trim());
+
+// Development
+fs.writeFileSync(".env.development.local", content.trim());
 
 console.log("Build version generated:");
-console.log(content.trim());
+console.log(content);
