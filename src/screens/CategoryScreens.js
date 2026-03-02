@@ -96,7 +96,7 @@ export default function CategoryScreen({
             setStep("base");
           }
 
-          scrollToTop();
+          scrollToTop(screenRef);
         }}
 
         goBase={goToBaseWithoutReset}
@@ -381,7 +381,7 @@ export default function CategoryScreen({
             setStep("dashboard");
           }
 
-          scrollToTop();
+          scrollToTop(screenRef);
 
         }}
       >
