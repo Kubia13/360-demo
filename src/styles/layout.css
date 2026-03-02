@@ -2,7 +2,8 @@
   position: relative;
   z-index: 1;
 
-  min-height: 100dvh;
+  height: 100dvh;           /* statt min-height */
+  overflow-y: auto;         /* wichtig */
 
   padding: 16px;
   padding-bottom: 110px;

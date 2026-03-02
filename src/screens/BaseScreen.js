@@ -199,7 +199,7 @@ export default function BaseScreen({
         onClick={() => {
           if (!canProceed) return;
           setStep("category");
-          scrollToTop();
+          scrollToTop(screenRef);
         }}
       >
         Weiter

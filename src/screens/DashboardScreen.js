@@ -38,7 +38,7 @@ export default function DashboardScreen({
         goBase={goToBaseWithoutReset}
         back={() => {
           setStep("category");
-          scrollToTop();
+         scrollToTop(screenRef);
         }}
       />
 

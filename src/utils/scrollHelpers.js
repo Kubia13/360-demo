@@ -13,20 +13,29 @@ export const scrollToTop = (screenRef, behavior = "auto") => {
   }
 
   const performScroll = () => {
+
+    // 1️⃣ Wenn screenRef existiert und scrollbar ist
     if (screenRef?.current) {
-      screenRef.current.scrollTo({ top: 0, behavior });
-    } else {
-      window.scrollTo({ top: 0, behavior });
+      screenRef.current.scrollTop = 0;
     }
+
+    // 2️⃣ Immer zusätzlich window scrollen (Mobile Fallback)
+    window.scrollTo({
+      top: 0,
+      behavior
+    });
+
+    // 3️⃣ iOS Safety (manchmal nötig)
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   };
 
   if (isInputFocused) {
-    // Warten bis Keyboard wirklich weg ist
     setTimeout(() => {
       requestAnimationFrame(() => {
         performScroll();
       });
-    }, 180); // etwas mehr als vorher
+    }, 250); // etwas mehr Delay für Mobile
   } else {
     performScroll();
   }
