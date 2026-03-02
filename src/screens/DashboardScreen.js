@@ -33,10 +33,13 @@ export default function DashboardScreen({
   ContactButton
 }) {
 
-  React.useEffect(() => {
-    // läuft NACH Render -> Mobile-safe
-    scrollToTop();
-  }, [scrollToTop]);
+  const didMountRef = React.useRef(false);
+
+React.useEffect(() => {
+  scrollToTop();
+  // absichtlich nur beim ersten Render
+  // keine Dependency, damit kein Re-Trigger beim Kategorie-Toggle
+}, []);
 
   return (
     <div className="screen" ref={screenRef}>
