@@ -37,7 +37,6 @@ import { useTopRecommendations } from "./hooks/useTopRecommendations";
 import { getDynamicCategories } from "./logic/categoryEngine";
 import { getDynamicHint } from "./logic/dashboardEngine";
 import { getStrategicRecommendation } from "./logic/recommendationEngine";
-import { resetAppState } from "./logic/resetAppState";
 import { calculateScoreEngine, getScore } from "./logic/scoring";
 
 /* ================= IMPORT OVERLAYS ================= */
