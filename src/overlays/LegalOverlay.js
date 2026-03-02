@@ -234,8 +234,8 @@ export default function LegalOverlay({
             <hr className="legalDivider" />
 
             <div className="legalVersion">
-              Version {GIT_HASH} · {BUILD_TIME}
-            </div>
+  Build {process.env.REACT_APP_BUILD_TIME} ({process.env.REACT_APP_GIT_HASH})
+</div>
           </>
         )}
       </div>

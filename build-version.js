@@ -3,18 +3,15 @@ const git = require("git-rev-sync");
 
 const now = new Date();
 
-const fmt = new Intl.DateTimeFormat("de-DE", {
+// ✅ erzwingt Europe/Berlin (auch auf Vercel/CI)
+const buildTime = new Intl.DateTimeFormat("de-DE", {
   timeZone: "Europe/Berlin",
-  year: "numeric",
-  month: "2-digit",
   day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
   hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  hour12: false,
-});
-
-const buildTime = fmt.format(now).replace(",", ""); // "02.03.2026 13:07:59"
+  minute: "2-digit"
+}).format(now);
 
 const gitHash = git.short();
 
