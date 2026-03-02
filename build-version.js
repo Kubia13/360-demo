@@ -14,7 +14,7 @@ const fmt = new Intl.DateTimeFormat("de-DE", {
   hour12: false,
 });
 
-const buildTime = fmt.format(now).replace(",", ""); // "02.03.2026 12:34:56"
+const buildTime = fmt.format(now).replace(",", ""); // "02.03.2026 13:07:59"
 
 const gitHash = git.short();
 
