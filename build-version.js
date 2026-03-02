@@ -18,11 +18,7 @@ REACT_APP_BUILD_TIME=${buildTime}
 REACT_APP_GIT_HASH=${gitHash}
 `;
 
-// Production
-fs.writeFileSync(".env.production.local", content.trim());
-
-// Development
-fs.writeFileSync(".env.development.local", content.trim());
+fs.writeFileSync(".env", content.trim());
 
 console.log("Build version generated:");
 console.log(content);
