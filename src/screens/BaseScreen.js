@@ -2,14 +2,15 @@
 
 import React from "react";
 import { Header, Input, Select, ContactButton } from "../components/UI";
+import { scrollToTop } from "../utils/scrollHelpers";
 
 export default function BaseScreen({
+  screenRef,   // 👈 NEU
   baseData,
   updateBaseData,
   baseFormRefs,
   focusNext,
   setStep,
-  scrollToTop,
   goToBaseWithoutReset,
   setLegalOverlay,
   setShowResetConfirm,
@@ -18,9 +19,14 @@ export default function BaseScreen({
   devBypass
 }) {
   const canProceed = devBypass || baseValidation?.isValid;
+
+  React.useEffect(() => {
+  scrollToTop(screenRef);
+}, []);
+
   return (
 
-    <div className="screen">
+    <div className="screen" ref={screenRef}>
       <Header goBase={goToBaseWithoutReset} />
 
       <h2>Persönliche Angaben</h2>
@@ -199,7 +205,6 @@ export default function BaseScreen({
         onClick={() => {
           if (!canProceed) return;
           setStep("category");
-          scrollToTop(screenRef);
         }}
       >
         Weiter

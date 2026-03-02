@@ -1,6 +1,7 @@
 import React from "react";
 import { QUESTIONS } from "../data/questions";
 import { CATEGORY_LABELS } from "../config/categoryLabels";
+import { scrollToTop } from "../utils/scrollHelpers";
 
 export default function CategoryScreen({
   screenRef,
@@ -85,6 +86,10 @@ export default function CategoryScreen({
   });
   const canProceed = devBypass || isCategoryComplete;
 
+  React.useEffect(() => {
+  scrollToTop(screenRef);
+}, []);
+
   return (
     <div className="screen" ref={screenRef}>
 
@@ -96,7 +101,7 @@ export default function CategoryScreen({
             setStep("base");
           }
 
-          scrollToTop(screenRef);
+        
         }}
 
         goBase={goToBaseWithoutReset}
@@ -381,7 +386,7 @@ export default function CategoryScreen({
             setStep("dashboard");
           }
 
-          scrollToTop(screenRef);
+      
 
         }}
       >

@@ -1,3 +1,5 @@
+import React from "react";
+
 /* =================  DASHBOARD  ================= */
 
 export default function DashboardScreen({
@@ -31,6 +33,11 @@ export default function DashboardScreen({
   ContactButton
 }) {
 
+  React.useEffect(() => {
+    // läuft NACH Render -> Mobile-safe
+    scrollToTop();
+  }, [scrollToTop]);
+
   return (
     <div className="screen" ref={screenRef}>
 
@@ -38,7 +45,6 @@ export default function DashboardScreen({
         goBase={goToBaseWithoutReset}
         back={() => {
           setStep("category");
-         scrollToTop(screenRef);
         }}
       />
 
