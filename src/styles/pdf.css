@@ -1,9 +1,9 @@
-@media (max-width: 480px) {
+@media (max-width: 760px) {
 
   /* ================= WRAPPER ================= */
 
   .pdfPreviewWrapper {
-    padding: 18px;
+    padding: 18px 10px;
     border-radius: 16px;
   }
 
@@ -12,87 +12,111 @@
     line-height: 1.55;
   }
 
-  /* ================= SECTION ================= */
+  .pdfPreview .pdfFooter {
+    font-size: 10px !important;
+    line-height: 1.35 !important;
+  }
+
+  /* ================= HERO FIX ================= */
+
+  .pdfPreview h1 {
+    font-size: 24px;
+    line-height: 1.2;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  /* ================= SECTION GLOBAL ================= */
 
   .pdfSection {
-    margin-bottom: 26px;
+    margin-bottom: 24px !important;
   }
 
   .pdfSection h3 {
-    font-size: 16px;
-    margin-bottom: 16px;
+    font-size: 15px !important;
+    margin-top: 24px !important;
+    margin-bottom: 10px !important;
+    padding-bottom: 6px !important;
   }
 
-  /* ================= TABLE ================= */
+  /* Inhalt unter Überschrift kompakter */
+  .pdfSection>*:not(h3) {
+    margin: 4px 0 !important;
+    line-height: 1.55 !important;
+  }
 
-  .pdfTable {
-    table-layout: fixed;
+  /* Persönliche Angaben etwas enger */
+  .pdfSection:first-of-type {
+    margin-bottom: 20px !important;
+  }
+
+  /* ================= MOBILE TABLE STACK ================= */
+
+  .pdfTable,
+  .pdfTable thead,
+  .pdfTable tbody,
+  .pdfTable th,
+  .pdfTable td,
+  .pdfTable tr {
+    display: block;
     width: 100%;
   }
 
-  .pdfTable th,
+  .pdfTable thead {
+    display: none;
+  }
+
+  .pdfTable tr {
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 14px;
+  }
+
   .pdfTable td {
+    text-align: left !important;
+    padding: 4px 0;
     font-size: 13px;
-    padding: 6px 4px;
-    word-break: break-word;
+    line-height: 1.45;
+    white-space: normal;
   }
 
-  .pdfTable th:nth-child(1),
   .pdfTable td:nth-child(1) {
-    width: 36%;
-    text-align: left;
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 
-  .pdfTable th:nth-child(2),
-  .pdfTable td:nth-child(2) {
-    width: 21%;
-    text-align: right;
+  .pdfTable td:nth-child(2)::before {
+    content: "Aktueller Schutz: ";
+    opacity: 0.7;
+    font-weight: 500;
   }
 
-  .pdfTable th:nth-child(3),
-  .pdfTable td:nth-child(3) {
-    width: 21%;
-    text-align: right;
+  .pdfTable td:nth-child(3)::before {
+    content: "Empfohlene Höhe: ";
+    opacity: 0.7;
+    font-weight: 500;
   }
 
-  .pdfTable th:nth-child(4),
-  .pdfTable td:nth-child(4) {
-    width: 22%;
-    text-align: right;
+  .pdfTable td:nth-child(4)::before {
+    content: "Noch abzusichern: ";
+    opacity: 0.7;
+    font-weight: 500;
   }
 
-  /* Zahlen ruhiger */
-
-  .pdfTable td {
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* ================= CATEGORY ROW FALLBACK ================= */
-
-  .pdfCategoryRow {
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
-  }
-
-  .pdfCategoryRow strong {
-    margin-bottom: 2px;
-  }
-
-  .pdfCategoryRow span {
-    text-align: left;
-  }
-
-  /* ================= CONTACT BLOCK ================= */
+  /* ================= CONTACT BLOCK MOBILE ================= */
 
   .pdfContactBlock {
     flex-direction: column;
-    gap: 24px;
     align-items: flex-start;
+    gap: 20px;
   }
 
   .pdfContactRight {
-    align-items: flex-start;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .pdfContactRight img {
@@ -100,57 +124,104 @@
     height: 80px;
   }
 
+  .pdfQrLabel {
+    text-align: center;
+    margin-top: 6px;
+  }
+
   /* ================= BUTTON FIX ================= */
 
   .pdfActions {
     flex-direction: column;
     gap: 12px;
-    margin-top: 20px;
+    margin-top: 24px;
   }
 
   .pdfActions button {
     width: 100%;
     height: 48px;
-    /* weniger wuchtig */
     border-radius: 16px;
     font-size: 14px;
-    /* kompakter */
     font-weight: 600;
-    line-height: 1.2;
-    padding: 0 14px;
   }
 
-  /* Druckbutton speziell */
   .primaryBtn {
     white-space: normal;
-    /* erlaubt sauberen Umbruch */
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
   }
 
-}
-
-/* ================= MOBILE LABEL ICON FIX ================= */
-
-@media (max-width: 480px) {
+  /* ================= LABEL ICON FIX ================= */
 
   .pdfBox .overlayLabelRow {
     position: relative;
     padding-right: 20px;
-    /* Platz für das i */
   }
 
   .pdfBox .overlayLabelRow label {
     padding-right: 20px;
-    /* verhindert Text-Überlagerung */
   }
 
   .pdfBox .overlayLabelRow .infoIconInline {
     right: 2px;
   }
 
+  /* ================= CATEGORY SEPARATOR ================= */
+
+  .pdfSection h3:not(:first-of-type) {
+    margin-top: 34px !important;
+    padding-top: 18px !important;
+    border-top: 1px solid rgba(255, 0, 0, 0.08);
+  }
+
+  .pdfSection>*:not(h3) {
+    margin: 5px 0 !important;
+    line-height: 1.6 !important;
+  }
+
+
+  .pdfPreviewWrapper {
+    padding: 18px 18px !important;
+  }
+
+  .pdfSection {
+    margin-bottom: 24px !important;
+  }
+
+  .pdfPreview .pdfSection h3 {
+    font-size: 15px !important;
+    margin-top: 10px !important;
+    margin-bottom: 8px !important;
+    padding-top: 0 !important;
+  }
+
+  .pdfPreview .pdfSection>*:not(h3) {
+    margin: 5px 0 !important;
+    line-height: 1.6 !important;
+  }
+
+  /* ================= MOBILE QR CENTER FIX ================= */
+
+  .pdfContactBlock {
+    align-items: center !important;
+    text-align: center;
+  }
+
+  .pdfContactLeft {
+    text-align: center;
+    width: 100%;
+  }
+
+  .pdfContactRight {
+    width: 100%;
+    align-items: center !important;
+  }
+
+  .pdfQrLabel {
+    text-align: center !important;
+  }
 }
 
 /* ================= PDF FORM – COMPACT PREMIUM ================= */
@@ -511,12 +582,12 @@
 .pdfContactBlock {
   margin-top: 60px;
   padding-top: 30px;
-
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  /* statt center */
   gap: 60px;
 }
 
@@ -541,12 +612,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* QR + Label sauber mittig */
   gap: 8px;
 }
 
 .pdfContactRight img {
-  width: 85px;
-  height: 85px;
+  width: 90px;
+  height: 90px;
 
   border-radius: 10px;
   background: white;
@@ -557,6 +629,7 @@
   font-size: 11px;
   letter-spacing: 0.4px;
   color: rgba(255, 255, 255, 0.6);
+  text-align: center;
 }
 
 /* ================= PDF SCROLL DOWN BUTTON – PREMIUM FIXED ================= */
@@ -596,4 +669,33 @@
     transform 0.25s ease;
 
   z-index: 9999;
+}
+
+/* ================= GLOBAL CATEGORY DIVIDER ================= */
+
+.pdfSection+.pdfSection {
+  margin-top: 48px;
+  padding-top: 28px;
+  border-top: 1px solid rgb(255, 255, 255);
+}
+
+/* ================= DETAIL CATEGORY SEPARATOR ================= */
+
+.pdfDetailCategory {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.336);
+}
+
+.pdfDetailCategory:first-of-type {
+  margin-top: 12px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.pdfDetailCategoryTitle {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
 }

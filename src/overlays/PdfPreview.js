@@ -267,37 +267,42 @@ export default function PdfPreview({
         page-break-after: avoid;
       }
 
-      /* ===== CONTACT BLOCK ===== */
+  /* ===== CONTACT BLOCK (PRINT FIXED) ===== */
 
-      .pdfContactBlock {
-        margin-top: 30px;
-        padding-top: 14px;
-        border-top: 1px solid #000;
-        display: table;
-        width: 100%;
-      }
+.pdfContactBlock {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #000;
 
-      .pdfContactLeft,
-      .pdfContactRight {
-        display: table-cell;
-        vertical-align: top;
-      }
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
 
-      .pdfContactRight {
-        text-align: right;
-      }
+.pdfContactLeft {
+  font-size: 13px;
+  line-height: 1.6;
+}
 
-      .pdfContactRight img {
-        width: 85px;
-        height: 85px;
-        margin-bottom: 4px;
-      }
+.pdfContactRight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* Wichtig */
+  justify-content: flex-start;
+  gap: 6px;
+}
 
-      .pdfQrLabel {
-        font-size: 10px;
-        color: #666;
-        text-align: center;
-      }
+.pdfContactRight img {
+  width: 90px;
+  height: 90px;
+}
+
+.pdfQrLabel {
+  font-size: 10px;
+  color: #666;
+  text-align: center;
+}
 
     </style>
   </head>
@@ -369,7 +374,7 @@ export default function PdfPreview({
                     </div>
                 </div>
 
-                <hr style={{ margin: "30px 0" }} />
+
 
                 {/* ================= PERSÖNLICHE ANGABEN ================= */}
 
@@ -458,7 +463,7 @@ export default function PdfPreview({
 
                 </div>
 
-                <hr style={{ margin: "30px 0" }} />
+
 
                 {/* ================= ERGÄNZENDE WERTE ================= */}
 
@@ -565,7 +570,7 @@ export default function PdfPreview({
                     ))}
                 </div>
 
-                <hr style={{ margin: "30px 0" }} />
+
 
                 {/* ================= HANDLUNGSFELDER ================= */}
 
@@ -586,7 +591,6 @@ export default function PdfPreview({
                     ))}
                 </div>
 
-                <hr style={{ margin: "30px 0" }} />
 
                 {/* ================= DETAILS ================= */}
 
@@ -596,10 +600,11 @@ export default function PdfPreview({
                     {Object.keys(groupedAnswers || {})
                         .filter(category => groupedAnswers[category].length > 0)
                         .map((category) => (
-                            <div key={category} style={{ marginBottom: 16 }}>
-                                <strong>
+                            <div key={category} className="pdfDetailCategory">
+
+                                <div className="pdfDetailCategoryTitle">
                                     {CATEGORY_LABELS[category] || category}
-                                </strong>
+                                </div>
 
                                 {groupedAnswers[category].map((item, i) => (
                                     <div key={i} className="pdfCategoryRow">
@@ -613,11 +618,11 @@ export default function PdfPreview({
                                                     : item.value}
                                     </div>
                                 ))}
+
                             </div>
                         ))}
                 </div>
 
-                <hr style={{ margin: "30px 0" }} />
 
 
                 <div className="pageBreak" />
@@ -641,11 +646,15 @@ export default function PdfPreview({
                     </div>
 
                     <div className="pdfContactRight">
-                        <img
-                            src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://agentur.barmenia.de/florian_loeffler"
-                            alt="QR Code Website"
-                        />
-                        <div className="pdfQrLabel">Agentur online aufrufen</div>
+                        <div className="pdfQrWrapper">
+                            <img
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://agentur.barmenia.de/florian_loeffler"
+                                alt="QR Code Website"
+                            />
+                            <div className="pdfQrLabel">
+                                Agentur online aufrufen
+                            </div>
+                        </div>
                     </div>
 
                 </div>
