@@ -63,6 +63,7 @@ import WelcomeScreen from "./screens/WelcomeScreen";
 /* ================= IMPORT UTILS ================= */
 
 import { scrollToTop } from "./utils/scrollHelpers";
+import { enableAutoFieldScroll } from "./utils/scrollHelpers";
 
 
 /* ================= APP ================= */
@@ -75,8 +76,15 @@ export default function App() {
   const [step, setStep] = useState("welcome");
   const [answers, setAnswers] = useState({});
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+
   const screenRef = React.useRef(null);
 
+  /* ===== GLOBAL AUTO INPUT SCROLL ===== */
+
+  React.useEffect(() => {
+    const cleanup = enableAutoFieldScroll();
+    return cleanup;
+  }, []);
 
 
   const [baseData, setBaseData] = useState({
@@ -105,8 +113,11 @@ export default function App() {
     });
   }, []);
 
-  /* 🔥 HIER rein */
+
+  /* ================= BASE FORM NAVIGATION ================= */
+
   const { baseFormRefs, focusNext } = useBaseFormNavigation();
+
 
   const baseValidation = useBaseDataValidation({
     baseData,
@@ -269,193 +280,194 @@ export default function App() {
   });
 
 
-/* ================= ANSWER ================= */
+  /* ================= ANSWER ================= */
 
-function answer(key, value) {
-  setAnswers((prev) => ({
-    ...prev,
-    [key]: value,
-  }));
-}
+  function answer(key, value) {
+    setAnswers((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  }
 
-return (
-  <>
-    {step === "welcome" && (
-      <WelcomeScreen
-        setStep={setStep}
-        setLegalOverlay={setLegalOverlay}
+  return (
+    <>
+      {step === "welcome" && (
+        <WelcomeScreen
+          setStep={setStep}
+          setLegalOverlay={setLegalOverlay}
+          setShowResetConfirm={setShowResetConfirm}
+          setContactOverlay={setContactOverlay}
+        />
+      )}
+
+      {step === "disclaimer" && (
+        <DisclaimerScreen
+          disclaimerAccepted={disclaimerAccepted}
+          setDisclaimerAccepted={setDisclaimerAccepted}
+          setStep={setStep}
+        />
+      )}
+
+      {step === "base" && (
+        <BaseScreen
+          screenRef={screenRef}
+          baseData={baseData}
+          updateBaseData={updateBaseData}
+          baseFormRefs={baseFormRefs}
+          focusNext={focusNext}
+          setStep={setStep}
+          scrollToTop={() => scrollToTop(screenRef)}
+          goToBaseWithoutReset={goToBaseWithoutReset}
+          setLegalOverlay={setLegalOverlay}
+          setShowResetConfirm={setShowResetConfirm}
+          setContactOverlay={setContactOverlay}
+
+          baseValidation={baseValidation}
+          devBypass={DEV_BYPASS}
+        />
+      )}
+
+      {step === "dashboard" && (
+        <DashboardScreen
+          screenRef={screenRef}
+          Header={Header}
+          goToBaseWithoutReset={goToBaseWithoutReset}
+          setStep={setStep}
+          scrollToTop={() => scrollToTop(screenRef)}
+          baseData={baseData}
+          animatedScore={animatedScore}
+          hasValidScoreData={hasValidScoreData}
+          dynamicHint={dynamicHint}
+          topRecommendations={topRecommendations}
+          ACTION_MAP={ACTION_MAP}
+          QUESTIONS={QUESTIONS}
+          setActionOverlay={setActionOverlay}
+          categories={categories}
+          answers={answers}
+          getStrategicRecommendation={getStrategicRecommendation}
+          expandedCategory={expandedCategory}
+          setExpandedCategory={setExpandedCategory}
+          CATEGORY_LABELS={CATEGORY_LABELS}
+          categoryScores={categoryScores}
+          setCalculatorOverlay={setCalculatorOverlay}
+          setShowResetConfirm={setShowResetConfirm}
+          setPdfPreview={setPdfPreview}
+          pdfOverlay={pdfOverlay}
+          setPdfOverlay={setPdfOverlay}
+          calculatorOverlay={calculatorOverlay}
+          buIncome={buIncome}
+          setBuIncome={setBuIncome}
+          pdfData={pdfData}
+          setPdfData={setPdfData}
+          isPdfValid={isPdfValid}
+          totalScore={totalScore}
+          pdfPreview={pdfPreview}
+          setContactOverlay={setContactOverlay}
+          setLegalOverlay={setLegalOverlay}
+          ContactButton={ContactButton}
+        />
+      )}
+
+      {step === "products" && (
+        <ProductsScreen
+          screenRef={screenRef}
+          Header={Header}
+          PRODUCT_STRUCTURE={PRODUCT_STRUCTURE}
+          expandedProductCategory={expandedProductCategory}
+          setExpandedProductCategory={setExpandedProductCategory}
+          setStep={setStep}
+          setLegalOverlay={setLegalOverlay}
+          setShowResetConfirm={setShowResetConfirm}
+          setContactOverlay={setContactOverlay}
+          ContactButton={ContactButton}
+        />
+      )}
+
+      {step === "category" && (
+        <CategoryScreen
+          screenRef={screenRef}
+          currentCategoryIndex={currentCategoryIndex}
+          categories={categories}
+          currentCategory={currentCategory}
+          baseData={baseData}
+          answers={answers}
+          answer={answer}
+          setCurrentCategoryIndex={setCurrentCategoryIndex}
+          setStep={setStep}
+          scrollToTop={() => scrollToTop(screenRef)}
+          goToBaseWithoutReset={goToBaseWithoutReset}
+          setShowInfo={setShowInfo}
+          showInfo={showInfo}
+          setLegalOverlay={setLegalOverlay}
+          setContactOverlay={setContactOverlay}
+          setShowResetConfirm={setShowResetConfirm}
+          Header={Header}
+          Select={Select}
+          Checkbox={Checkbox}
+          ContactButton={ContactButton}
+          QUESTIONS={QUESTIONS}
+          devBypass={DEV_BYPASS}
+        />
+      )}
+
+      <ResetOverlay
+        showResetConfirm={showResetConfirm}
         setShowResetConfirm={setShowResetConfirm}
+        resetAll={resetAll}
+      />
+
+      <LegalOverlay
+        legalOverlay={legalOverlay}
+        setLegalOverlay={setLegalOverlay}
+      />
+
+      <ContactOverlay
+        contactOverlay={contactOverlay}
         setContactOverlay={setContactOverlay}
       />
-    )}
 
-    {step === "disclaimer" && (
-      <DisclaimerScreen
-        disclaimerAccepted={disclaimerAccepted}
-        setDisclaimerAccepted={setDisclaimerAccepted}
-        setStep={setStep}
-      />
-    )}
-
-    {step === "base" && (
-      <BaseScreen
-        baseData={baseData}
-        updateBaseData={updateBaseData}
-        baseFormRefs={baseFormRefs}
-        focusNext={focusNext}
-        setStep={setStep}
-        scrollToTop={() => scrollToTop(screenRef)}
-        goToBaseWithoutReset={goToBaseWithoutReset}
-        setLegalOverlay={setLegalOverlay}
-        setShowResetConfirm={setShowResetConfirm}
+      <ActionOverlay
+        actionOverlay={actionOverlay}
+        setActionOverlay={setActionOverlay}
         setContactOverlay={setContactOverlay}
-
-        baseValidation={baseValidation}
-        devBypass={DEV_BYPASS}
-      />
-    )}
-
-    {step === "dashboard" && (
-      <DashboardScreen
-        screenRef={screenRef}
-        Header={Header}
-        goToBaseWithoutReset={goToBaseWithoutReset}
-        setStep={setStep}
-        scrollToTop={() => scrollToTop(screenRef)}
-        baseData={baseData}
-        animatedScore={animatedScore}
-        hasValidScoreData={hasValidScoreData}
-        dynamicHint={dynamicHint}
-        topRecommendations={topRecommendations}
         ACTION_MAP={ACTION_MAP}
         QUESTIONS={QUESTIONS}
-        setActionOverlay={setActionOverlay}
-        categories={categories}
-        answers={answers}
-        getStrategicRecommendation={getStrategicRecommendation}
-        expandedCategory={expandedCategory}
-        setExpandedCategory={setExpandedCategory}
-        CATEGORY_LABELS={CATEGORY_LABELS}
-        categoryScores={categoryScores}
-        setCalculatorOverlay={setCalculatorOverlay}
-        setShowResetConfirm={setShowResetConfirm}
-        setPdfPreview={setPdfPreview}
+      />
+
+      {/* ===== NEUE AUSGELAGERTE OVERLAYS ===== */}
+
+      <PdfOverlay
         pdfOverlay={pdfOverlay}
         setPdfOverlay={setPdfOverlay}
-        calculatorOverlay={calculatorOverlay}
-        buIncome={buIncome}
-        setBuIncome={setBuIncome}
         pdfData={pdfData}
         setPdfData={setPdfData}
-        isPdfValid={isPdfValid}
-        totalScore={totalScore}
-        pdfPreview={pdfPreview}
-        setContactOverlay={setContactOverlay}
-        setLegalOverlay={setLegalOverlay}
-        ContactButton={ContactButton}
-      />
-    )}
-
-    {step === "products" && (
-      <ProductsScreen
-        screenRef={screenRef}
-        Header={Header}
-        PRODUCT_STRUCTURE={PRODUCT_STRUCTURE}
-        expandedProductCategory={expandedProductCategory}
-        setExpandedProductCategory={setExpandedProductCategory}
-        setStep={setStep}
-        setLegalOverlay={setLegalOverlay}
-        setShowResetConfirm={setShowResetConfirm}
-        setContactOverlay={setContactOverlay}
-        ContactButton={ContactButton}
-      />
-    )}
-
-    {step === "category" && (
-      <CategoryScreen
-        screenRef={screenRef}
-        currentCategoryIndex={currentCategoryIndex}
-        categories={categories}
-        currentCategory={currentCategory}
         baseData={baseData}
-        answers={answers}
-        answer={answer}
-        setCurrentCategoryIndex={setCurrentCategoryIndex}
-        setStep={setStep}
-        scrollToTop={() => scrollToTop(screenRef)}
-        goToBaseWithoutReset={goToBaseWithoutReset}
-        setShowInfo={setShowInfo}
-        showInfo={showInfo}
-        setLegalOverlay={setLegalOverlay}
-        setContactOverlay={setContactOverlay}
-        setShowResetConfirm={setShowResetConfirm}
-        Header={Header}
-        Select={Select}
-        Checkbox={Checkbox}
-        ContactButton={ContactButton}
-        QUESTIONS={QUESTIONS}
-        devBypass={DEV_BYPASS}
-      />
-    )}
-
-    <ResetOverlay
-      showResetConfirm={showResetConfirm}
-      setShowResetConfirm={setShowResetConfirm}
-      resetAll={resetAll}
-    />
-
-    <LegalOverlay
-      legalOverlay={legalOverlay}
-      setLegalOverlay={setLegalOverlay}
-    />
-
-    <ContactOverlay
-      contactOverlay={contactOverlay}
-      setContactOverlay={setContactOverlay}
-    />
-
-    <ActionOverlay
-      actionOverlay={actionOverlay}
-      setActionOverlay={setActionOverlay}
-      setContactOverlay={setContactOverlay}
-      ACTION_MAP={ACTION_MAP}
-      QUESTIONS={QUESTIONS}
-    />
-
-    {/* ===== NEUE AUSGELAGERTE OVERLAYS ===== */}
-
-    <PdfOverlay
-      pdfOverlay={pdfOverlay}
-      setPdfOverlay={setPdfOverlay}
-      pdfData={pdfData}
-      setPdfData={setPdfData}
-      baseData={baseData}
-      buIncome={buIncome}
-      setPdfPreview={setPdfPreview}
-    />
-
-    <CalculatorOverlay
-      calculatorOverlay={calculatorOverlay}
-      setCalculatorOverlay={setCalculatorOverlay}
-      buIncome={buIncome}
-      setBuIncome={setBuIncome}
-    />
-
-    {pdfPreview && (
-      <PdfPreview
-        pdfPreview={pdfPreview}
-        setPdfPreview={setPdfPreview}
-        totalScore={totalScore}
-        topRecommendations={topRecommendations}
-        categoryScores={categoryScores}
-        baseData={baseData}
-        pdfData={pdfData}
         buIncome={buIncome}
-        answers={answers}
+        setPdfPreview={setPdfPreview}
       />
-    )}
-  </>
-);
+
+      <CalculatorOverlay
+        calculatorOverlay={calculatorOverlay}
+        setCalculatorOverlay={setCalculatorOverlay}
+        buIncome={buIncome}
+        setBuIncome={setBuIncome}
+      />
+
+      {pdfPreview && (
+        <PdfPreview
+          pdfPreview={pdfPreview}
+          setPdfPreview={setPdfPreview}
+          totalScore={totalScore}
+          topRecommendations={topRecommendations}
+          categoryScores={categoryScores}
+          baseData={baseData}
+          pdfData={pdfData}
+          buIncome={buIncome}
+          answers={answers}
+        />
+      )}
+    </>
+  );
 
 }
 

@@ -35,11 +35,11 @@ export default function DashboardScreen({
 
   const didMountRef = React.useRef(false);
 
-React.useEffect(() => {
-  scrollToTop();
-  // absichtlich nur beim ersten Render
-  // keine Dependency, damit kein Re-Trigger beim Kategorie-Toggle
-}, []);
+  React.useEffect(() => {
+    scrollToTop();
+    // absichtlich nur beim ersten Render
+    // keine Dependency, damit kein Re-Trigger beim Kategorie-Toggle
+  }, []);
 
   return (
     <div className="screen" ref={screenRef}>
@@ -515,7 +515,13 @@ React.useEffect(() => {
 
       <button
         className="tertiaryBtn"
-        onClick={() => setStep("products")}
+        onClick={() => {
+          setStep("products");
+
+          setTimeout(() => {
+            scrollToTop(screenRef);
+          }, 40);
+        }}
       >
         Tarifübersicht öffnen
       </button>

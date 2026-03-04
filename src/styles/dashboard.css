@@ -27,10 +27,7 @@
   align-items: center;
 
   padding: 9px 10px;
-  /* schlanker */
-
   border-radius: 12px;
-  /* kleiner Radius = kompakter */
 
   background: #111c26;
   border: 1px solid rgba(139, 124, 246, 0.15);
@@ -39,6 +36,9 @@
 
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+  gap: 8px;
+  /* wichtig für Abstand */
 }
 
 .categoryRow:hover {
@@ -47,9 +47,24 @@
   box-shadow: 0 6px 18px rgba(139, 124, 246, 0.18);
 }
 
+
+/* LINKER TEXT */
+
+.categoryRow span:first-child {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+
+/* SCORE */
+
 .categoryRow span:last-child {
   font-weight: 600;
   color: #A99BFF;
+
+  white-space: nowrap;
+  margin-left: 6px;
 }
 
 /* ================= CATEGORY CHEVRON ================= */
@@ -424,7 +439,7 @@
 
 .productRow {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 16px;
   align-items: center;
 
@@ -437,6 +452,33 @@
   backdrop-filter: blur(10px);
 
   transition: all 0.2s ease;
+}
+
+/* TEXT DARF SCHRUMPFEN UND UMBRECHEN */
+
+
+.productRow>*:first-child {
+  min-width: 0;
+  flex: 1;
+
+  white-space: normal;
+  word-break: normal;
+  /* verhindert Wort-Zerhackung */
+  overflow-wrap: break-word;
+  /* bricht nur wenn nötig */
+
+  line-height: 1.35;
+}
+
+/* BUTTON BLEIBT RECHTS */
+
+.productRow button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;
+  text-align: center;
 }
 
 .productRow:hover {
@@ -458,6 +500,36 @@
   }
 }
 
+@media (max-width:480px) {
+
+  .productRow button {
+    font-size: 13px;
+    padding: 7px 12px;
+  }
+
+}
+
+/* ================= MOBILE BUTTON TYPO ================= */
+
+@media (max-width:480px) {
+
+  .secondaryActionBtn {
+    font-size: clamp(13px, 4vw, 16px);
+    padding: 10px 16px;
+    line-height: 1.2;
+  }
+
+  .tertiaryBtn {
+    font-size: 14px;
+  }
+
+  .productRow button {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+}
+
 /* ================= CTA CLEAN ================= */
 /* Wenn ctaSubline auch außerhalb des Dashboards genutzt wird -> später nach components/utilities schieben. */
 .ctaSubline {
@@ -465,3 +537,4 @@
   opacity: 0.6;
   margin-top: 10px;
 }
+

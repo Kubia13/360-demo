@@ -1,3 +1,5 @@
+/* ================= SCROLL TO TOP ================= */
+
 export const scrollToTop = (screenRef, behavior = "auto") => {
   if (typeof window === "undefined") return;
 
@@ -39,19 +41,51 @@ export const scrollToTop = (screenRef, behavior = "auto") => {
   } else {
     performScroll();
   }
-  
 };
+
+
+/* ================= SCROLL TO FIELD ================= */
 
 export const scrollToField = (ref, behavior = "smooth") => {
   if (!ref?.current) return;
 
-  setTimeout(() => {
+  const el = ref.current;
 
-    ref.current.scrollIntoView({
+  requestAnimationFrame(() => {
+    el.scrollIntoView({
       behavior,
       block: "center",
       inline: "nearest"
     });
+  });
+};
 
-  }, 80);
+
+/* ================= AUTO INPUT SCROLL ================= */
+
+export const enableAutoFieldScroll = () => {
+
+  const handler = (e) => {
+    const target = e.target;
+
+    if (
+      target.tagName === "INPUT" ||
+      target.tagName === "SELECT" ||
+      target.tagName === "TEXTAREA"
+    ) {
+      setTimeout(() => {
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "nearest"
+        });
+      }, 80);
+    }
+  };
+
+  document.addEventListener("focusin", handler);
+
+  return () => {
+    document.removeEventListener("focusin", handler);
+  };
 };
