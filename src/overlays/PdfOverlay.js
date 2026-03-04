@@ -274,7 +274,6 @@ export default function PdfOverlay({
             }
             inputRef={pdfFormRefs.buEmpfehlung}
             onEnter={() => {
-              blurRef(pdfFormRefs.buEmpfehlung);
               focusNext(pdfFormRefs.buEmpfehlung);
             }}
           />
@@ -288,6 +287,10 @@ export default function PdfOverlay({
               onChange={(v) =>
                 setPdfData({ ...pdfData, existingBU: v })
               }
+              inputRef={pdfFormRefs.existingBU}
+              onEnter={() => {
+                focusNext(pdfFormRefs.existingBU);
+              }}
             />
           </div>
         </div>
@@ -322,6 +325,10 @@ export default function PdfOverlay({
             onChange={(v) =>
               setPdfData({ ...pdfData, rentenluecke: v })
             }
+            inputRef={pdfFormRefs.rentenluecke}
+            onEnter={() => {
+              focusNext(pdfFormRefs.rentenluecke);
+            }}
           />
 
           {/* IST-FELD */}
@@ -333,6 +340,10 @@ export default function PdfOverlay({
               onChange={(v) =>
                 setPdfData({ ...pdfData, existingRente: v })
               }
+              inputRef={pdfFormRefs.existingRente}
+              onEnter={() => {
+                focusNext(pdfFormRefs.existingRente);
+              }}
             />
           </div>
         </div>
@@ -368,10 +379,7 @@ export default function PdfOverlay({
             }
             inputRef={pdfFormRefs.ktgEmpfehlung}
             onEnter={() => {
-              if (!isValid) return;
-
-              setPdfOverlay(false);
-              setPdfPreview(true);
+              focusNext(pdfFormRefs.ktgEmpfehlung);
             }}
           />
 
@@ -384,6 +392,16 @@ export default function PdfOverlay({
               onChange={(v) =>
                 setPdfData({ ...pdfData, existingKTG: v })
               }
+              inputRef={pdfFormRefs.existingKTG}
+              onEnter={() => {
+                if (!isValid) return;
+
+                setPdfOverlay(false);
+
+                setTimeout(() => {
+                  setPdfPreview(true);
+                }, 40);
+              }}
             />
           </div>
         </div>

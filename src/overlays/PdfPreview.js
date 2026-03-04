@@ -266,7 +266,24 @@ export default function PdfPreview({
         break-after: avoid;
         page-break-after: avoid;
       }
+/* ===== DETAIL KATEGORIEN ===== */
 
+.pdfDetailCategory {
+  margin-top: 14px;
+  padding-top: 8px;
+  border-top: 1px solid #000;
+}
+
+.pdfDetailCategory:first-of-type {
+  margin-top: 8px;
+  border-top: none;
+}
+
+.pdfDetailCategoryTitle {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
   /* ===== CONTACT BLOCK (PRINT FIXED) ===== */
 
 .pdfContactBlock {
@@ -288,14 +305,16 @@ export default function PdfPreview({
 .pdfContactRight {
   display: flex;
   flex-direction: column;
-  align-items: center;   /* Wichtig */
+  align-items: center;      /* QR + Text horizontal mittig */
   justify-content: flex-start;
   gap: 6px;
+  text-align: center;       /* Text exakt unter QR-Code */
 }
 
 .pdfContactRight img {
   width: 90px;
   height: 90px;
+  margin-bottom: 2px;
 }
 
 .pdfQrLabel {

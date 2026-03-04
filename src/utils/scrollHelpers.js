@@ -39,4 +39,19 @@ export const scrollToTop = (screenRef, behavior = "auto") => {
   } else {
     performScroll();
   }
+  
+};
+
+export const scrollToField = (ref, behavior = "smooth") => {
+  if (!ref?.current) return;
+
+  setTimeout(() => {
+
+    ref.current.scrollIntoView({
+      behavior,
+      block: "center",
+      inline: "nearest"
+    });
+
+  }, 80);
 };

@@ -20,9 +20,9 @@ export default function BaseScreen({
 }) {
   const canProceed = devBypass || baseValidation?.isValid;
 
-  React.useEffect(() => {
+React.useEffect(() => {
   scrollToTop(screenRef);
-}, []);
+}, [screenRef]);
 
   return (
 

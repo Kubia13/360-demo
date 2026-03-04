@@ -1,5 +1,5 @@
 import { useMemo, useCallback, createRef } from "react";
-
+import { scrollToField } from "../utils/scrollHelpers";
 export function useBaseFormNavigation() {
 
   /* ================= BASE FORM REFS ================= */
@@ -56,15 +56,8 @@ const focusNext = useCallback((currentRef) => {
 
       el.focus();
 
-      // 🔥 Smooth scroll nur wenn nötig
-      setTimeout(() => {
-        if (typeof el.scrollIntoView === "function") {
-          el.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-          });
-        }
-      }, 50);
+  el.focus();
+scrollToField(nextRef);
 
       break;
     }

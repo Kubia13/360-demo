@@ -11,8 +11,11 @@ export function usePdfFormNavigation() {
     telefon: createRef(),
     handy: createRef(),
     buEmpfehlung: createRef(),
+    existingBU: createRef(),      // NEU
     rentenluecke: createRef(),
-    ktgEmpfehlung: createRef()
+    existingRente: createRef(),   // NEU
+    ktgEmpfehlung: createRef(),
+    existingKTG: createRef()      // NEU
   }), []);
 
   const inputOrder = useMemo(() => [
@@ -24,8 +27,11 @@ export function usePdfFormNavigation() {
     pdfFormRefs.telefon,
     pdfFormRefs.handy,
     pdfFormRefs.buEmpfehlung,
+    pdfFormRefs.existingBU,
     pdfFormRefs.rentenluecke,
-    pdfFormRefs.ktgEmpfehlung
+    pdfFormRefs.existingRente,
+    pdfFormRefs.ktgEmpfehlung,
+    pdfFormRefs.existingKTG
   ], [pdfFormRefs]);
 
   const focusNext = useCallback((currentRef) => {
