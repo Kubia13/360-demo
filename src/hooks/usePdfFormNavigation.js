@@ -40,12 +40,17 @@ export function usePdfFormNavigation() {
 
     for (let i = index + 1; i < inputOrder.length; i++) {
       const nextRef = inputOrder[i];
+
       if (nextRef?.current?.focus) {
         nextRef.current.focus();
-        nextRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "center"
-        });
+
+        setTimeout(() => {
+          nextRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+          });
+        }, 60);
+
         break;
       }
     }
