@@ -1,21 +1,21 @@
 /* ================= DISCLAIMER ================= */
-
 import React from "react";
+import { scrollToTop } from "../utils/scrollHelpers";
 
 export default function DisclaimerScreen({
+  screenRef,
   disclaimerAccepted,
   setDisclaimerAccepted,
   setStep
 }) {
+  React.useEffect(() => {
+    scrollToTop(screenRef);
+  }, [screenRef]);
 
   return (
-    <div className="screen center disclaimerScreen">
-
+    <div className="screen center disclaimerScreen" ref={screenRef}>
       <div className="disclaimerCard">
-
-        <h2 style={{ marginBottom: 20 }}>
-          Hinweis zur Nutzung
-        </h2>
+        <h2 style={{ marginBottom: 20 }}>Hinweis zur Nutzung</h2>
 
         <p style={{ fontSize: 13, opacity: 0.75 }}>
           Der 360° Absicherungscheck ist ein unverbindliches digitales Informations-
@@ -58,7 +58,7 @@ export default function DisclaimerScreen({
             Ich bestätige, den Hinweis zur Kenntnis genommen zu haben.
           </label>
         </div>
-        
+
         <button
           className="primaryBtn big"
           disabled={!disclaimerAccepted}
@@ -71,7 +71,6 @@ export default function DisclaimerScreen({
         >
           Weiter zu den persönlichen Angaben
         </button>
-
       </div>
     </div>
   );

@@ -13,7 +13,6 @@ export default function CategoryScreen({
   answer,
   setCurrentCategoryIndex,
   setStep,
-  scrollToTop,
   goToBaseWithoutReset,
   setShowInfo,
   showInfo,
@@ -26,6 +25,9 @@ export default function CategoryScreen({
   ContactButton,
   devBypass
 }) {
+  React.useEffect(() => {
+    scrollToTop(screenRef);
+  }, [screenRef]);
   /* ================= KATEGORIEN ================= */
 
 
