@@ -27,7 +27,7 @@ export default function CategoryScreen({
 }) {
   React.useEffect(() => {
     scrollToTop(screenRef);
-  }, [screenRef]);
+  }, [currentCategoryIndex]);
   /* ================= KATEGORIEN ================= */
 
 
@@ -88,10 +88,6 @@ export default function CategoryScreen({
   });
   const canProceed = devBypass || isCategoryComplete;
 
-  React.useEffect(() => {
-  scrollToTop(screenRef);
-}, []);
-
   return (
     <div className="screen" ref={screenRef}>
 
@@ -103,7 +99,7 @@ export default function CategoryScreen({
             setStep("base");
           }
 
-        
+
         }}
 
         goBase={goToBaseWithoutReset}
@@ -388,7 +384,7 @@ export default function CategoryScreen({
             setStep("dashboard");
           }
 
-      
+
 
         }}
       >
